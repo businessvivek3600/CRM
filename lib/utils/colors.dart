@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_constants.dart';
 
 var primaryColor = AppConst.defaultPrimaryColor;
-const secondaryPrimaryColor = Color(0xfff3f4fa);
+const secondaryPrimaryColor = Color(0xff373b44);
 //Text Color
 const appTextPrimaryColor = Color(0xff1C1F34);
 const appTextSecondaryColor = Color(0xff6C757D);
