@@ -2,6 +2,7 @@ import 'package:crm/constants/app_constants.dart';
 import 'package:crm/features/auth/auth/auth_screen.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'services/theme_service.dart';
 
@@ -12,21 +13,28 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner:false,
+      debugShowCheckedModeBanner: false,
       title: AppConst.appName,
       theme: ThemeData(
-        primaryColor: AppConst.defaultPrimaryColor, // Set your default primary color
-        scaffoldBackgroundColor: Colors.white, // Optional: Customize scaffold color
+        primaryColor: AppConst.defaultPrimaryColor,
+        scaffoldBackgroundColor: Colors.white,
         appBarTheme: AppBarTheme(
-          backgroundColor: AppConst.defaultPrimaryColor,
-          foregroundColor: Colors.white, // Text/icon color for AppBar
+          backgroundColor: secondaryPrimaryColor,
+          foregroundColor: Colors.white,
+          titleTextStyle: GoogleFonts.lato(
+            textStyle: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
+        textTheme: GoogleFonts.latoTextTheme(), // Apply Lato to all text
         buttonTheme: ButtonThemeData(
-          buttonColor: AppConst.defaultPrimaryColor, // Button color
+          buttonColor: AppConst.defaultPrimaryColor,
           textTheme: ButtonTextTheme.primary,
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
@@ -36,11 +44,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-
-
       home: const AuthScreen(),
     );
   }
 }
-
-
