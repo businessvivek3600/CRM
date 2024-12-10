@@ -25,7 +25,7 @@ class AppConst {
 
   static String testerEmail = 'demo@gmail.com';
 
-  static Color defaultPrimaryColor = const Color(0xFF2663eb);
+  static Color defaultPrimaryColor = const Color(0xFF313943);
 
 
 

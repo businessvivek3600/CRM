@@ -1,5 +1,5 @@
 import 'package:crm/constants/app_constants.dart';
-import 'package:crm/features/auth/auth_screen.dart';
+import 'package:crm/features/auth/auth/auth_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'services/theme_service.dart';
@@ -30,7 +30,8 @@ class MyApp extends StatelessWidget {
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppConst.defaultPrimaryColor, // Elevated button color
+            backgroundColor: AppConst.defaultPrimaryColor,
+            foregroundColor: Colors.white,
           ),
         ),
       ),
