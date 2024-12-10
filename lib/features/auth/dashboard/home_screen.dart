@@ -1,3 +1,4 @@
+import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,13 +13,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // backgroundColor: Colors.blueGrey[900],
+        backgroundColor: secondaryPrimaryColor,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.menu),
           onPressed: () {},
         ),
-
         title: Row(
           // mainAxisAlignment: MainAxisAlignment.center,
           // crossAxisAlignment: CrossAxisAlignment.center,
@@ -66,6 +66,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
+              SizedBox(height: 20),
+              // GridView(gridDelegate: gridDelegate)
             ],
           ),
         ),
