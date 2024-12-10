@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class AppConst {
   static const tag = 'AppConst';
-  static String appName = "Bright Future";
+  static String appName = "CRM";
   static String appVersion = "";
 
 
@@ -25,7 +25,7 @@ class AppConst {
 
   static String testerEmail = 'demo@gmail.com';
 
-  static Color defaultPrimaryColor = const Color(0xFF6F06D7);
+  static Color defaultPrimaryColor = const Color(0xFF2663eb);
 
 
 

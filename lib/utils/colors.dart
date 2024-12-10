@@ -21,7 +21,7 @@ const favouriteColor = Colors.red;
 const unFavouriteColor = Colors.grey;
 
 //Status Color
-const acceptColor = Color(0xFF00968A);
+const acceptColor = Color(0xFF2663eb);
 const onGoingColor = Color(0xFFFD6922);
 const inProgressColor = Color(0xFFB953C0);
 const holdColor = Color(0xFFFFBD49);
