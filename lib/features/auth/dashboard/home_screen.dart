@@ -1,3 +1,5 @@
+import 'package:crm/features/auth/dashboard/components/drawer_widget.dart';
+import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,20 +13,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: CustomDrawer(),
       appBar: AppBar(
-        // backgroundColor: Colors.blueGrey[900],
+        backgroundColor: secondaryPrimaryColor,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {},
-        ),
-
-        title: Row(
+        title: const Row(
           // mainAxisAlignment: MainAxisAlignment.center,
           // crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(width: 8),
-            const Text(
+            SizedBox(width: 8),
+            Text(
               'Home Screen',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 23),
@@ -38,17 +36,17 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
+              const Row(
                 children: [
                   CircleAvatar(
                     radius: 30,
                     backgroundImage: NetworkImage(
                         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRchTRZ8A5eyfaCmAQYhVZA4-vgU-dfV94Ufw&s"),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         'Welcome John Doe',
                         style: TextStyle(
@@ -65,6 +63,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ],
+              ),
+              const SizedBox(height: 20),
+              GridView(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                ),
               ),
             ],
           ),

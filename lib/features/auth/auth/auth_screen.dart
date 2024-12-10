@@ -1,3 +1,4 @@
+import 'package:crm/features/auth/dashboard/home_screen.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/text_field.dart';
 import 'package:flutter/material.dart';
@@ -75,11 +76,17 @@ class AuthScreen extends StatelessWidget {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                 const CommonTextField(label: "Email", hint: "test@gmail.com",),
+                  const CommonTextField(
+                    label: "Email",
+                    hint: "test@gmail.com",
+                  ),
 
                   const SizedBox(height: 20),
                   // Password TextField
-                const CommonTextField(label: "Password", isPassword: true, ),
+                  const CommonTextField(
+                    label: "Password",
+                    isPassword: true,
+                  ),
                   const SizedBox(height: 20),
                   // Remember Me and Forgot Password
                   Row(
@@ -114,7 +121,12 @@ class AuthScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HomeScreen()));
+                      },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 15),
                         backgroundColor:
