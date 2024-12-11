@@ -1,3 +1,4 @@
+import 'package:crm/features/auth/dashboard/components/drawer_widget.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -12,13 +13,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: CustomDrawer(),
       appBar: AppBar(
         backgroundColor: secondaryPrimaryColor,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {},
-        ),
+        
         title: const Row(
           // mainAxisAlignment: MainAxisAlignment.center,
           // crossAxisAlignment: CrossAxisAlignment.center,
