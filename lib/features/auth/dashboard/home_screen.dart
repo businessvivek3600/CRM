@@ -17,6 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: secondaryPrimaryColor,
         elevation: 0,
+        
         title: const Row(
           // mainAxisAlignment: MainAxisAlignment.center,
           // crossAxisAlignment: CrossAxisAlignment.center,
@@ -30,13 +31,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
+              const Row(
                 children: [
                   CircleAvatar(
                     radius: 30,
@@ -64,10 +65,63 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 20),
-              // GridView(gridDelegate: gridDelegate)
+              const SizedBox(height: 20),
+
+              // Metrics cards
+              GridView(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                ),
+                children: [
+                  _buildMetricCard(Icons.attach_money, '27 of 31',
+                      'Invoices Awaiting P...', Colors.black),
+                  _buildMetricCard(
+                      Icons.refresh, '0 of 0', 'Converted Leads', Colors.black),
+                  _buildMetricCard(Icons.file_copy, '121 of 121',
+                      'Not Completed Tasks', Colors.black),
+                  _buildMetricCard(Icons.add_box, '8 of 21',
+                      'Projects In Progress', Colors.black),
+                ],
+              ),
+              const SizedBox(height: 20),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMetricCard(
+      IconData icon, String count, String label, Color color) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 40, color: color),
+            const SizedBox(height: 8),
+            Text(
+              count,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey[700],
+              ),
+            ),
+          ],
         ),
       ),
     );
