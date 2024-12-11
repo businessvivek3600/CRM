@@ -1,5 +1,6 @@
 import 'package:crm/features/auth/auth/auth_screen.dart';
 import 'package:crm/features/auth/dashboard/components/drawer_fragment/customer_Screen.dart';
+import 'package:crm/features/auth/dashboard/components/drawer_fragment/leads_screen.dart';
 import 'package:flutter/material.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -14,7 +15,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
-
       child: Drawer(
         elevation: 6,
         backgroundColor: Colors.white,
@@ -31,7 +31,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
               child: Row(
                 children: [
                   CircleAvatar(
-
                     radius: 45,
                     backgroundImage: NetworkImage(
                         "https://img.freepik.com/free-psd/expressive-man-gesturing_23-2150198787.jpg"),
@@ -51,7 +50,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           'johndoe23@gmail.com',
                           style: TextStyle(
                             color: Colors.lightBlueAccent,
-                            fontSize: 16,decoration: TextDecoration.underline,
+                            fontSize: 16,
+                            decoration: TextDecoration.underline,
                           ),
                         ),
                       ],
@@ -65,7 +65,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
               leading: const Icon(Icons.people),
               trailing: const Icon(Icons.keyboard_arrow_right),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerScreen(),));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CustomerScreen(),
+                    ));
               },
             ),
             ListTile(
@@ -73,7 +77,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
               trailing: const Icon(Icons.keyboard_arrow_right),
               leading: const Icon(Icons.leaderboard),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LeadsScreen(),
+                    ));
               },
             ),
             ListTile(
@@ -81,7 +89,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
               trailing: const Icon(Icons.keyboard_arrow_right),
               title: const Text('Logout'),
               onTap: () {
-               Navigator.push(context, MaterialPageRoute(builder: (context) => const AuthScreen(),));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AuthScreen(),
+                    ));
               },
             ),
           ],
