@@ -1,3 +1,5 @@
+import 'package:crm/features/auth/dashboard/components/drawer_fragment/component/add_customer.dart';
+import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomerScreen extends StatefulWidget {
@@ -45,43 +47,43 @@ class _CustomerScreenState extends State<CustomerScreen> {
                   )
                 ],
               ),
-              SizedBox(
-                height: 220,
-                child: GridView.builder(
-                  itemCount: 6,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3, childAspectRatio: 3 / 2),
-                  itemBuilder: (context, index) => SizedBox(
-                    height: 220,
-                    child: const Card(
-                      elevation: 8,
-                      shadowColor: Colors.black54,
-                      color: Colors.white,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Icon(Icons.person),
-                                Text(
-                                  '26',
-                                  style: TextStyle(fontSize: 20),
-                                )
-                              ],
-                            ),
-                            Expanded(
-                              child: Text(
-                                'Total Customer',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                ),
+              GridView.builder(
+                shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                itemCount: 6,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3, childAspectRatio: 3 / 2),
+                itemBuilder: (context, index) => const SizedBox(
+                  height: 220,
+                  child: Card(
+                    elevation: 8,
+                    shadowColor: Colors.black54,
+                    color: Colors.white,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Icon(Icons.person),
+                              Text(
+                                '26',
+                                style: TextStyle(fontSize: 20),
+                              )
+                            ],
+                          ),
+                          SizedBox(height: 10,),
+                          Expanded(
+                            child: Text(
+                              'Total Customer',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
                               ),
-                            )
-                          ],
-                        ),
+                            ),
+                          )
+                        ],
                       ),
                     ),
                   ),
@@ -131,16 +133,16 @@ class _CustomerScreenState extends State<CustomerScreen> {
                           shadowColor: Colors.black54,
                           color: Colors.white,
                           child: Padding(
-                            padding: EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(8.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                CircleAvatar(
+                                const CircleAvatar(
                                   radius: 30,
                                   child: Text('A'),
                                 ),
-                                Expanded(
+                                const Expanded(
                                   child: Column(
                                     children: [
                                       Text(
@@ -163,14 +165,14 @@ class _CustomerScreenState extends State<CustomerScreen> {
                                 ),
                                 OutlinedButton(onPressed: () {
 
-                                }, child: Text("Not Active"))
+                                }, child: const Text("Not Active"))
                               ],
                             ),
                           ),
                         ),
                       );
                     },
-                    separatorBuilder: (context, index) => SizedBox(
+                    separatorBuilder: (context, index) => const SizedBox(
                           height: 10,
                         ),
                     itemCount: 10),
@@ -178,6 +180,18 @@ class _CustomerScreenState extends State<CustomerScreen> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        shape: CircleBorder(),
+        backgroundColor: secondaryPrimaryColor,
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => AddCustomer(),));
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: const Icon(Icons.add,color: Colors.white,size: 30,),
+        ),
+        tooltip: 'Add Customer',
       ),
     );
   }
