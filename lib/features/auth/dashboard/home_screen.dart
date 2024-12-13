@@ -1,6 +1,7 @@
 import 'package:crm/features/auth/dashboard/components/drawer_widget.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -47,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text(
           'Home Screen',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 23),
+          style: TextStyle(fontSize: 23, color: white),
         ),
       ),
       body: SingleChildScrollView(
