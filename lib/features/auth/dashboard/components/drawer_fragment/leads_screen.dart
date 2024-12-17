@@ -146,18 +146,18 @@ class _LeadsScreenState extends State<LeadsScreen> {
                   IconButton(
                     onPressed: () {
                       setState(() {
-                        if (isShow == true) {
-                          isShow = false;
-                        } else {
-                          isShow = true;
-                        }
+                        isShow =
+                            !(isShow ?? false); // Toggle global isShow variable
                       });
                     },
-                    icon: const Icon(
-                      Icons.keyboard_arrow_down_outlined,
+                    icon: Icon(
+                      (isShow ?? false)
+                          ? Icons.keyboard_arrow_up_outlined // Show up arrow
+                          : Icons
+                              .keyboard_arrow_down_outlined, // Show down arrow
                       size: 25,
                     ),
-                  )
+                  ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -281,29 +281,62 @@ class _LeadsScreenState extends State<LeadsScreen> {
               children: [
                 // Colored bar
                 Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      bottomLeft: Radius.circular(10),
+                    ),
+                    color: lead["statusColor"],
+                  ),
                   width: 5,
-                  height: 100,
-                  color: lead["statusColor"],
+                  height: 120,
                 ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          lead["name"],
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              lead["name"],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              lead["amount"],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          lead["role"],
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                lead["role"],
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              lead["platform"],
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
                         ),
                         const Divider(),
                         const SizedBox(height: 8),
@@ -345,34 +378,28 @@ class _LeadsScreenState extends State<LeadsScreen> {
                               ],
                             ),
                           ],
+                          
                         ),
                       ],
                     ),
                   ),
                 ),
 
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        lead["amount"],
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        lead["platform"],
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.all(12.0),
+                //   child: Column(
+                //     crossAxisAlignment: CrossAxisAlignment.end,
+                //     children: [
+                //       Text(
+                //         lead["platform"],
+                //         style: const TextStyle(
+                //           fontSize: 12,
+                //           color: Colors.grey,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
               ],
             ),
           ),
