@@ -27,10 +27,10 @@ class LeadDetailsScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: secondaryPrimaryColor,
-          title: Text('Lead Details',
-              style: TextStyle(
-                color: Colors.white,
-              )),
+          title: Text(
+            'Lead Details',
+            style: TextStyle(color: Colors.white),
+          ),
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back,
@@ -43,23 +43,55 @@ class LeadDetailsScreen extends StatelessWidget {
               );
             },
           ),
-          bottom: TabBar(
-            labelColor: Colors.white, // Color for selected tab text
-            unselectedLabelColor:
-                Colors.white70, // Color for unselected tab text
-            indicatorColor: Colors.white, // Color for the tab indicator
-            tabs: [
-              Tab(text: 'Profile'),
-              Tab(text: 'Notes'),
-              Tab(text: 'Remainder'),
-            ],
-          ),
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.edit,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                // TODO: Implement edit functionality here
+                print('Edit button pressed');
+              },
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.delete,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                // TODO: Implement delete functionality here
+                print('Delete button pressed');
+              },
+            ),
+          ],
         ),
-        body: TabBarView(
+        body: Column(
           children: [
-            ProfileTab(),
-            Center(child: Text('Notes')),
-            Center(child: Text('Remainder')),
+            // TabBar Moved Here
+            Material(
+              color: Colors.white, // Background color for TabBar
+              child: TabBar(
+                labelColor: Colors.grey, // Color for selected tab text
+                unselectedLabelColor: Colors.grey, // Unselected tab text
+                indicatorColor: Colors.black45, // Tab indicator color
+                tabs: [
+                  Tab(text: 'Profile'),
+                  Tab(text: 'Notes'),
+                  Tab(text: 'Remainder'),
+                ],
+              ),
+            ),
+            Expanded(
+              // Ensures TabBarView takes remaining space
+              child: TabBarView(
+                children: [
+                  ProfileTab(),
+                  Center(child: Text('Notes')),
+                  Center(child: Text('Remainder')),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -89,7 +121,6 @@ class ProfileTab extends StatelessWidget {
         'Country': '236',
       },
     },
-    // Add more entries here for additional cards
   ];
 
   @override
@@ -181,7 +212,7 @@ class ProfileTab extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 16),
-// Merged Details Card
+              // Merged Details Card
               Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -236,33 +267,24 @@ class DetailRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            mainAxisAlignment:
-                MainAxisAlignment.spaceBetween, // Adjust alignment as needed
-            children: [
-              Text(
-                '$label :',
-                // First label-value pair
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
+          Text(
+            '$label:',
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                color: Colors.black54,
+                fontWeight: FontWeight.bold,
               ),
-              SizedBox(width: 10),
-              Text(
-                '$value', // Second label-value pair
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Divider()
-            ],
-          )
-          // Text(
-          //   value,
-          //   style: TextStyle(fontWeight: FontWeight.bold),
-          // ),
+            ),
+          ),
         ],
       ),
     );
