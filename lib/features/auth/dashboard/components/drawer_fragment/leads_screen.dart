@@ -1,3 +1,4 @@
+import 'package:crm/features/auth/dashboard/components/drawer_fragment/component/add_customer.dart';
 import 'package:crm/features/auth/dashboard/components/drawer_fragment/leads_details.dart';
 import 'package:crm/features/auth/dashboard/home_screen.dart';
 import 'package:crm/utils/colors.dart';
@@ -12,7 +13,7 @@ class LeadsScreen extends StatefulWidget {
 }
 
 class _LeadsScreenState extends State<LeadsScreen> {
-  bool? isShow;
+  bool isShow = true;
   final List<Map<String, String>> summaryData = [
     {"count": "2", "label": "New Lead"},
     {"count": "4", "label": "Contacted"},
@@ -120,6 +121,21 @@ class _LeadsScreenState extends State<LeadsScreen> {
           },
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Add your action here, e.g., navigate to a new screen.
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddCustomer()),
+          );
+        },
+        shape: CircleBorder(),
+        backgroundColor: secondaryPrimaryColor,
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -146,12 +162,11 @@ class _LeadsScreenState extends State<LeadsScreen> {
                   IconButton(
                     onPressed: () {
                       setState(() {
-                        isShow =
-                            !(isShow ?? false); // Toggle global isShow variable
+                        isShow = !isShow; // Toggle the visibility of the list
                       });
                     },
                     icon: Icon(
-                      (isShow ?? false)
+                      isShow
                           ? Icons.keyboard_arrow_up_outlined // Show up arrow
                           : Icons
                               .keyboard_arrow_down_outlined, // Show down arrow
@@ -161,7 +176,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                 ],
               ),
               const SizedBox(height: 10),
-              isShow == true
+              isShow
                   ? SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
@@ -175,6 +190,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                       ),
                     )
                   : const SizedBox(),
+
               const SizedBox(height: 20),
               // Leads Section
               Row(
@@ -378,7 +394,6 @@ class _LeadsScreenState extends State<LeadsScreen> {
                               ],
                             ),
                           ],
-                          
                         ),
                       ],
                     ),
