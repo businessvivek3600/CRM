@@ -3,7 +3,6 @@ import 'package:crm/features/auth/auth/auth_screen.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'services/theme_service.dart';
 
 void main() {
