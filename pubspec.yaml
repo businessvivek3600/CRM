@@ -37,7 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
   nb_utils: ^7.0.7
-  provider: ^6.1.2
+  country_state_picker: ^0.0.5
 
 dev_dependencies:
   flutter_test:
