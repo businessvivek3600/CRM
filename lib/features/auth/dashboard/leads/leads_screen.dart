@@ -1,5 +1,6 @@
-import 'package:crm/features/auth/dashboard/components/drawer_fragment/component/add_customer.dart';
-import 'package:crm/features/auth/dashboard/components/drawer_fragment/leads_details.dart';
+import 'package:crm/features/auth/dashboard/leads/addleads.dart';
+
+import 'package:crm/features/auth/dashboard/leads/leads_details.dart';
 import 'package:crm/features/auth/dashboard/home_screen.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
@@ -126,7 +127,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
           // Add your action here, e.g., navigate to a new screen.
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddCustomer()),
+            MaterialPageRoute(builder: (context) => Addleads()),
           );
         },
         shape: CircleBorder(),

@@ -1,4 +1,4 @@
-import 'package:crm/features/auth/dashboard/components/drawer_fragment/component/add_customer.dart';
+import 'package:crm/features/auth/dashboard/customer/add_customer.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
 

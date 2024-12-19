@@ -1,4 +1,5 @@
-import 'package:crm/features/auth/dashboard/components/drawer_fragment/leads_screen.dart';
+import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
+import 'package:crm/features/auth/dashboard/leads/updatelead.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -39,7 +40,9 @@ class LeadDetailsScreen extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => LeadsScreen()),
+                MaterialPageRoute(
+                  builder: (context) => const LeadsScreen(),
+                ),
               );
             },
           ),
@@ -50,8 +53,12 @@ class LeadDetailsScreen extends StatelessWidget {
                 color: Colors.white,
               ),
               onPressed: () {
-                // TODO: Implement edit functionality here
-                print('Edit button pressed');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Updatelead(),
+                  ),
+                );
               },
             ),
             IconButton(
@@ -60,15 +67,14 @@ class LeadDetailsScreen extends StatelessWidget {
                 color: Colors.white,
               ),
               onPressed: () {
-                // TODO: Implement delete functionality here
-                print('Delete button pressed');
+                _showDeleteDialog(
+                    context); // Show the delete confirmation dialog
               },
             ),
           ],
         ),
         body: Column(
           children: [
-            // TabBar Moved Here
             Material(
               color: Colors.white, // Background color for TabBar
               child: TabBar(
@@ -86,9 +92,9 @@ class LeadDetailsScreen extends StatelessWidget {
               // Ensures TabBarView takes remaining space
               child: TabBarView(
                 children: [
-                  ProfileTab(),
-                  Center(child: Text('Notes')),
-                  Center(child: Text('Remainder')),
+                  ProfileTab(), // Includes cards
+                  Center(child: Text('Notes Content')),
+                  Center(child: Text('Remainder Content')),
                 ],
               ),
             ),
@@ -97,10 +103,121 @@ class LeadDetailsScreen extends StatelessWidget {
       ),
     );
   }
+
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Exclamation Mark Icon with Gradient Background
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [Colors.orange, Colors.red],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                  padding: EdgeInsets.all(16),
+                  child: Icon(
+                    Icons.error_outline,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                ),
+                SizedBox(height: 16),
+
+                // Title
+                Text(
+                  "Delete Lead",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 16),
+
+                // Description
+                Text(
+                  "Are you sure that you want to delete this Lead?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black54,
+                  ),
+                ),
+                SizedBox(height: 24),
+
+                // Buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: secondaryPrimaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close dialog
+                        },
+                        child: Text(
+                          "No",
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: secondaryPrimaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const LeadsScreen(),
+                            ),
+                          ); // Close dialog
+                          // Add delete functionality here
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text("Lead deleted!"),
+                          ));
+                        },
+                        child: Text(
+                          "Yes",
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 class ProfileTab extends StatelessWidget {
-  // List of lead details for dynamic cards
   final List<Map<String, dynamic>> leadDetails = [
     {
       'name': 'John Smith',
@@ -118,7 +235,7 @@ class ProfileTab extends StatelessWidget {
         'City': 'San Francisco',
         'State': 'CA',
         'Zip Code': '94110',
-        'Country': '236',
+        'Country': 'USA',
       },
     },
   ];
@@ -212,7 +329,7 @@ class ProfileTab extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 16),
-              // Merged Details Card
+              // Details Card
               Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -223,22 +340,14 @@ class ProfileTab extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Company Details with Divider
                       ...detail['companyDetails'].entries.map((entry) {
-                        int index = detail['companyDetails']
-                            .entries
-                            .toList()
-                            .indexOf(entry);
-                        bool isLast = index ==
-                            detail['companyDetails'].entries.length - 1;
                         return Column(
                           children: [
                             DetailRow(
                               label: entry.key,
                               value: entry.value,
                             ),
-                            if (!isLast)
-                              Divider(), // Add divider except after the last item
+                            Divider(),
                           ],
                         );
                       }).toList(),

@@ -1,6 +1,7 @@
 import 'package:crm/features/auth/auth/auth_screen.dart';
-import 'package:crm/features/auth/dashboard/components/drawer_fragment/customer_Screen.dart';
-import 'package:crm/features/auth/dashboard/components/drawer_fragment/leads_screen.dart';
+
+import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
+import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:flutter/material.dart';
 
 class CustomDrawer extends StatefulWidget {
