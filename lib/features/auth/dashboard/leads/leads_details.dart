@@ -1,4 +1,6 @@
+import 'package:crm/features/auth/dashboard/leads/addnotes.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
+import 'package:crm/features/auth/dashboard/leads/reminders.dart';
 import 'package:crm/features/auth/dashboard/leads/updatelead.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
@@ -78,13 +80,15 @@ class LeadDetailsScreen extends StatelessWidget {
             Material(
               color: Colors.white, // Background color for TabBar
               child: TabBar(
-                labelColor: Colors.grey, // Color for selected tab text
-                unselectedLabelColor: Colors.grey, // Unselected tab text
-                indicatorColor: Colors.black45, // Tab indicator color
+                labelColor: textPrimaryColor, // Color for selected tab text
+                unselectedLabelColor:
+                    textPrimaryColor.withOpacity(0.6), // Unselected tab text
+                indicatorColor:
+                    textPrimaryColor.withOpacity(0.6), // Tab indicator color
                 tabs: [
                   Tab(text: 'Profile'),
                   Tab(text: 'Notes'),
-                  Tab(text: 'Remainder'),
+                  Tab(text: 'Reminder'),
                 ],
               ),
             ),
@@ -93,8 +97,8 @@ class LeadDetailsScreen extends StatelessWidget {
               child: TabBarView(
                 children: [
                   ProfileTab(), // Includes cards
-                  Center(child: Text('Notes Content')),
-                  Center(child: Text('Remainder Content')),
+                  AddNotesTab(),
+                  RemindersTab()
                 ],
               ),
             ),
