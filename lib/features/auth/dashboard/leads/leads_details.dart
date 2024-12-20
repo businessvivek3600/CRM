@@ -78,13 +78,13 @@ class LeadDetailsScreen extends StatelessWidget {
         body: Column(
           children: [
             Material(
-              color: Colors.white, // Background color for TabBar
+              color: Color(0xfffef7ff), // Background color for TabBar
               child: TabBar(
                 labelColor: textPrimaryColor, // Color for selected tab text
                 unselectedLabelColor:
                     textPrimaryColor.withOpacity(0.6), // Unselected tab text
                 indicatorColor:
-                    textPrimaryColor.withOpacity(0.6), // Tab indicator color
+                    textPrimaryColor.withOpacity(0.8), // Tab indicator color
                 tabs: [
                   Tab(text: 'Profile'),
                   Tab(text: 'Notes'),
