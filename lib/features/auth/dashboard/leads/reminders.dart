@@ -104,8 +104,10 @@ class _RemindersTabState extends State<RemindersTab> {
                       TextField(
                         controller: dateTimeController,
                         readOnly: true,
+
                         onTap: _pickDateTime, // Open picker on tap
                         decoration: InputDecoration(
+                          hintText: "yyyy-MM-dd HH:mm   ",
                           labelStyle: TextStyle(color: textPrimaryColor),
                           suffixIcon: IconButton(
                             icon: Icon(Icons.calendar_today,
@@ -142,7 +144,7 @@ class _RemindersTabState extends State<RemindersTab> {
                             ),
                       ),
                       TextSpan(
-                        text: ' Set remainder to', // Bolded text
+                        text: ' Set reminder to', // Bolded text
                         style: TextStyle(
                           color: Colors
                               .black, // Set the color of the text to black
