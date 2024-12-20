@@ -11,27 +11,44 @@ class RemindersTab extends StatefulWidget {
 
 class _RemindersTabState extends State<RemindersTab> {
   final TextEditingController dateTimeController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+
+  DateTime? selectedDateTime;
+
   Future<void> _pickDateTime() async {
+    // Step 1: Pick a date
     DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: selectedDateTime ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
 
     if (pickedDate != null) {
-      TimeOfDay currentTime = TimeOfDay.now(); // Get the current time
-      DateTime combinedDateTime = DateTime(
-        pickedDate.year,
-        pickedDate.month,
-        pickedDate.day,
-        currentTime.hour,
-        currentTime.minute,
+      // Step 2: Pick a time
+      TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: selectedDateTime != null
+            ? TimeOfDay.fromDateTime(selectedDateTime!)
+            : TimeOfDay.now(),
       );
-      setState(() {
-        dateTimeController.text =
-            DateFormat('yyyy-MM-dd HH:mm').format(combinedDateTime);
-      });
+
+      if (pickedTime != null) {
+        // Combine the picked date and time
+        DateTime combinedDateTime = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+
+        setState(() {
+          selectedDateTime = combinedDateTime;
+          dateTimeController.text =
+              DateFormat('yyyy-MM-dd HH:mm').format(combinedDateTime);
+        });
+      }
     }
   }
 
@@ -68,22 +85,16 @@ class _RemindersTabState extends State<RemindersTab> {
                             TextSpan(
                               text: '*', // Red asterisk
                               style: TextStyle(
-                                  color: Colors
-                                      .red, // Set the color of the asterisk to red
+                                  color: Colors.red,
                                   fontSize: 18,
-                                  fontWeight: FontWeight
-                                      .bold // You can adjust the font size here if necessary
-                                  ),
+                                  fontWeight: FontWeight.bold),
                             ),
                             TextSpan(
-                              text: ' Date to be notified', // Bolded text
+                              text: ' Date to be notified',
                               style: TextStyle(
-                                color: Colors
-                                    .black, // Set the color of the text to black
-                                fontWeight:
-                                    FontWeight.w500, // Make the text bold
-                                fontSize:
-                                    16, // Adjust the font size if necessary
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
                               ),
                             ),
                           ],
@@ -93,6 +104,7 @@ class _RemindersTabState extends State<RemindersTab> {
                       TextField(
                         controller: dateTimeController,
                         readOnly: true,
+                        onTap: _pickDateTime, // Open picker on tap
                         decoration: InputDecoration(
                           labelStyle: TextStyle(color: textPrimaryColor),
                           suffixIcon: IconButton(
@@ -163,34 +175,36 @@ class _RemindersTabState extends State<RemindersTab> {
                   ),
                 ),
                 const SizedBox(height: 10),
+                const SizedBox(height: 10),
                 RichText(
                   text: TextSpan(
                     children: <TextSpan>[
                       TextSpan(
                         text: '*', // Red asterisk
                         style: TextStyle(
-                            color: Colors
-                                .red, // Set the color of the asterisk to red
+                            color: Colors.red,
                             fontSize: 18,
-                            fontWeight: FontWeight
-                                .bold // You can adjust the font size here if necessary
-                            ),
+                            fontWeight: FontWeight.bold),
                       ),
                       TextSpan(
-                        text: ' Description', // Bolded text
+                        text: ' Description',
                         style: TextStyle(
-                          color: Colors
-                              .black, // Set the color of the text to black
-                          fontWeight: FontWeight.w500, // Make the text bold
-                          fontSize: 16, // Adjust the font size if necessary
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
                         ),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextField(
+                  controller: descriptionController,
                   maxLines: 4,
+                  onTap: () {
+                    // Logic for description field interactions (if any)
+                    FocusScope.of(context).requestFocus(FocusNode());
+                  },
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderSide: BorderSide(color: textPrimaryColor),
@@ -201,12 +215,11 @@ class _RemindersTabState extends State<RemindersTab> {
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: textPrimaryColor),
                     ),
+                    hintText: 'Enter description here',
                   ),
                   style: TextStyle(color: textPrimaryColor),
                 ),
-                // Rectangular shaped radio button
                 const SizedBox(height: 10),
-                // Checkbox for Terms and Conditions or agreement
                 Row(
                   children: [
                     Checkbox(
@@ -228,7 +241,6 @@ class _RemindersTabState extends State<RemindersTab> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                // Close and Save buttons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -237,22 +249,20 @@ class _RemindersTabState extends State<RemindersTab> {
                         Navigator.pop(context); // Close the current screen
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            secondaryPrimaryColor, // Close button color
+                        backgroundColor: secondaryPrimaryColor,
                       ),
                       child: const Text(
                         'Close',
                         style: TextStyle(color: Colors.white, fontSize: 15),
                       ),
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     ElevatedButton(
                       onPressed: () {
                         // Save action here
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            secondaryPrimaryColor, // Save button color
+                        backgroundColor: secondaryPrimaryColor,
                       ),
                       child: const Text(
                         'Save',

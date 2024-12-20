@@ -15,27 +15,42 @@ class _AddnotesTabState extends State<AddNotesTab> {
   final TextEditingController dateTimeController = TextEditingController();
 
   // Method to pick a date and set the time to current time automatically
+  DateTime? selectedDateTime;
+
   Future<void> _pickDateTime() async {
+    // Step 1: Pick a date
     DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: selectedDateTime ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
 
     if (pickedDate != null) {
-      TimeOfDay currentTime = TimeOfDay.now(); // Get the current time
-      DateTime combinedDateTime = DateTime(
-        pickedDate.year,
-        pickedDate.month,
-        pickedDate.day,
-        currentTime.hour,
-        currentTime.minute,
+      // Step 2: Pick a time
+      TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: selectedDateTime != null
+            ? TimeOfDay.fromDateTime(selectedDateTime!)
+            : TimeOfDay.now(),
       );
-      setState(() {
-        dateTimeController.text =
-            DateFormat('yyyy-MM-dd HH:mm').format(combinedDateTime);
-      });
+
+      if (pickedTime != null) {
+        // Combine the picked date and time
+        DateTime combinedDateTime = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+
+        setState(() {
+          selectedDateTime = combinedDateTime;
+          dateTimeController.text =
+              DateFormat('yyyy-MM-dd HH:mm').format(combinedDateTime);
+        });
+      }
     }
   }
 
@@ -75,7 +90,8 @@ class _AddnotesTabState extends State<AddNotesTab> {
                       const SizedBox(height: 10),
                       TextField(
                         controller: dateTimeController,
-                        readOnly: true,
+                        readOnly: true, // Prevent keyboard from opening
+                        onTap: _pickDateTime, // Open calendar picker on tap
                         decoration: InputDecoration(
                           labelText: 'Select Date and Time',
                           labelStyle: TextStyle(color: textPrimaryColor),
