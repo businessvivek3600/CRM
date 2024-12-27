@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../constants/app_constants.dart';
@@ -10,6 +9,7 @@ const appTextPrimaryColor = Color(0xff1C1F34);
 const appTextSecondaryColor = Color(0xff6C757D);
 const cardColor = Color(0xFFF6F7F9);
 const borderColor = Color(0xFFEBEBEB);
+const textPrimaryColor = Color(0xFF0E1116);
 
 const scaffoldColorDark = Color(0xFF0E1116);
 const scaffoldSecondaryDark = Color(0xFF1C1F26);
@@ -37,8 +37,6 @@ const waitingColor = Color(0xFF2CAFAF);
 const runningColor = Color(0xFF2962FF);
 const sellColor = Color(0xFFC500BB);
 const buyColor = Color(0xFFF20101);
-
-
 
 Color fromHex(String hexString) {
   final buffer = StringBuffer();
