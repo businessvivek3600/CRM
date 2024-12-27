@@ -1,4 +1,5 @@
-import 'package:crm/features/auth/dashboard/components/drawer_fragment/component/add_customer.dart';
+import 'package:crm/features/auth/dashboard/customer/add_customer.dart';
+import 'package:crm/features/auth/dashboard/customer/customerdetails.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -10,11 +11,12 @@ class CustomerScreen extends StatefulWidget {
 }
 
 class _CustomerScreenState extends State<CustomerScreen> {
+  bool isShow = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-       title:  const Text(
+        title: const Text(
           'Customer',
           style: TextStyle(
             fontSize: 18,
@@ -29,66 +31,83 @@ class _CustomerScreenState extends State<CustomerScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  const SizedBox(width: 8),
                   const Text(
-                    'Customer Summery',
+                    'Customer Summary',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const Spacer(),
                   IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.keyboard_arrow_down_outlined,
+                    onPressed: () {
+                      setState(() {
+                        isShow = !isShow; // Toggle the visibility of the list
+                      });
+                    },
+                    icon: Icon(
+                      isShow
+                          ? Icons.keyboard_arrow_up_outlined // Show up arrow
+                          : Icons
+                              .keyboard_arrow_down_outlined, // Show down arrow
                       size: 25,
                     ),
-                  )
+                  ),
                 ],
               ),
-              GridView.builder(
-                shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                itemCount: 6,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3, childAspectRatio: 3 / 2),
-                itemBuilder: (context, index) => const SizedBox(
-                  height: 220,
-                  child: Card(
-                    elevation: 8,
-                    shadowColor: Colors.black54,
-                    color: Colors.white,
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Icon(Icons.person),
-                              Text(
-                                '26',
-                                style: TextStyle(fontSize: 20),
-                              )
-                            ],
-                          ),
-                          SizedBox(height: 10,),
-                          Expanded(
-                            child: Text(
-                              'Total Customer',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
+              const SizedBox(height: 10),
+              isShow
+                  ? SingleChildScrollView(
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: 6,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3, childAspectRatio: 3 / 2),
+                        itemBuilder: (context, index) => const SizedBox(
+                          height: 220,
+                          child: Card(
+                            elevation: 8,
+                            shadowColor: Colors.black54,
+                            color: Colors.white,
+                            child: Padding(
+                              padding: EdgeInsets.all(6.0),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Icon(Icons.person),
+                                      Text(
+                                        '26',
+                                        style: TextStyle(fontSize: 20),
+                                      )
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      'Total Customer',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  )
+                                ],
                               ),
                             ),
-                          )
-                        ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-              ),
+                    )
+                  : const SizedBox(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -126,9 +145,15 @@ class _CustomerScreenState extends State<CustomerScreen> {
                 child: ListView.separated(
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      return SizedBox(
-                        height: 100,
-                        child:  Card(
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CustomerDetails()),
+                          );
+                        },
+                        child: Card(
                           elevation: 8,
                           shadowColor: Colors.black54,
                           color: Colors.white,
@@ -163,9 +188,9 @@ class _CustomerScreenState extends State<CustomerScreen> {
                                     ],
                                   ),
                                 ),
-                                OutlinedButton(onPressed: () {
-
-                                }, child: const Text("Not Active"))
+                                OutlinedButton(
+                                    onPressed: () {},
+                                    child: const Text("Not Active"))
                               ],
                             ),
                           ),
@@ -185,11 +210,19 @@ class _CustomerScreenState extends State<CustomerScreen> {
         shape: CircleBorder(),
         backgroundColor: secondaryPrimaryColor,
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => AddCustomer(),));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AddCustomer(),
+              ));
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: const Icon(Icons.add,color: Colors.white,size: 30,),
+          child: const Icon(
+            Icons.add,
+            color: Colors.white,
+            size: 30,
+          ),
         ),
         tooltip: 'Add Customer',
       ),
