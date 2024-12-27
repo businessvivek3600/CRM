@@ -63,7 +63,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
               child: TabBarView(
                 children: [
                   _buildProfileTab(),
-                  Center(child: Text('Billing & Shipping Details')),
+                  _BillingShippingDetailsTab(),
                   Center(child: Text('Contact Information')),
                 ],
               ),
@@ -73,6 +73,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
       ),
     );
   }
+  //ProfileTab
 
   Widget _buildProfileTab() {
     return SingleChildScrollView(
@@ -127,6 +128,84 @@ class _CustomerDetailsState extends State<CustomerDetails> {
   }
 
   Widget _buildRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[700],
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _BillingShippingDetailsTab() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            _buildCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildRow('Company', 'ABC Electronics'),
+                  _buildRow('VAT Number', 'US7654321'),
+                  const Divider(),
+                  _buildRow('Phone', '+1 (555) 555-5555'),
+                  _buildRow('Website', '-'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildRow('Address', '789 Electronics Avenue'),
+                  const Divider(),
+                  _buildRow('City', 'San Francisco'),
+                  _buildRow('State', 'CA'),
+                  const Divider(),
+                  _buildRow('Zip Code', '94101'),
+                  _buildRow('Country', '3'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBillingCard({required Widget child}) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: child,
+      ),
+    );
+  }
+
+  Widget _buildBillingRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
