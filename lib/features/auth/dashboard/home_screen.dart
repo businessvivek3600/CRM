@@ -1,5 +1,6 @@
 // import 'package:crm/features/auth/dashboard/components/drawer_fragment/drawer_widget.dart';
 import 'package:crm/features/auth/dashboard/components/drawer_fragment/drawer_widget.dart';
+import 'package:crm/store/app_store.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -69,16 +70,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children:  [
                       Text(
-                        'Welcome John Doe',
+                        'Welcome ${appStore.fullName}',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        'admin@demo.com',
+                       appStore.userEmail,
                         style: TextStyle(
                           color: Colors.grey,
                         ),
