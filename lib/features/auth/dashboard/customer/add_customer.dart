@@ -15,7 +15,6 @@ class AddCustomer extends StatefulWidget {
 }
 
 class _AddCustomerState extends State<AddCustomer> {
-
   String? state;
   String? country;
 
@@ -32,16 +31,14 @@ class _AddCustomerState extends State<AddCustomer> {
               fontWeight: FontWeight.bold,
             ),
           ),
-
         ),
         body: Column(
           children: [
             Container(
               color: Colors.white,
               child: TabBar(
-
                 unselectedLabelColor: AppConst.defaultPrimaryColor,
-                indicatorColor:waitingColor,
+                indicatorColor: waitingColor,
                 labelColor: black,
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicatorWeight: 2.0,
@@ -57,55 +54,55 @@ class _AddCustomerState extends State<AddCustomer> {
               child: TabBarView(
                 children: [
                   // Profile Tab
-               SingleChildScrollView(
+                  SingleChildScrollView(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // const SizedBox(height: 20),
                           const CommonTextField(
                             label: 'Legal Company Name',
                             hint: 'Legal Company Name',
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 15),
                           const CommonTextField(
                             label: 'VAT Number',
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 15),
                           const CommonTextField(
                             label: 'Phone',
                             hint: 'Enter Phone Number',
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 15),
                           const CommonTextField(
                             label: 'Website',
                             hint: 'Enter Website URL',
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 15),
                           const CommonTextField(
                             label: 'Address',
                             hint: 'Enter Address',
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 15),
                           CountryStatePicker(
                             inputDecoration: InputDecoration(
                               labelStyle: TextStyle(
-                                  color: Theme.of(context).primaryColor), // Primary color
+                                  color: Theme.of(context).primaryColor),
                               hintStyle: TextStyle(
-                                  color: Theme.of(context).primaryColor.withOpacity(0.6)), // Primary color with opacity
+                                  color: Theme.of(context)
+                                      .primaryColor
+                                      .withOpacity(0.6)),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                                 borderSide: BorderSide(
-                                    color: Theme.of(context).primaryColor), // Primary color border
+                                    color: Theme.of(context).primaryColor),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                                 borderSide: BorderSide(
-                                    color: Theme.of(context).primaryColor), // Focused state border color
+                                    color: Theme.of(context).primaryColor),
                               ),
-                              focusColor: Theme.of(context).primaryColor, // Focus color
-                              hoverColor: Theme.of(context).primaryColor, // Hover color
                             ),
                             countryLabel: const Label(title: "Country"),
                             stateLabel: const Label(title: "State"),
@@ -120,172 +117,172 @@ class _AddCustomerState extends State<AddCustomer> {
                             stateHintText: "Select State",
                             noStateFoundText: "No State Found",
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 15),
                           const CommonTextField(
                             label: 'Zip Code',
                             hint: 'Enter Zip Code',
-                          ),
-                          const SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: () {
-                              if (country != null && state != null) {
-                                // Submit billing details logic
-                                debugPrint('Country: $country, State: $state');
-                              } else {
-                                // Show error
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Please select a country and state.'),
-                                  ),
-                                );
-                              }
-                            },
-                            child: const Text('Submit'),
                           ),
                         ],
                       ),
                     ),
                   ),
-
-                  // Billing Details Tab
+                  // Billing Details Tab (example placeholder)
                   SingleChildScrollView(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                      child:Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // const SizedBox(height: 20),
-                          const CommonTextField(
-                            label: 'Billing Street',
-                            hint: 'Billing Street',
-                          ),
-                          const SizedBox(height: 20),
-                          const CommonTextField(
-                            label: 'Billing City',
-                            hint: 'Billing City',
-                          ),
-                          // const SizedBox(height: 20),
-                          // const CommonTextField(
-                          //   label: 'Billing State',
-                          //   hint: 'Billing State'
-                          // ),
-                          const SizedBox(height: 20),
-                          const CommonTextField(
-                            label: 'Billing Zip',
-                            hint: 'Billing Zip',
-                          ),
-                          const SizedBox(height: 20),
-                          CountryStatePicker(
-                            inputDecoration: InputDecoration(
-                              labelStyle: TextStyle(
-                                  color: Theme.of(context).primaryColor), // Primary color
-                              hintStyle: TextStyle(
-                                  color: Theme.of(context).primaryColor.withOpacity(0.6)), // Primary color with opacity
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                    color: Theme.of(context).primaryColor), // Primary color border
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                    color: Theme.of(context).primaryColor), // Focused state border color
-                              ),
-                              focusColor: Theme.of(context).primaryColor, // Focus color
-                              hoverColor: Theme.of(context).primaryColor, // Hover color
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // const SizedBox(height: 15),
+                            const CommonTextField(
+                              label: 'Billing Street',
+                              hint: 'Billing Street',
                             ),
-                            // countryLabel: const Label(title: "Country"),
-                            // stateLabel: const Label(title: "State"),
-                            onCountryChanged: (ct) => setState(() {
-                              country = ct;
-                              state = null;
-                            }),
-                            onStateChanged: (st) => setState(() {
-                              state = st;
-                            }),
-                            countryHintText: "Select Billing Country",
-                            stateHintText: "Billing State",
-                            noStateFoundText: "No State Found",
-                          ),
-                          SizedBox(height: 20),
-                          const SizedBox(height: 20),
-                          const CommonTextField(
-                            label: 'Shipping Street',
-                            hint: 'Shipping Street',
-                          ),
-                          const SizedBox(height: 20),
-                          const CommonTextField(
-                            label: 'Shipping City',
-                            hint: 'Shipping City',
-                          ),
-                          // const SizedBox(height: 20),
-                          // const CommonTextField(
-                          //   label: 'Billing State',
-                          //   hint: 'Billing State'
-                          // ),
-                          const SizedBox(height: 20),
-                          const CommonTextField(
-                            label: 'Shipping Zip',
-                            hint: 'Shipping Zip',
-                          ),
-                          const SizedBox(height: 20),
-                          CountryStatePicker(
-                            inputDecoration: InputDecoration(
-                              labelStyle: TextStyle(
-                                  color: Theme.of(context).primaryColor), // Primary color
-                              hintStyle: TextStyle(
-                                  color: Theme.of(context).primaryColor.withOpacity(0.6)), // Primary color with opacity
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                    color: Theme.of(context).primaryColor), // Primary color border
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                    color: Theme.of(context).primaryColor), // Focused state border color
-                              ),
-                              focusColor: Theme.of(context).primaryColor, // Focus color
-                              hoverColor: Theme.of(context).primaryColor, // Hover color
+                            const SizedBox(height: 15),
+                            const CommonTextField(
+                              label: 'Billing City',
+                              hint: 'Billing City',
                             ),
-                            // countryLabel: const Label(title: "Country"),
-                            // stateLabel: const Label(title: "State"),
-                            onCountryChanged: (ct) => setState(() {
-                              country = ct;
-                              state = null;
-                            }),
-                            onStateChanged: (st) => setState(() {
-                              state = st;
-                            }),
-                            countryHintText: "Select Shipping Country",
-                            stateHintText: "Shipping State",
-                            noStateFoundText: "No State Found",
-                          ),
-                          const SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: () {
-                              if (country != null && state != null) {
-                                // Submit billing details logic
-                                debugPrint('Country: $country, State: $state');
-                              } else {
-                                // Show error
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Please select a country and state.'),
-                                  ),
-                                );
-                              }
-                            },
-                            child: const Text('Submit'),
-                          ),
-                        ],
-                      )
-                    ),
+                            // const SizedBox(height: 15),
+                            // const CommonTextField(
+                            //   label: 'Billing State',
+                            //   hint: 'Billing State'
+                            // ),
+                            const SizedBox(height: 15),
+                            const CommonTextField(
+                              label: 'Billing Zip',
+                              hint: 'Billing Zip',
+                            ),
+                            const SizedBox(height: 15),
+                            CountryStatePicker(
+                              inputDecoration: InputDecoration(
+                                labelStyle: TextStyle(
+                                    color: Theme.of(context)
+                                        .primaryColor), // Primary color
+                                hintStyle: TextStyle(
+                                    color: Theme.of(context)
+                                        .primaryColor
+                                        .withOpacity(
+                                            0.6)), // Primary color with opacity
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide(
+                                      color: Theme.of(context)
+                                          .primaryColor), // Primary color border
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide(
+                                      color: Theme.of(context)
+                                          .primaryColor), // Focused state border color
+                                ),
+                                focusColor: Theme.of(context)
+                                    .primaryColor, // Focus color
+                                hoverColor: Theme.of(context)
+                                    .primaryColor, // Hover color
+                              ),
+                              // countryLabel: const Label(title: "Country"),
+                              // stateLabel: const Label(title: "State"),
+                              onCountryChanged: (ct) => setState(() {
+                                country = ct;
+                                state = null;
+                              }),
+                              onStateChanged: (st) => setState(() {
+                                state = st;
+                              }),
+                              countryHintText: "Select Billing Country",
+                              stateHintText: "Billing State",
+                              noStateFoundText: "No State Found",
+                            ),
+                            SizedBox(height: 15),
+                            const SizedBox(height: 15),
+                            const CommonTextField(
+                              label: 'Shipping Street',
+                              hint: 'Shipping Street',
+                            ),
+                            const SizedBox(height: 15),
+                            const CommonTextField(
+                              label: 'Shipping City',
+                              hint: 'Shipping City',
+                            ),
+                            // const SizedBox(height: 15),
+                            // const CommonTextField(
+                            //   label: 'Billing State',
+                            //   hint: 'Billing State'
+                            // ),
+                            const SizedBox(height: 15),
+                            const CommonTextField(
+                              label: 'Shipping Zip',
+                              hint: 'Shipping Zip',
+                            ),
+                            const SizedBox(height: 15),
+                            CountryStatePicker(
+                              inputDecoration: InputDecoration(
+                                labelStyle: TextStyle(
+                                    color: Theme.of(context)
+                                        .primaryColor), // Primary color
+                                hintStyle: TextStyle(
+                                    color: Theme.of(context)
+                                        .primaryColor
+                                        .withOpacity(
+                                            0.6)), // Primary color with opacity
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide(
+                                      color: Theme.of(context)
+                                          .primaryColor), // Primary color border
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide(
+                                      color: Theme.of(context)
+                                          .primaryColor), // Focused state border color
+                                ),
+                                focusColor: Theme.of(context)
+                                    .primaryColor, // Focus color
+                                hoverColor: Theme.of(context)
+                                    .primaryColor, // Hover color
+                              ),
+                              // countryLabel: const Label(title: "Country"),
+                              // stateLabel: const Label(title: "State"),
+                              onCountryChanged: (ct) => setState(() {
+                                country = ct;
+                                state = null;
+                              }),
+                              onStateChanged: (st) => setState(() {
+                                state = st;
+                              }),
+                              countryHintText: "Select Shipping Country",
+                              stateHintText: "Shipping State",
+                              noStateFoundText: "No State Found",
+                            ),
+                            const SizedBox(height: 15),
+                          ],
+                        )),
                   ),
                 ],
               ),
             ),
           ],
+        ),
+        // Bottom Navigation Button
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(10),
+          child: ElevatedButton(
+            onPressed: () {
+              if (country != null && state != null) {
+                debugPrint('Country: $country, State: $state');
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please select a country and state.'),
+                  ),
+                );
+              }
+            },
+            child: const Text('Submit'),
+          ),
         ),
       ),
     );
