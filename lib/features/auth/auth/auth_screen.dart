@@ -3,8 +3,44 @@ import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/text_field.dart';
 import 'package:flutter/material.dart';
 
-class AuthScreen extends StatelessWidget {
+import '../../../services/auth_services.dart';
+import '../../../store/app_store.dart';
+
+class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
+
+  @override
+  State<AuthScreen> createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends State<AuthScreen> {
+  final _loginFormKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController(text: '');
+  final _passwordController = TextEditingController(text: '');
+  bool _isLoading = false;
+  bool obscureText = true;
+  setObscureText() => setState(() => obscureText = !obscureText);
+  void _login() async {
+    if (!_loginFormKey.currentState!.validate()) {
+      return;
+    }
+    _loginFormKey.currentState!.save();
+    setState(() => _isLoading = true);
+    AuthService()
+        .login(
+      context,
+      _emailController.text,
+      _passwordController.text,
+    )
+        .then((value) async {
+      setState(() => _isLoading = false);
+
+      if (appStore.isLoggedIn) {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +73,10 @@ class AuthScreen extends StatelessWidget {
 
                       Container(
                         width: double.infinity,
-                        child: Column(
+                        child: const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               "Login",
                               style: TextStyle(
                                 fontSize: 35,
@@ -49,7 +85,7 @@ class AuthScreen extends StatelessWidget {
                               ),
                               textAlign: TextAlign.start,
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: 8),
                             Text(
                               "Login to your account",
                               style: TextStyle(
@@ -85,78 +121,86 @@ class AuthScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 20),
-                    const CommonTextField(
-                      label: "Email",
-                      hint: "test@gmail.com",
-                    ),
-
-                    const SizedBox(height: 20),
-                    // Password TextField
-                    const CommonTextField(
-                      label: "Password",
-                      isPassword: true,
-                    ),
-                    const SizedBox(height: 20),
-                    // Remember Me and Forgot Password
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: false,
-                              shape: const CircleBorder(),
-                              onChanged: (value) {},
-                              activeColor: Theme.of(context)
-                                  .primaryColor, // Primary color for the checkbox
-                            ),
-                            const Text(
-                              "Remember Me",
-                              style: TextStyle(color: Colors.black54),
-                            ),
-                          ],
-                        ),
-                        const Text(
-                          "Forgot Password?",
-                          style: TextStyle(
-                            color: Color(0xFF007BFF),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 40),
-                    // Sign In Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => HomeScreen()));
+                child: Form(
+                  key: _loginFormKey,
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      CommonTextField(
+                        label: "Email",
+                        hint: "test@gmail.com",
+                        controller: _emailController,
+                        validation: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter username Or Login ID';
+                          }
+                          return null;
                         },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          backgroundColor:
-                              secondaryPrimaryColor, // Primary color for the button
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
+                      ),
+
+                      const SizedBox(height: 20),
+                      // Password TextField
+                   CommonTextField(
+                        label: "Password",
+                        controller: _passwordController,
+                        isPassword: true,
+                      ),
+                      const SizedBox(height: 20),
+                      // Remember Me and Forgot Password
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: false,
+                                shape: const CircleBorder(),
+                                onChanged: (value) {},
+                                activeColor: Theme.of(context)
+                                    .primaryColor, // Primary color for the checkbox
+                              ),
+                              const Text(
+                                "Remember Me",
+                                style: TextStyle(color: Colors.black54),
+                              ),
+                            ],
                           ),
-                        ),
-                        child: const Text(
-                          "Sign In",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
+                          const Text(
+                            "Forgot Password?",
+                            style: TextStyle(
+                              color: Color(0xFF007BFF),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 40),
+                      // Sign In Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            _login();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            backgroundColor:
+                                secondaryPrimaryColor, // Primary color for the button
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                          ),
+                          child: const Text(
+                            "Sign In",
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
