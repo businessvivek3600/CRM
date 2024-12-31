@@ -135,11 +135,48 @@ abstract class _AppStore with Store {
   @observable
   String loginToken = '';
 
+  @observable
+  bool rememberMe = false;
+
+
+
+  @action
+  void setRememberMe(bool value) => rememberMe = value;
+  ///---REmember me
+  ///
+  @action
+  void setIsLoggedIn(bool value) => isLoggedIn = value;
+
+  Future<void> saveCredentials(String email, String password) async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('email', email);
+      await prefs.setString('password', password);
+  }
+
+  Future<Map<String, String?>> loadCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return {
+      'email': prefs.getString('email'),
+      'password': prefs.getString('password'),
+    };
+  }
+
+  Future<void> clearCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('email');
+    await prefs.remove('password');
+    setIsLoggedIn(false);
+  }
+
+
 ///get full name
   @computed
   String get fullName {
     return '$firstName $lastName'.trim();
   }
+
+
+  ////
 ///set User_data
   @action
   Future<void> setStaffId(String val, {bool isInitializing = false}) async {
