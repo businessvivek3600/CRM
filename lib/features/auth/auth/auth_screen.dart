@@ -2,6 +2,8 @@ import 'package:crm/features/auth/dashboard/home_screen.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 import '../../../services/auth_services.dart';
 import '../../../store/app_store.dart';
@@ -19,7 +21,14 @@ class _AuthScreenState extends State<AuthScreen> {
   final _passwordController = TextEditingController(text: '');
   bool _isLoading = false;
   bool obscureText = true;
+  bool isRememberMe = false;
   setObscureText() => setState(() => obscureText = !obscureText);
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadSavedCredentials();
+  }
   void _login() async {
     if (!_loginFormKey.currentState!.validate()) {
       return;
@@ -36,12 +45,20 @@ class _AuthScreenState extends State<AuthScreen> {
       setState(() => _isLoading = false);
 
       if (appStore.isLoggedIn) {
+        appStore.setIsLoggedIn(true);
+        await appStore.saveCredentials(_emailController.text, _passwordController.text);
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => const HomeScreen()));
       }
     });
   }
-
+  Future<void> _loadSavedCredentials() async {
+    final credentials = await appStore.loadCredentials();
+    setState(() {
+      _emailController.text = credentials['email'] ?? '';
+      _passwordController.text = credentials['password'] ?? '';
+    });
+  }
   @override
   Widget build(BuildContext context) {
     // Get screen height
@@ -152,12 +169,20 @@ class _AuthScreenState extends State<AuthScreen> {
                         children: [
                           Row(
                             children: [
-                              Checkbox(
-                                value: false,
-                                shape: const CircleBorder(),
-                                onChanged: (value) {},
-                                activeColor: Theme.of(context)
-                                    .primaryColor, // Primary color for the checkbox
+                              Observer(
+                                builder: (_) => Checkbox(
+                                  value: isRememberMe,
+                                  checkColor: Colors.white,
+                                  onChanged: (value) {
+
+
+                                 setState(() {
+                                   isRememberMe = value!;
+                                 });
+                                    print('Remember Me State: ${appStore.rememberMe}');
+                                  },
+                                  activeColor: Theme.of(context).primaryColor, // Primary color for the checkbox
+                                ),
                               ),
                               const Text(
                                 "Remember Me",
