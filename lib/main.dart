@@ -8,6 +8,7 @@ import 'package:nb_utils/nb_utils.dart';
 import 'constants/value_constants.dart';
 import 'database/dio/dio/dio_client.dart';
 import 'database/dio/dio/loging_interceotor.dart';
+import 'features/auth/dashboard/home_screen.dart';
 import 'services/theme_service.dart';
 import 'utils/default_logger.dart';
 
@@ -22,6 +23,7 @@ Future<void>  main() async{
 
 Future<void> initialize() async {
   sharedPreferences = await SharedPreferences.getInstance();
+  await appStore.setToken(getStringAsync(TOKEN), isInitializing: true);
 }
 Future<void> initializeUserData() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,38 +57,56 @@ Future<void> setupAppStore() async {
 }
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  Future<bool> _checkIfLoggedIn() async {
+    final credentials = await appStore.loadCredentials();
+    if (credentials['email'] != null && credentials['password'] != null) {
+      appStore.setIsLoggedIn(true);
+      return true;
+    }
+    return false;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: AppConst.appName,
-        theme: ThemeData(
-          primaryColor: AppConst.defaultPrimaryColor,
-          scaffoldBackgroundColor: Colors.white,
-          appBarTheme: AppBarTheme(
-            backgroundColor: secondaryPrimaryColor,
-            foregroundColor: Colors.white,
-            titleTextStyle: GoogleFonts.lato(
-              textStyle: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+    return FutureBuilder<bool>(
+        future: _checkIfLoggedIn(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator(); // Show loading indicator
+          }
+          final isLoggedIn = snapshot.data ?? false;
+
+        return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: AppConst.appName,
+            theme: ThemeData(
+              primaryColor: AppConst.defaultPrimaryColor,
+              scaffoldBackgroundColor: Colors.white,
+              appBarTheme: AppBarTheme(
+                backgroundColor: secondaryPrimaryColor,
+                foregroundColor: Colors.white,
+                titleTextStyle: GoogleFonts.lato(
+                  textStyle: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              textTheme: GoogleFonts.latoTextTheme(), // Apply Lato to all text
+              buttonTheme: ButtonThemeData(
+                buttonColor: AppConst.defaultPrimaryColor,
+                textTheme: ButtonTextTheme.primary,
+              ),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: secondaryPrimaryColor,
+                  foregroundColor: Colors.white,
+                ),
               ),
             ),
-          ),
-          textTheme: GoogleFonts.latoTextTheme(), // Apply Lato to all text
-          buttonTheme: ButtonThemeData(
-            buttonColor: AppConst.defaultPrimaryColor,
-            textTheme: ButtonTextTheme.primary,
-          ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: secondaryPrimaryColor,
-              foregroundColor: Colors.white,
-            ),
-          ),
-        ),
-        home: AuthScreen());
-  }
+            home:isLoggedIn ? const HomeScreen() : const AuthScreen(),
+        );
+      }
+    );}
 }
