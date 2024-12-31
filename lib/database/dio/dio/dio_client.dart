@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:crm/constants/app_constants.dart';
+import 'package:crm/store/app_store.dart';
 import 'package:dio/dio.dart';
 
 import '../../../utils/default_logger.dart';
@@ -95,7 +96,7 @@ class DioClient{
         }
       }
       if (token) {
-        formData.fields.add(MapEntry('login_token', "appStore.token"));
+        formData.fields.add(MapEntry('login_token', appStore.token));
       }
 
       pl('formdata :${formData.fields} ${dio.options.headers}', 'DIO CLIENT');

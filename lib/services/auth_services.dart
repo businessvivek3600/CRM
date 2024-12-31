@@ -20,9 +20,7 @@ class AuthService {
   Future<void> login(
     BuildContext context,
     String email,
-    String password, {
-    bool loginAsGuest = false,
-  }) async {
+    String password) async {
     try {
       var requestData = {
         "username": email,

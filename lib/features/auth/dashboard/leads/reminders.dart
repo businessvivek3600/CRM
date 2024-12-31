@@ -80,7 +80,7 @@ class _RemindersTabState extends State<RemindersTab> {
                     children: [
                       const SizedBox(height: 10),
                       RichText(
-                        text: TextSpan(
+                        text: const TextSpan(
                           children: <TextSpan>[
                             TextSpan(
                               text: '*', // Red asterisk
@@ -100,7 +100,7 @@ class _RemindersTabState extends State<RemindersTab> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       TextField(
                         controller: dateTimeController,
                         readOnly: true,
@@ -108,30 +108,30 @@ class _RemindersTabState extends State<RemindersTab> {
                         onTap: _pickDateTime, // Open picker on tap
                         decoration: InputDecoration(
                           hintText: "yyyy-MM-dd HH:mm   ",
-                          labelStyle: TextStyle(color: textPrimaryColor),
+                          labelStyle: const TextStyle(color: textPrimaryColor),
                           suffixIcon: IconButton(
-                            icon: Icon(Icons.calendar_today,
+                            icon: const Icon(Icons.calendar_today,
                                 color: textPrimaryColor),
                             onPressed: _pickDateTime,
                           ),
-                          border: OutlineInputBorder(
+                          border: const OutlineInputBorder(
                             borderSide: BorderSide(color: textPrimaryColor),
                           ),
-                          focusedBorder: OutlineInputBorder(
+                          focusedBorder: const OutlineInputBorder(
                             borderSide: BorderSide(color: textPrimaryColor),
                           ),
-                          enabledBorder: OutlineInputBorder(
+                          enabledBorder: const OutlineInputBorder(
                             borderSide: BorderSide(color: textPrimaryColor),
                           ),
                         ),
-                        style: TextStyle(color: textPrimaryColor),
+                        style: const TextStyle(color: textPrimaryColor),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 RichText(
-                  text: TextSpan(
+                  text: const TextSpan(
                     children: <TextSpan>[
                       TextSpan(
                         text: '*', // Red asterisk
@@ -179,7 +179,7 @@ class _RemindersTabState extends State<RemindersTab> {
                 const SizedBox(height: 10),
                 const SizedBox(height: 10),
                 RichText(
-                  text: TextSpan(
+                  text: const TextSpan(
                     children: <TextSpan>[
                       TextSpan(
                         text: '*', // Red asterisk
@@ -207,7 +207,7 @@ class _RemindersTabState extends State<RemindersTab> {
                     // Logic for description field interactions (if any)
                     FocusScope.of(context).requestFocus(FocusNode());
                   },
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: OutlineInputBorder(
                       borderSide: BorderSide(color: textPrimaryColor),
                     ),
@@ -219,7 +219,7 @@ class _RemindersTabState extends State<RemindersTab> {
                     ),
                     hintText: 'Enter description here',
                   ),
-                  style: TextStyle(color: textPrimaryColor),
+                  style: const TextStyle(color: textPrimaryColor),
                 ),
                 const SizedBox(height: 10),
                 Row(
@@ -234,7 +234,7 @@ class _RemindersTabState extends State<RemindersTab> {
                       activeColor: textPrimaryColor,
                       checkColor: Colors.white,
                     ),
-                    Expanded(
+                    const Expanded(
                       child: Text(
                         'Send also an email for this reminder',
                         style: TextStyle(color: textPrimaryColor),
