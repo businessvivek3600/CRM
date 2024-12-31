@@ -3,8 +3,14 @@ import 'package:crm/features/auth/dashboard/leads/addleads.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_details.dart';
 import 'package:crm/features/auth/dashboard/home_screen.dart';
 import 'package:crm/utils/colors.dart';
+import 'package:crm/utils/default_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../Models/leads_model.dart';
+import '../../../../store/lead_store.dart';
 
 class LeadsScreen extends StatefulWidget {
   const LeadsScreen({super.key});
@@ -26,80 +32,12 @@ class _LeadsScreenState extends State<LeadsScreen> {
     {"count": "3", "label": "Missed"},
   ];
 
-  final List<Map<String, dynamic>> leads = [
-    {
-      "name": "John Smith",
-      "role": "CEO - SmithTech Solutions",
-      "status": "Customer",
-      "statusColor": Colors.green,
-      "amount": "7500.00",
-      "platform": "Google",
-      "date": "03 Dec 2024",
-    },
-    {
-      "name": "Emily Johnson",
-      "role": "Marketing Manager - Marketing Pros Inc.",
-      "status": "Converted",
-      "statusColor": Colors.blue,
-      "amount": "5500.00",
-      "platform": "Facebook",
-      "date": "03 Dec 2024",
-    },
-    {
-      "name": "Michael Williams",
-      "role": "Sales Director - SalesCorp Ltd.",
-      "status": "Reopened",
-      "statusColor": Colors.purple,
-      "amount": "6200.00",
-      "platform": "Google",
-      "date": "03 Dec 2024",
-    },
-    {
-      "name": "Sophia Brown",
-      "role": "Marketing Coordinator - Digital Marketers...",
-      "status": "New Lead",
-      "statusColor": Colors.teal,
-      "amount": "4800.00",
-      "platform": "Facebook",
-      "date": "03 Dec 2024",
-    },
-    {
-      "name": "John Smith",
-      "role": "CEO - SmithTech Solutions",
-      "status": "Customer",
-      "statusColor": Colors.green,
-      "amount": "7500.00",
-      "platform": "Google",
-      "date": "03 Dec 2024",
-    },
-    {
-      "name": "Emily Johnson",
-      "role": "Marketing Manager - Marketing Pros Inc.",
-      "status": "Converted",
-      "statusColor": Colors.blue,
-      "amount": "5500.00",
-      "platform": "Facebook",
-      "date": "03 Dec 2024",
-    },
-    {
-      "name": "Michael Williams",
-      "role": "Sales Director - SalesCorp Ltd.",
-      "status": "Reopened",
-      "statusColor": Colors.purple,
-      "amount": "6200.00",
-      "platform": "Google",
-      "date": "03 Dec 2024",
-    },
-    {
-      "name": "Sophia Brown",
-      "role": "Marketing Coordinator - Digital Marketers...",
-      "status": "New Lead",
-      "statusColor": Colors.teal,
-      "amount": "4800.00",
-      "platform": "Facebook",
-      "date": "03 Dec 2024",
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Calling getLeads method on screen initialization
+    leadStore.getLeads();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,10 +65,10 @@ class _LeadsScreenState extends State<LeadsScreen> {
           // Add your action here, e.g., navigate to a new screen.
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Addleads()),
+            MaterialPageRoute(builder: (context) => const Addleads()),
           );
         },
-        shape: CircleBorder(),
+        shape: const CircleBorder(),
         backgroundColor: secondaryPrimaryColor,
         child: const Icon(
           Icons.add,
@@ -227,25 +165,109 @@ class _LeadsScreenState extends State<LeadsScreen> {
                 ],
               ),
               const SizedBox(height: 10),
-              Expanded(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  // physics: const NeverScrollableScrollPhysics(),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: leads.length,
-                  itemBuilder: (context, index) {
-                    final lead = leads[index];
-                    return _buildLeadCard(lead);
-                  },
-                ),
-              ),
+              Observer(builder: (_) {
+                if (leadStore.leads == null) {
+                  return const Center(child: CircularProgressIndicator());
+                } else {
+                  // You can print the lead values here for debugging
+                  List<Lead> leads = leadStore
+                      .leads;
+                  if (leads.isNotEmpty) {
+                    for (var lead in leads) {
+                      successLog(
+                          'Lead: ${lead.name}, ${lead.title}, ${lead.company}');
+                    }
+                  }
+
+                  // Displaying leads on the screen
+                  return Expanded(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      // physics: const NeverScrollableScrollPhysics(),
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: leads.length,
+                      itemBuilder: (context, index) {
+                        final lead = leads[index];
+                        final leadMap = {
+                          "statusColor": lead.status,
+                          "name": lead.name,
+                          "amount": lead.leadValue,
+                          "role": lead.company,
+                          "platform": lead.website,
+                          "status": getStatusText(lead.status),
+                          "date": formatDate(lead.dateadded),
+                          "color" : getStatusColor(lead.status),
+                          "company": lead.company,
+                        };
+                        return _buildLeadCard(leadMap);
+                      },
+                    ),
+                  );
+                }
+              }),
             ],
           ),
         ),
       ),
     );
   }
+  String getStatusText(status) {
+    switch (status) {
+      case "1":
+        return "Customer";
+      case "2":
+        return "New Lead";
+      case "3":
+        return "Calling";
+      case "4":
+        return "Contacted";
+      case "5":
+        return "Follow Up";
+      case "6":
+        return "Demo Sent";
+      case "7":
+        return "Proposal sent";
+      case "8":
+        return "Hot";
+      case "9":
+        return "Cold";
+      case "10":
+        return "Meeting Done";
+      case "11":
+        return "Budget Issues";
+      case "12":
+        return "Awaiting";
+      case "13":
+        return "Duplicate Lead";
+      case "14":
+        return "Not Required";
+      case "15":
+        return "Wrong";
+      case "16":
+        return "WA Sent";
+      case "17":
+        return "Language Barrier";
+      case "18":
+        return "Test Lead";
+      case "19":
+        return "Invalid Lead";
 
+      default:
+        return "";
+    }
+  }
+  Color getStatusColor(status) {
+    switch (status) {
+      case "1":
+        return Colors.lightGreen;
+      case "2":
+        return  Colors.lightBlueAccent;
+      case "4":
+        return Colors.green;
+      default:
+        return Colors.redAccent;
+    }
+  }
   Widget _buildSummaryCard(String count, String label) {
     return Card(
       elevation: 8,
@@ -279,13 +301,20 @@ class _LeadsScreenState extends State<LeadsScreen> {
       ),
     );
   }
-
+  String formatDate(String date) {
+    try {
+      DateTime parsedDate = DateTime.parse(date);
+      return DateFormat('dd MMM yyyy h:mm a').format(parsedDate);
+    } catch (e) {
+      return date;
+    }
+  }
   Widget _buildLeadCard(Map<String, dynamic> lead) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => Leads_Details()),
+          MaterialPageRoute(builder: (context) => const Leads_Details()),
         );
       },
       child: Stack(children: [
@@ -298,12 +327,12 @@ class _LeadsScreenState extends State<LeadsScreen> {
               children: [
                 // Colored bar
                 Container(
-                  decoration: BoxDecoration(
+                  decoration:  BoxDecoration(
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(10),
                       bottomLeft: Radius.circular(10),
                     ),
-                    color: lead["statusColor"],
+                    color: lead["color"],
                   ),
                   width: 5,
                   height: 120,
@@ -318,18 +347,36 @@ class _LeadsScreenState extends State<LeadsScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              lead["name"],
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    lead["name"],
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8,),
+                                  Text(
+                                    lead["company"],
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            Text(
-                              lead["amount"],
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                            Expanded(
+                              child: Text(
+                                lead["amount"],
+                                textAlign: TextAlign.end,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
@@ -362,16 +409,16 @@ class _LeadsScreenState extends State<LeadsScreen> {
                           children: [
                             Row(
                               children: [
-                                Icon(
+                                 Icon(
                                   Icons.check_circle,
                                   size: 16,
-                                  color: lead["statusColor"],
+                                  color: lead["color"]
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   lead["status"],
-                                  style: TextStyle(
-                                    color: lead["statusColor"],
+                                  style:  TextStyle(
+                                    color: Colors.grey.shade400,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
