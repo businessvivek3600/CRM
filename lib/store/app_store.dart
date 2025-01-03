@@ -138,6 +138,14 @@ abstract class _AppStore with Store {
   @observable
   bool rememberMe = false;
 
+  @observable
+  bool isLoading = false;
+
+
+  @action
+  void setLoading(bool val) {
+    isLoading = val;
+  }
 
 
   @action
