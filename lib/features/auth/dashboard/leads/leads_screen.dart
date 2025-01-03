@@ -188,16 +188,17 @@ class _LeadsScreenState extends State<LeadsScreen> {
                       itemCount: leads.length,
                       itemBuilder: (context, index) {
                         final lead = leads[index];
+
                         final leadMap = {
-                          "statusColor": lead.status,
-                          "name": lead.name,
-                          "amount": lead.leadValue,
-                          "role": lead.company,
-                          "platform": lead.website,
-                          "status": getStatusText(lead.status),
-                          "date": formatDate(lead.dateadded),
-                          "color" : getStatusColor(lead.status),
-                          "company": lead.company,
+                          "statusColor": lead.status  ?? "User",
+                          "name": lead.name ?? "",
+                          "amount": lead.leadValue ?? "",
+                          "role": lead.company ?? "",
+                          "platform": lead.website ?? "",
+                          "status": getStatusText(lead.status) ?? "",
+                          "date": formatDate(lead.dateadded) ?? "",
+                          "color" : getStatusColor(lead.status) ?? "",
+                          "company": lead.company ?? "",
                         };
                         return _buildLeadCard(leadMap);
                       },
@@ -251,7 +252,8 @@ class _LeadsScreenState extends State<LeadsScreen> {
         return "Test Lead";
       case "19":
         return "Invalid Lead";
-
+      case "20":
+        return "Potential";
       default:
         return "";
     }

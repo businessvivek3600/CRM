@@ -46,27 +46,27 @@ class Lead {
   String id;
   String hash;
   String name;
-  String title;
-  String company;
-  String description;
+  String? title;
+  String? company;
+  String? description;
   String country;
-  String zip;
-  String city;
-  String state;
-  String address;
+  String? zip;
+  String? city;
+  String? state;
+  String? address;
   String assigned;
   String dateadded;
   String fromFormId;
   String status;
   String source;
-  String lastcontact;
+  String? lastcontact;
   String? dateassigned;
   String lastStatusChange;
   String addedfrom;
-  String email;
-  String website;
+  String? email;
+  String? website;
   String leadorder;
-  String phonenumber;
+  String? phonenumber;
   String? dateConverted;
   String lost;
   String junk;
@@ -74,35 +74,35 @@ class Lead {
   String isImportedFromEmailIntegration;
   String? emailIntegrationUid;
   String isPublic;
-  String defaultLanguage;
+  String? defaultLanguage;
   String clientId;
-  String leadValue;
+  String? leadValue;
 
   Lead({
     required this.id,
     required this.hash,
     required this.name,
-    required this.title,
-    required this.company,
-    required this.description,
+    this.title,
+    this.company,
+    this.description,
     required this.country,
-    required this.zip,
-    required this.city,
-    required this.state,
-    required this.address,
+    this.zip,
+    this.city,
+    this.state,
+    this.address,
     required this.assigned,
     required this.dateadded,
     required this.fromFormId,
     required this.status,
     required this.source,
-    required this.lastcontact,
+    this.lastcontact,
     this.dateassigned,
     required this.lastStatusChange,
     required this.addedfrom,
-    required this.email,
-    required this.website,
+    this.email,
+    this.website,
     required this.leadorder,
-    required this.phonenumber,
+    this.phonenumber,
     this.dateConverted,
     required this.lost,
     required this.junk,
@@ -110,46 +110,46 @@ class Lead {
     required this.isImportedFromEmailIntegration,
     this.emailIntegrationUid,
     required this.isPublic,
-    required this.defaultLanguage,
+    this.defaultLanguage,
     required this.clientId,
-    required this.leadValue,
+    this.leadValue,
   });
 
   factory Lead.fromJson(Map<String, dynamic> json) {
     return Lead(
-      id: json['id'],
-      hash: json['hash'],
-      name: json['name'],
+      id: json['id'] ?? '',
+      hash: json['hash'] ?? '',
+      name: json['name'] ?? '',
       title: json['title'],
       company: json['company'],
       description: json['description'],
-      country: json['country'],
+      country: json['country'] ?? '',
       zip: json['zip'],
       city: json['city'],
       state: json['state'],
       address: json['address'],
-      assigned: json['assigned'],
-      dateadded: json['dateadded'],
-      fromFormId: json['from_form_id'],
-      status: json['status'],
-      source: json['source'],
+      assigned: json['assigned'] ?? '',
+      dateadded: json['dateadded'] ?? '',
+      fromFormId: json['from_form_id'] ?? '',
+      status: json['status'] ?? '',
+      source: json['source'] ?? '',
       lastcontact: json['lastcontact'],
       dateassigned: json['dateassigned'],
-      lastStatusChange: json['last_status_change'],
-      addedfrom: json['addedfrom'],
+      lastStatusChange: json['last_status_change'] ?? '',
+      addedfrom: json['addedfrom'] ?? '',
       email: json['email'],
       website: json['website'],
-      leadorder: json['leadorder'],
+      leadorder: json['leadorder'] ?? '',
       phonenumber: json['phonenumber'],
       dateConverted: json['date_converted'],
-      lost: json['lost'],
-      junk: json['junk'],
-      lastLeadStatus: json['last_lead_status'],
-      isImportedFromEmailIntegration: json['is_imported_from_email_integration'],
+      lost: json['lost'] ?? '',
+      junk: json['junk'] ?? '',
+      lastLeadStatus: json['last_lead_status'] ?? '',
+      isImportedFromEmailIntegration: json['is_imported_from_email_integration'] ?? '',
       emailIntegrationUid: json['email_integration_uid'],
-      isPublic: json['is_public'],
+      isPublic: json['is_public'] ?? '',
       defaultLanguage: json['default_language'],
-      clientId: json['client_id'],
+      clientId: json['client_id'] ?? '',
       leadValue: json['lead_value'],
     );
   }
@@ -193,3 +193,4 @@ class Lead {
     };
   }
 }
+
