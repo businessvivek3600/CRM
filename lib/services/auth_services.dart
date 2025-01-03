@@ -62,6 +62,17 @@ class AuthService {
       logger.e('login error : $e', tag: tag);
     }
   }
+  Future<bool>
+  logout() async {
+    await appStore.setUser(null);
+    await appStore.setLoggedIn(false);
+    await appStore.setToken('');
+    await appStore.setUserEmail('');
+    await appStore.setFirstName('');
+    await appStore.setLastName('');
+    return true;
+    // }
+  }
   Future<void> setUserDataByFieldName(String fieldName, dynamic value) async {
     try {
       switch (fieldName) {
