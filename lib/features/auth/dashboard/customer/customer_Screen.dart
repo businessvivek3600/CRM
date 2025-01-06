@@ -1,5 +1,6 @@
 import 'package:crm/features/auth/dashboard/customer/add_customer.dart';
 import 'package:crm/features/auth/dashboard/customer/customerdetails.dart';
+import 'package:crm/features/auth/dashboard/home_screen.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -16,12 +17,21 @@ class _CustomerScreenState extends State<CustomerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: secondaryPrimaryColor,
         title: const Text(
           'Customer',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              ),
+            );
+          },
         ),
       ),
       body: SingleChildScrollView(
