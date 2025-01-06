@@ -1,23 +1,31 @@
+import 'dart:convert';
+
 import 'package:crm/constants/app_constants.dart';
 import 'package:crm/features/auth/auth/auth_screen.dart';
 import 'package:crm/store/app_store.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'Models/user_data.dart';
 import 'constants/value_constants.dart';
 import 'database/dio/dio/dio_client.dart';
 import 'database/dio/dio/loging_interceotor.dart';
+import 'database/routes/route_settings.dart';
 import 'features/auth/dashboard/home_screen.dart';
+import 'services/auth_services.dart';
 import 'services/theme_service.dart';
 import 'utils/default_logger.dart';
+import 'widgets/loader_widget.dart';
 
 Future<void>  main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await initialize();
   await setupAppStore();
   await initializeUserData();
+  await initializeUserDatas();
   await initNbUtils().then((value) async => await initialize());
   runApp(const MyApp());
 }
@@ -25,6 +33,42 @@ Future<void>  main() async{
 Future<void> initialize() async {
   sharedPreferences = await SharedPreferences.getInstance();
   await appStore.setToken(getStringAsync(TOKEN), isInitializing: true);
+  // appStore.loadUserData();
+}
+Future<void> initializeUserDatas() async {
+  try {
+
+    // await setValue(TOKEN, 'EgANjoDNEyOHu9pqadiAyGzaXCqeP5V5a3YKIgVr');
+    var token = getStringAsync(TOKEN);
+
+
+
+    dioClient.updateHeader(getStringAsync(TOKEN));
+    if (appStore.isLoggedIn && token.isNotEmpty) {
+
+      await appStore.setFirstName(getStringAsync(FIRST_NAME),
+          isInitializing: true);
+      await appStore.setLastName(getStringAsync(LAST_NAME),
+          isInitializing: true);
+      await appStore.setUserEmail(getStringAsync(USER_EMAIL),
+          isInitializing: true);
+
+      await appStore.setToken(getStringAsync(TOKEN), isInitializing: true);
+
+
+      await tryCatch(() async {
+        await appStore.setUser(User.fromJson(
+            jsonDecode(getStringAsync(USER_DATA)) as Map<String, dynamic>));
+      });
+
+    } else {
+      await AuthService().logout();
+
+    }
+
+  } catch (e) {
+    logger.e('initializeUserData: -------------------------- $e');
+  }
 }
 Future<void> initializeUserData() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,62 +100,35 @@ Future<void> setupAppStore() async {
   await appStore.setLoggedIn(getBoolAsync(IS_LOGGED_IN), isInitializing: true);
 
 }
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
-  Future<bool> _checkIfLoggedIn() async {
-    final credentials = await appStore.loadCredentials();
-    if (credentials['email'] != null && credentials['password'] != null) {
-      appStore.setIsLoggedIn(true);
-      return true;
-    }
-    return false;
-  }
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-        future: _checkIfLoggedIn(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator(); // Show loading indicator
-          }
-          final isLoggedIn = snapshot.data ?? false;
+  State<MyApp> createState() => _MyAppState();
+}
 
-        return Observer(
-          builder: (context) {
-            return MaterialApp(
-                debugShowCheckedModeBanner: false,
-                title: AppConst.appName,
-                theme: ThemeData(
-                  primaryColor: AppConst.defaultPrimaryColor,
-                  scaffoldBackgroundColor: Colors.white,
-                  appBarTheme: AppBarTheme(
-                    backgroundColor: secondaryPrimaryColor,
-                    foregroundColor: Colors.white,
-                    titleTextStyle: GoogleFonts.lato(
-                      textStyle: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  textTheme: GoogleFonts.latoTextTheme(), // Apply Lato to all text
-                  buttonTheme: ButtonThemeData(
-                    buttonColor: AppConst.defaultPrimaryColor,
-                    textTheme: ButtonTextTheme.primary,
-                  ),
-                  elevatedButtonTheme: ElevatedButtonThemeData(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: secondaryPrimaryColor,
-                      foregroundColor: Colors.white,
-                    ),
-                  ),
-                ),
-                home:isLoggedIn ? const HomeScreen() : const AuthScreen(),
-            );
-          }
-        );
-      }
-    );}
+class _MyAppState extends State<MyApp> {
+  final GoRouter _goRouter = goRouter;
+  @override
+  Widget build(BuildContext context) {
+    return Observer(
+        builder: (_) => MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              routerConfig: _goRouter,
+              theme: AppTheme.dynamicTheme(lightThemeSetColor),
+              darkTheme: AppTheme.dynamicTheme(darkThemeSetColor),
+              themeMode:
+             ThemeMode.light,
+              title: AppConst.appName,
+              builder: (context, child) {
+                return LoadingWidget(
+                  context: context,
+                  goRouter: _goRouter,
+                  child: child!,
+                );
+              },
+            )
+
+    );
+  }
 }

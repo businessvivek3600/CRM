@@ -21,7 +21,12 @@ class LeadsScreen extends StatefulWidget {
 
 class _LeadsScreenState extends State<LeadsScreen> {
   bool isShow = true;
+  int currentPage = 0;
+  bool isLoadingMore = false;
+  bool hasMore = true; // Indicates if there are more leads to load
+  final ScrollController _scrollController = ScrollController();
   final List<Map<String, String>> summaryData = [
+
     {"count": "2", "label": "New Lead"},
     {"count": "4", "label": "Contacted"},
     {"count": "0", "label": "Qualified"},
@@ -35,9 +40,38 @@ class _LeadsScreenState extends State<LeadsScreen> {
   @override
   void initState() {
     super.initState();
-    // Calling getLeads method on screen initialization
-    leadStore.getLeads();
+    leadStore.getLeads(page: currentPage); // Fetch initial leads
+    _scrollController.addListener(_onScroll);
   }
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent &&
+        !isLoadingMore &&
+        hasMore) {
+      _loadMoreLeads();
+    }
+  }
+
+  Future<void> _loadMoreLeads() async {
+    setState(() {
+      isLoadingMore = true;
+    });
+
+    currentPage++; // Increment the current page
+    await leadStore.getLeads(page: currentPage); // Fetch the next page of leads
+
+    setState(() {
+      isLoadingMore = false; // Stop the loading state
+    });
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -169,35 +203,28 @@ class _LeadsScreenState extends State<LeadsScreen> {
                 if (leadStore.leads == null) {
                   return const Center(child: CircularProgressIndicator());
                 } else {
-                  // You can print the lead values here for debugging
-                  List<Lead> leads = leadStore
-                      .leads;
-                  if (leads.isNotEmpty) {
-                    for (var lead in leads) {
-                      successLog(
-                          'Lead: ${lead.name}, ${lead.title}, ${lead.company}');
-                    }
-                  }
+                  List<Lead> leads = leadStore.leads;
 
-                  // Displaying leads on the screen
                   return Expanded(
                     child: ListView.builder(
-                      shrinkWrap: true,
-                      // physics: const NeverScrollableScrollPhysics(),
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      itemCount: leads.length,
+                      controller: _scrollController,
+                      itemCount: leads.length + (hasMore ? 1 : 0),
                       itemBuilder: (context, index) {
-                        final lead = leads[index];
+                        if (index == leads.length) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
 
+                        final lead = leads[index];
                         final leadMap = {
-                          "statusColor": lead.status  ?? "User",
+                          "statusColor": lead.status ?? "User",
                           "name": lead.name ?? "",
                           "amount": lead.leadValue ?? "",
                           "role": lead.company ?? "",
                           "platform": lead.website ?? "",
                           "status": getStatusText(lead.status) ?? "",
                           "date": formatDate(lead.dateadded) ?? "",
-                          "color" : getStatusColor(lead.status) ?? "",
+                          "color": getStatusColor(lead.status) ?? "",
                           "company": lead.company ?? "",
                         };
                         return _buildLeadCard(leadMap);
@@ -316,7 +343,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const Leads_Details()),
+          MaterialPageRoute(builder: (context) =>  LeadDetails()),
         );
       },
       child: Stack(children: [

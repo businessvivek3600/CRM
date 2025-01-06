@@ -10,4 +10,4 @@ class Routes{
   static const String updateLead = 'update_lead';
   static const String  leadDetails = 'lead_details';
   static const String  customerDetails = 'customer_details';
-}git status
+}

@@ -1,3 +1,4 @@
+import 'package:crm/constants/value_constants.dart';
 import 'package:crm/features/auth/auth/auth_screen.dart';
 import 'package:crm/features/auth/dashboard/customer/add_customer.dart';
 import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
@@ -11,18 +12,24 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../features/auth/dashboard/home_screen.dart';
+import '../../services/auth_services.dart';
 import '../../store/app_store.dart';
 import '../../utils/default_logger.dart';
 import 'route_name.dart';
 import 'route_path.dart';
 
-final GoRouter goRouter = GoRouter(routes: <RouteBase>[
+final GoRouter goRouter = GoRouter(
+    navigatorKey: navigatorKey,
+    initialLocation: Paths.dashboard,
+    redirect: _redirect,
+    routes: <RouteBase>[
   // GoRoute(
   //   path: Paths.splash,
   //   name: Routes.splash,
   //   pageBuilder: (context, state) =>
   //       animatedRoute(state, (state) => const SplashScreen()),
   // ),
+
   GoRoute(
     path: Paths.dashboard,
     name: Routes.dashboard,
@@ -50,9 +57,9 @@ final GoRouter goRouter = GoRouter(routes: <RouteBase>[
   ),
   GoRoute(
     path: Paths.leadDetails,
-    name: Routes.login,
+    name: Routes.leadDetails,
     pageBuilder: (context, state) =>
-        animatedRoute(state, (state) =>  LeadDetailsScreen()),
+        animatedRoute(state, (state) =>  LeadDetails()),
   ),
   GoRoute(
     path: Paths.addLead,
@@ -107,6 +114,26 @@ Page animatedRoute(
     arguments: state.extra,
   );
 }
+Future<bool> checkLogin() async {
+  await appStore.setLoggedIn(getBoolAsync(IS_LOGGED_IN));
+  return appStore.isLoggedIn;
+}
+
+
+Future<String?> _redirect(BuildContext context, GoRouterState state) async {
+  infoLog('Redirecting to ${state.matchedLocation}');
+  infoLog('isLoggedIn: ${appStore.isLoggedIn}');
+  bool loggedIn = await checkLogin();
+  if (state.matchedLocation == Paths.login) return null;
+
+  // Redirect logic
+  if (loggedIn) {
+    return Paths.dashboard; // Redirect to dashboard if logged in
+  } else {
+    return Paths.login;
+  }
+}
+
 
 enum RouteTransition {
   slide,

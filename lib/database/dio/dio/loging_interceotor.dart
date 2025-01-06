@@ -27,8 +27,8 @@ class LoggingInterceptor extends InterceptorsWrapper {
 
     if (response.data?['is_logged_in'] != null) {
       pl('[${response.requestOptions.path}] is_logged_in: ${response.data['is_logged_in']}');
-      if (response.data['is_logged_in'] == 1) {
-        appStore.setSessionExpired(true);
+      if (response.data['is_logged_in'] == 0 && !appStore.isSessionExpired) {
+        await appStore.setSessionExpired(true);
       }
     }
     return super.onResponse(response, handler);
