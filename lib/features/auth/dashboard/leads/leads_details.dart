@@ -1,3 +1,4 @@
+import 'package:crm/features/auth/dashboard/customer/convertedto_customer.dart';
 import 'package:crm/features/auth/dashboard/leads/addnotes.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/features/auth/dashboard/leads/reminders.dart';
@@ -252,10 +253,48 @@ class ProfileTab extends StatelessWidget {
         children: leadDetails.map((detail) {
           return Column(
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end, // Aligns to the right
+                children: [
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.green), // Button background color
+                      foregroundColor: MaterialStateProperty.all<Color>(
+                          Colors.white), // Button text color
+                      // elevation: MaterialStateProperty.all<double>(
+                      //     5), // Shadow elevation
+                      padding: MaterialStateProperty.all<EdgeInsets>(
+                        EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      ),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              10), // No border radius for rectangular shape
+                        ),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ConvertToCustomer(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'Convert To Customer',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 10),
               // Top Summary Card
               Card(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(15),
                 ),
                 elevation: 4,
                 child: Padding(
