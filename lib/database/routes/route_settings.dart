@@ -1,3 +1,4 @@
+import 'package:crm/Models/leads_model.dart';
 import 'package:crm/constants/value_constants.dart';
 import 'package:crm/features/auth/auth/auth_screen.dart';
 import 'package:crm/features/auth/dashboard/customer/add_customer.dart';
@@ -55,12 +56,12 @@ final GoRouter goRouter = GoRouter(
     pageBuilder: (context, state) =>
         animatedRoute(state, (state) => const LeadsScreen()),
   ),
-  GoRoute(
-    path: Paths.leadDetails,
-    name: Routes.leadDetails,
-    pageBuilder: (context, state) =>
-        animatedRoute(state, (state) =>  LeadDetails()),
-  ),
+  // GoRoute(
+  //   path: Paths.leadDetails,
+  //   name: Routes.leadDetails,
+  //   pageBuilder: (context, state) =>
+  //       animatedRoute(state, (state) =>  LeadDetails(lead: Lead.t ,)),
+  // ),
   GoRoute(
     path: Paths.addLead,
     name: Routes.addLead,

@@ -36,12 +36,12 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
             color: Colors.white,
           ),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => LeadDetailsScreen(),
-              ),
-            );
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => LeadDetails(),
+            //   ),
+            // );
           },
         ),
       ),
@@ -182,12 +182,12 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LeadDetailsScreen(),
-                          ),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => LeadDetails(),
+                        //   ),
+                        // );
                       },
                       child: const Text("Back to lead"),
                     ),
