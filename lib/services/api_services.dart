@@ -16,10 +16,10 @@ import '../widgets/toastification/toastification.dart';
 class ApiService {
   static String tag = 'ApiService';
 
-  static Future<(bool, Map<String, dynamic>, String?)> getLeads() async {
+  static Future<(bool, Map<String, dynamic>, String?)> getLeads({int page = 0}) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-      await ApiHandler.fetchData(ApiConstant.getLeads,
+      await ApiHandler.fetchData('${ApiConstant.getLeads}?page=$page',
           method: ApiMethod.POST);
       if (status && data.isNotEmpty) {
         return (true, data, message);

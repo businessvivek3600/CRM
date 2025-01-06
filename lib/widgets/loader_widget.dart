@@ -2,11 +2,13 @@ import 'package:crm/widgets/spin_kit_chasing_dots.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 import '../constants/value_constants.dart';
+import '../database/routes/route_path.dart';
 import '../features/auth/auth/auth_screen.dart';
 import '../services/auth_services.dart';
 import '../store/app_store.dart';
@@ -49,9 +51,15 @@ class _LoaderWidgetState extends State<LoaderWidget>
 }
 
 class LoadingWidget extends StatelessWidget {
-  const LoadingWidget({required this.child, super.key, required this.context});
+  const LoadingWidget(
+      {required this.child,
+        super.key,
+        required this.context,
+        required this.goRouter});
   final BuildContext context;
   final Widget child;
+  final GoRouter goRouter;
+
 
   @override
   Widget build(BuildContext context) => Material(
@@ -64,7 +72,15 @@ class LoadingWidget extends StatelessWidget {
             const Breakpoint(start: 801, end: 1920, name: DESKTOP),
             const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
           ],
+          // child: ToastificationConfigProvider(
+          //     config: const ToastificationConfig(
+          //       margin: EdgeInsets.fromLTRB(0, 16, 0, 110),
+          //       alignment: Alignment.center,
+          //       itemWidth: 440,
+          //       animationDuration: Duration(milliseconds: 500),
+          //     ),
           child: child,
+          // ),
         ),
         Positioned(
           bottom: 0,
@@ -72,7 +88,7 @@ class LoadingWidget extends StatelessWidget {
           right: 0,
           child: Observer(builder: (context) {
             if (appStore.isSessionExpired) {
-              return const _SessionExpiredWidget();
+              return _SessionExpiredWidget(goRouter: goRouter);
             } else {
               return Container();
             }
@@ -86,18 +102,36 @@ class LoadingWidget extends StatelessWidget {
                   color: Colors.black.withOpacity(0.1),
                   child: Center(
                       child: SpinKitChasingDots(
-                        color: context.theme.primaryColor,
+                        color:  Colors.white
+
                       )))),
         ),
       ],
-    ).onTap(() {
-      hideKeyboard(context);
-    }),
+    ).onTap(
+      isMacOS || isWeb || isWindows || isLinux
+          ? null
+          : () {
+        // if (defaultTargetPlatform == TargetPlatform.android) {
+        //   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+        //     // SystemUiOverlay.bottom,
+        //     SystemUiOverlay.top,
+        //   ]);
+        //   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        //     statusBarColor: Colors.transparent, // Status bar color
+        //     systemNavigationBarColor: Colors.transparent,
+        //     systemNavigationBarContrastEnforced: true,
+        //   ));
+        // }
+        hideKeyboard(context);
+      },
+    ),
   );
 }
 
 class _SessionExpiredWidget extends StatefulWidget {
-  const _SessionExpiredWidget({super.key});
+  const _SessionExpiredWidget({super.key, required this.goRouter});
+
+  final GoRouter goRouter;
 
   @override
   State<_SessionExpiredWidget> createState() => _SessionExpiredWidgetState();
@@ -108,13 +142,10 @@ class _SessionExpiredWidgetState extends State<_SessionExpiredWidget> {
   void initState() {
     super.initState();
     AuthService().logout().then((value) {
-      pl('running logout...');
-      Future.delayed(const Duration(seconds: 1), () {
-        appStore.setSessionExpired(false);
-        Navigator.of(context, rootNavigator: true).pushReplacement(
-          MaterialPageRoute(builder: (_) => const AuthScreen()),
-        );
-      });
+      pl('running loggout... ');
+      1.seconds.delay.then((value) => widget.goRouter.go(Paths.login))
+      .then((value) => appStore.setSessionExpired(false))
+          ;
     });
   }
 

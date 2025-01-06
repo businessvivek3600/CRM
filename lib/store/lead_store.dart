@@ -19,9 +19,11 @@ abstract class _LeadStore with Store {
   List<Lead> leads = [];
 
   @action
-  Future<void> getLeads() async {
+  Future<void> getLeads({int page = 0}) async {
+    infoLog("Leads Page Count --------$page");
     loadingLeads.value = true; // Update as observable
-    var (status, data, message) = await ApiService.getLeads();
+    var (status, data, message) = await ApiService.getLeads(page:  page);
+    infoLog("API Response Data according page: ${data['leads']}");
     if (status) {
       List<Lead> _leads = [];
       tryCatch(() => _leads = (data['leads'] as List).map((e) {
