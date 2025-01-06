@@ -18,7 +18,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Customer Details'),
-          backgroundColor: Colors.blueGrey[900],
+          backgroundColor: secondaryPrimaryColor,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
