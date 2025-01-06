@@ -1,3 +1,4 @@
+import 'package:crm/Models/leads_model.dart';
 import 'package:crm/features/auth/dashboard/customer/convertedto_customer.dart';
 import 'package:crm/features/auth/dashboard/leads/addnotes.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
@@ -6,24 +7,18 @@ import 'package:crm/features/auth/dashboard/leads/updatelead.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
 
-class LeadDetails extends StatefulWidget {
-  const LeadDetails({super.key});
+import '../../../../widgets/date_formation.dart';
 
+
+
+class LeadDetails extends StatefulWidget {
+  const LeadDetails({Key? key, required this.lead}) : super(key: key);
+   final Lead lead;
   @override
   State<LeadDetails> createState() => _LeadDetailsState();
 }
 
 class _LeadDetailsState extends State<LeadDetails> {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: LeadDetailsScreen(),
-    );
-  }
-}
-
-class LeadDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -86,10 +81,10 @@ class LeadDetailsScreen extends StatelessWidget {
                     textPrimaryColor.withOpacity(0.6), // Unselected tab text
                 indicatorColor:
                     textPrimaryColor.withOpacity(0.8), // Tab indicator color
-                tabs: [
-                  const Tab(text: 'Profile'),
-                  const Tab(text: 'Notes'),
-                  const Tab(text: 'Reminder'),
+                tabs: const [
+                  Tab(text: 'Profile'),
+                  Tab(text: 'Notes'),
+                  Tab(text: 'Reminder'),
                 ],
               ),
             ),
@@ -97,7 +92,7 @@ class LeadDetailsScreen extends StatelessWidget {
               // Ensures TabBarView takes remaining space
               child: TabBarView(
                 children: [
-                  ProfileTab(), // Includes cards
+                  ProfileTab(lead: widget.lead), // Includes cards
                   const AddNotesTab(),
                   const RemindersTab()
                 ],
@@ -223,189 +218,211 @@ class LeadDetailsScreen extends StatelessWidget {
 }
 
 class ProfileTab extends StatelessWidget {
-  final List<Map<String, dynamic>> leadDetails = [
-    {
-      'name': 'John Smith',
-      'role': 'CEO',
-      'balance': '7500.00',
-      'company': 'Google',
-      'status': 'Customer',
-      'date': '03 Dec 2024',
-      'companyDetails': {
-        'Company': 'SmithTech Solutions',
-        'VAT Number': '-',
-        'Phone': '+1 (123) 456-7890',
-        'Website': 'https://www.exampleco.com',
-        'Address': '456 Oak Street',
-        'City': 'San Francisco',
-        'State': 'CA',
-        'Zip Code': '94110',
-        'Country': 'USA',
-      },
-    },
-  ];
+  final Lead lead;
+
+  const ProfileTab({required this.lead, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
-        children: leadDetails.map((detail) {
-          return Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end, // Aligns to the right
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end, // Aligns to the right
-                children: [
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          Colors.green), // Button background color
-                      foregroundColor: MaterialStateProperty.all<Color>(
-                          Colors.white), // Button text color
-                      // elevation: MaterialStateProperty.all<double>(
-                      //     5), // Shadow elevation
-                      padding: MaterialStateProperty.all<EdgeInsets>(
-                        EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      ),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              10), // No border radius for rectangular shape
-                        ),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ConvertToCustomer(),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      'Convert To Customer',
-                      style: TextStyle(fontSize: 16),
+              ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
+                  foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                  padding: MaterialStateProperty.all<EdgeInsets>(
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                ],
-              ),
-
-              SizedBox(height: 10),
-              // Top Summary Card
-              Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
                 ),
-                elevation: 4,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                detail['name'],
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                detail['role'],
-                                style: const TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                detail['balance'],
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                detail['company'],
-                                style: const TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const Divider(),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.check_circle, color: Colors.green),
-                              const SizedBox(width: 8),
-                              Text(
-                                detail['status'],
-                                style: const TextStyle(color: Colors.green),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Icon(Icons.calendar_today, color: Colors.blue),
-                              const SizedBox(width: 8),
-                              Text(
-                                detail['date'],
-                                style: const TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Details Card
-              Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                elevation: 4,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ...detail['companyDetails'].entries.map((entry) {
-                        return Column(
-                          children: [
-                            DetailRow(
-                              label: entry.key,
-                              value: entry.value,
-                            ),
-                            const Divider(),
-                          ],
-                        );
-                      }).toList(),
-                    ],
-                  ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ConvertToCustomer(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Convert To Customer',
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
             ],
-          );
-        }).toList(),
+          ),
+          const SizedBox(height: 10),
+          // Top Summary Card
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            lead.name ?? '',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            lead.title ?? 'N/A',
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            lead.leadValue ?? '0.00',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            lead.company ?? 'N/A',
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.check_circle, color: Colors.green),
+                          const SizedBox(width: 8),
+                          Text(
+                            getStatusText(lead.status)?? 'N/A',
+                            style: const TextStyle(color: Colors.green),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Icon(Icons.calendar_today, color: Colors.blue),
+                          const SizedBox(width: 8),
+                          Text(
+                            formatDate(lead.dateadded) ?? 'N/A',
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Details Card
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DetailRow(label: 'Company', value: lead.company ?? 'N/A'),
+                  const Divider(),
+                  DetailRow(label: 'Phone', value: lead.phonenumber ?? 'N/A'),
+                  const Divider(),
+                  DetailRow(label: 'Website', value: lead.website ?? 'N/A'),
+                  const Divider(),
+                  DetailRow(label: 'Address', value: lead.address ?? 'N/A'),
+                  const Divider(),
+                  DetailRow(label: 'City', value: lead.city ?? 'N/A'),
+                  const Divider(),
+                  DetailRow(label: 'State', value: lead.state ?? 'N/A'),
+                  const Divider(),
+                  DetailRow(label: 'Country', value: lead.country ?? 'N/A'),
+                  const Divider(),
+                  DetailRow(label: 'Zip Code', value: lead.zip ?? 'N/A'),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
+String getStatusText(status) {
+  switch (status) {
+    case "1":
+      return "Customer";
+    case "2":
+      return "New Lead";
+    case "3":
+      return "Calling";
+    case "4":
+      return "Contacted";
+    case "5":
+      return "Follow Up";
+    case "6":
+      return "Demo Sent";
+    case "7":
+      return "Proposal sent";
+    case "8":
+      return "Hot";
+    case "9":
+      return "Cold";
+    case "10":
+      return "Meeting Done";
+    case "11":
+      return "Budget Issues";
+    case "12":
+      return "Awaiting";
+    case "13":
+      return "Duplicate Lead";
+    case "14":
+      return "Not Required";
+    case "15":
+      return "Wrong";
+    case "16":
+      return "WA Sent";
+    case "17":
+      return "Language Barrier";
+    case "18":
+      return "Test Lead";
+    case "19":
+      return "Invalid Lead";
+    case "20":
+      return "Potential";
+    default:
+      return "";
+  }
+}
 class DetailRow extends StatelessWidget {
   final String label;
   final String value;
@@ -426,7 +443,7 @@ class DetailRow extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 30),
           Expanded(
             child: Text(
               value,
