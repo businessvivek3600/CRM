@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../Models/leads_model.dart';
 import '../../../../store/lead_store.dart';
+import '../../../../widgets/date_formation.dart';
 
 class LeadsScreen extends StatefulWidget {
   const LeadsScreen({super.key});
@@ -216,18 +217,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                         }
 
                         final lead = leads[index];
-                        final leadMap = {
-                          "statusColor": lead.status ?? "User",
-                          "name": lead.name ?? "",
-                          "amount": lead.leadValue ?? "",
-                          "role": lead.company ?? "",
-                          "platform": lead.website ?? "",
-                          "status": getStatusText(lead.status) ?? "",
-                          "date": formatDate(lead.dateadded) ?? "",
-                          "color": getStatusColor(lead.status) ?? "",
-                          "company": lead.company ?? "",
-                        };
-                        return _buildLeadCard(leadMap);
+                        return _buildLeadCard(lead);
                       },
                     ),
                   );
@@ -330,20 +320,13 @@ class _LeadsScreenState extends State<LeadsScreen> {
       ),
     );
   }
-  String formatDate(String date) {
-    try {
-      DateTime parsedDate = DateTime.parse(date);
-      return DateFormat('dd MMM yyyy h:mm a').format(parsedDate);
-    } catch (e) {
-      return date;
-    }
-  }
-  Widget _buildLeadCard(Map<String, dynamic> lead) {
+
+  Widget _buildLeadCard(Lead lead) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) =>  LeadDetails()),
+          MaterialPageRoute(builder: (context) =>  LeadDetails(lead: lead,)),
         );
       },
       child: Stack(children: [
@@ -356,12 +339,12 @@ class _LeadsScreenState extends State<LeadsScreen> {
               children: [
                 // Colored bar
                 Container(
-                  decoration:  BoxDecoration(
+                  decoration:   BoxDecoration(
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(10),
                       bottomLeft: Radius.circular(10),
                     ),
-                    color: lead["color"],
+                    color: getStatusColor(lead.status),
                   ),
                   width: 5,
                   height: 120,
@@ -381,7 +364,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    lead["name"],
+                                    lead.name,
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -389,7 +372,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                                   ),
                                   const SizedBox(height: 8,),
                                   Text(
-                                    lead["company"],
+                                    lead.title ?? '',
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -400,7 +383,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                             ),
                             Expanded(
                               child: Text(
-                                lead["amount"],
+                                lead.leadValue ?? "",
                                 textAlign: TextAlign.end,
                                 style: const TextStyle(
                                   fontSize: 16,
@@ -415,7 +398,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                           children: [
                             Expanded(
                               child: Text(
-                                lead["role"],
+                                lead.company ?? "",
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey,
@@ -423,7 +406,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                               ),
                             ),
                             Text(
-                              lead["platform"],
+                              lead.source,
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: Colors.black,
@@ -438,14 +421,14 @@ class _LeadsScreenState extends State<LeadsScreen> {
                           children: [
                             Row(
                               children: [
-                                 Icon(
+                                  Icon(
                                   Icons.check_circle,
                                   size: 16,
-                                  color: lead["color"]
+                                  color: getStatusColor(lead.status),
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  lead["status"],
+                                 getStatusText( lead.status),
                                   style:  TextStyle(
                                     color: Colors.grey.shade400,
                                     fontWeight: FontWeight.w600,
@@ -462,7 +445,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  lead["date"],
+                                  formatDate(lead.dateadded) ?? '',
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey,
