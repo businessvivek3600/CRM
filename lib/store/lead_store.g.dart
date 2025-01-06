@@ -44,8 +44,8 @@ mixin _$LeadStore on _LeadStore, Store {
       AsyncAction('_LeadStore.getLeads', context: context);
 
   @override
-  Future<void> getLeads() {
-    return _$getLeadsAsyncAction.run(() => super.getLeads());
+  Future<void> getLeads({int page = 0}) {
+    return _$getLeadsAsyncAction.run(() => super.getLeads(page: page));
   }
 
   @override

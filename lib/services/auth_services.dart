@@ -44,10 +44,13 @@ class AuthService {
             for (var key in user.keys) {
                           await setUserDataByFieldName(key, user[key]);
                         }
-            await appStore.setToken(token);
-            dioClient.updateHeader(token);
             await appStore.setUser(userFromJson(user));
+            await appStore.setToken(token);
+
+            dioClient.updateHeader(token);
+
             await appStore.setLoggedIn(true);
+
           }
         }
       } else {
@@ -62,17 +65,25 @@ class AuthService {
       logger.e('login error : $e', tag: tag);
     }
   }
-  Future<bool>
-  logout() async {
-    await appStore.setUser(null);
-    await appStore.setLoggedIn(false);
-    await appStore.setToken('');
-    await appStore.setUserEmail('');
-    await appStore.setFirstName('');
-    await appStore.setLastName('');
-    return true;
-    // }
+
+
+  Future<bool> logout() async {
+    try {
+      await Future.wait([
+        appStore.setUser(null),
+        appStore.setSessionExpired(false),
+        appStore.setLoggedIn(false),
+        appStore.setToken(''),
+        appStore.setLastName(''),
+      ]);
+      pl('All user data cleared successfully');
+      return true;
+    } catch (e) {
+      logger.e('Logout error: $e', tag: tag);
+      return false;
+    }
   }
+
   Future<void> setUserDataByFieldName(String fieldName, dynamic value) async {
     try {
       switch (fieldName) {
@@ -185,7 +196,7 @@ class AuthService {
           break;
       }
     } catch (e) {
-      logger.e('setUserDataByFieldName error on $fieldName $value : $e', tag: tag);
+      logger.e('setUserDataByFieldName error on $fieldName $value : $e');
     }
   }
 

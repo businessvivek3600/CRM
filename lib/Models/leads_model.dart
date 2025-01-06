@@ -1,7 +1,7 @@
 import 'package:crm/Models/user_data.dart';
 
 class LeadsModel {
-  bool status;
+  List<LeadStatus> status;
   int isLoggedIn;
   String loginToken;
   User userData;
@@ -19,7 +19,9 @@ class LeadsModel {
 
   factory LeadsModel.fromJson(Map<String, dynamic> json) {
     return LeadsModel(
-      status: json['status'],
+      status: (json['status'] as List)
+          .map((statusJson) => LeadStatus.fromJson(statusJson))
+          .toList(),
       isLoggedIn: json['is_logged_in'],
       loginToken: json['login_token'],
       userData: User.fromJson(json['userData']),
@@ -32,7 +34,7 @@ class LeadsModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'status': status,
+      'status': status.map((status) => status.toJson()).toList(),
       'is_logged_in': isLoggedIn,
       'login_token': loginToken,
       'userData': userData.toJson(),
@@ -42,9 +44,45 @@ class LeadsModel {
   }
 }
 
+class LeadStatus {
+  String id;
+  String name;
+  String statusOrder;
+  String color;
+  String isDefault;
+
+  LeadStatus({
+    required this.id,
+    required this.name,
+    required this.statusOrder,
+    required this.color,
+    required this.isDefault,
+  });
+
+  factory LeadStatus.fromJson(Map<String, dynamic> json) {
+    return LeadStatus(
+      id: json['id'],
+      name: json['name'],
+      statusOrder: json['statusorder'],
+      color: json['color'],
+      isDefault: json['isdefault'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'statusorder': statusOrder,
+      'color': color,
+      'isdefault': isDefault,
+    };
+  }
+}
+
 class Lead {
   String id;
-  String hash;
+  String? hash;
   String name;
   String? title;
   String? company;
@@ -61,7 +99,7 @@ class Lead {
   String source;
   String? lastcontact;
   String? dateassigned;
-  String lastStatusChange;
+  String? lastStatusChange;
   String addedfrom;
   String? email;
   String? website;
@@ -80,7 +118,7 @@ class Lead {
 
   Lead({
     required this.id,
-    required this.hash,
+    this.hash,
     required this.name,
     this.title,
     this.company,
@@ -97,7 +135,7 @@ class Lead {
     required this.source,
     this.lastcontact,
     this.dateassigned,
-    required this.lastStatusChange,
+    this.lastStatusChange,
     required this.addedfrom,
     this.email,
     this.website,
@@ -118,7 +156,7 @@ class Lead {
   factory Lead.fromJson(Map<String, dynamic> json) {
     return Lead(
       id: json['id'] ?? '',
-      hash: json['hash'] ?? '',
+      hash: json['hash'],
       name: json['name'] ?? '',
       title: json['title'],
       company: json['company'],
@@ -135,7 +173,7 @@ class Lead {
       source: json['source'] ?? '',
       lastcontact: json['lastcontact'],
       dateassigned: json['dateassigned'],
-      lastStatusChange: json['last_status_change'] ?? '',
+      lastStatusChange: json['last_status_change'],
       addedfrom: json['addedfrom'] ?? '',
       email: json['email'],
       website: json['website'],
@@ -145,7 +183,8 @@ class Lead {
       lost: json['lost'] ?? '',
       junk: json['junk'] ?? '',
       lastLeadStatus: json['last_lead_status'] ?? '',
-      isImportedFromEmailIntegration: json['is_imported_from_email_integration'] ?? '',
+      isImportedFromEmailIntegration:
+      json['is_imported_from_email_integration'] ?? '',
       emailIntegrationUid: json['email_integration_uid'],
       isPublic: json['is_public'] ?? '',
       defaultLanguage: json['default_language'],
@@ -184,7 +223,8 @@ class Lead {
       'lost': lost,
       'junk': junk,
       'last_lead_status': lastLeadStatus,
-      'is_imported_from_email_integration': isImportedFromEmailIntegration,
+      'is_imported_from_email_integration':
+      isImportedFromEmailIntegration,
       'email_integration_uid': emailIntegrationUid,
       'is_public': isPublic,
       'default_language': defaultLanguage,
@@ -193,4 +233,3 @@ class Lead {
     };
   }
 }
-
