@@ -650,6 +650,22 @@ mixin _$AppStore on _AppStore, Store {
     });
   }
 
+  late final _$isLoadingAtom =
+      Atom(name: '_AppStore.isLoading', context: context);
+
+  @override
+  bool get isLoading {
+    _$isLoadingAtom.reportRead();
+    return super.isLoading;
+  }
+
+  @override
+  set isLoading(bool value) {
+    _$isLoadingAtom.reportWrite(value, super.isLoading, () {
+      super.isLoading = value;
+    });
+  }
+
   late final _$userAtom = Atom(name: '_AppStore.user', context: context);
 
   @override
@@ -663,6 +679,15 @@ mixin _$AppStore on _AppStore, Store {
     _$userAtom.reportWrite(value, super.user, () {
       super.user = value;
     });
+  }
+
+  late final _$setLoggedInAsyncAction =
+      AsyncAction('_AppStore.setLoggedIn', context: context);
+
+  @override
+  Future<void> setLoggedIn(bool val, {bool isInitializing = false}) {
+    return _$setLoggedInAsyncAction
+        .run(() => super.setLoggedIn(val, isInitializing: isInitializing));
   }
 
   late final _$setStaffIdAsyncAction =
@@ -1011,17 +1036,37 @@ mixin _$AppStore on _AppStore, Store {
         .run(() => super.setUser(val, isInitializing: isInitializing));
   }
 
-  late final _$setLoggedInAsyncAction =
-      AsyncAction('_AppStore.setLoggedIn', context: context);
+  late final _$loadUserDataAsyncAction =
+      AsyncAction('_AppStore.loadUserData', context: context);
 
   @override
-  Future<void> setLoggedIn(bool val, {bool isInitializing = false}) {
-    return _$setLoggedInAsyncAction
-        .run(() => super.setLoggedIn(val, isInitializing: isInitializing));
+  Future<void> loadUserData() {
+    return _$loadUserDataAsyncAction.run(() => super.loadUserData());
+  }
+
+  late final _$setUserDataAsyncAction =
+      AsyncAction('_AppStore.setUserData', context: context);
+
+  @override
+  Future<void> setUserData(Map<String, dynamic> userData,
+      {bool isInitializing = false}) {
+    return _$setUserDataAsyncAction
+        .run(() => super.setUserData(userData, isInitializing: isInitializing));
   }
 
   late final _$_AppStoreActionController =
       ActionController(name: '_AppStore', context: context);
+
+  @override
+  void setLoading(bool val) {
+    final _$actionInfo =
+        _$_AppStoreActionController.startAction(name: '_AppStore.setLoading');
+    try {
+      return super.setLoading(val);
+    } finally {
+      _$_AppStoreActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void setRememberMe(bool value) {
@@ -1088,6 +1133,7 @@ loginIpAddress: ${loginIpAddress},
 loginTime: ${loginTime},
 loginToken: ${loginToken},
 rememberMe: ${rememberMe},
+isLoading: ${isLoading},
 user: ${user},
 fullName: ${fullName}
     ''';

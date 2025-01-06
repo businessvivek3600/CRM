@@ -154,6 +154,12 @@ abstract class _AppStore with Store {
   ///
   @action
   void setIsLoggedIn(bool value) => isLoggedIn = value;
+  @action
+  Future<void> setLoggedIn(bool val, {bool isInitializing = false}) async {
+    isLoggedIn = val;
+    if (!isInitializing) await setValue(IS_LOGGED_IN, val);
+  }
+
 
   Future<void> saveCredentials(String email, String password) async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -428,10 +434,57 @@ abstract class _AppStore with Store {
       await setValue(USER_DATA, jsonEncode(val?.toJson()));
     }
   }
-  ///Check Login
+
+
   @action
-  Future<void> setLoggedIn(bool val, {bool isInitializing = false}) async {
-    isLoggedIn = val;
-    if (!isInitializing) await setValue(IS_LOGGED_IN, val);
+  Future<void> loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userDataString = prefs.getString(USER_DATA);
+
+    if (userDataString != null) {
+      Map<String, dynamic> userData = jsonDecode(userDataString);
+      await setUserData(userData, isInitializing: true);
+      setLoggedIn(true); // Mark the user as logged in
+    } else {
+      setLoggedIn(false); // Mark the user as not logged in
+    }
   }
+  @action
+  Future<void> setUserData(Map<String, dynamic> userData, {bool isInitializing = false}) async {
+    await setStaffId(userData['staffid'] ?? '', isInitializing: isInitializing);
+    await setUserEmail(userData['email'] ?? '', isInitializing: isInitializing);
+    await setFirstName(userData['firstname'] ?? '', isInitializing: isInitializing);
+    await setLastName(userData['lastname'] ?? '', isInitializing: isInitializing);
+    await setFacebook(userData['facebook'] ?? '', isInitializing: isInitializing);
+    await setLinkedin(userData['linkedin'] ?? '', isInitializing: isInitializing);
+    await setPhoneNumber(userData['phonenumber'] ?? '', isInitializing: isInitializing);
+    await setSkype(userData['skype'] ?? '', isInitializing: isInitializing);
+    await setPassword(userData['password'] ?? '', isInitializing: isInitializing);
+    await setDateCreated(userData['datecreated'] ?? '', isInitializing: isInitializing);
+    await setProfileImage(userData['thumb_image'] ?? '', isInitializing: isInitializing);
+    await setLastIp(userData['last_ip'] ?? '', isInitializing: isInitializing);
+    await setLastLogin(userData['last_login'] ?? '', isInitializing: isInitializing);
+    await setLastActivity(userData['last_activity'] ?? '', isInitializing: isInitializing);
+    await setLastPasswordChange(userData['last_password_change'], isInitializing: isInitializing);
+    await setNewPassKey(userData['new_pass_key'], isInitializing: isInitializing);
+    await setNewPassKeyRequested(userData['new_pass_key_requested'], isInitializing: isInitializing);
+    await setAdmin(userData['admin'] ?? '', isInitializing: isInitializing);
+    await setRole(userData['role'] ?? '', isInitializing: isInitializing);
+    await setActive(userData['active'] ?? '', isInitializing: isInitializing);
+    await setDefaultLanguage(userData['default_language'] ?? '', isInitializing: isInitializing);
+    await setDirection(userData['direction'] ?? '', isInitializing: isInitializing);
+    await setMediaPathSlug(userData['media_path_slug'] ?? '', isInitializing: isInitializing);
+    await setIsNotStaff(userData['is_not_staff'] ?? '', isInitializing: isInitializing);
+    await setHourlyRate(userData['hourly_rate'] ?? '', isInitializing: isInitializing);
+    await setTwoFactorAuthEnabled(userData['two_factor_auth_enabled'] ?? '', isInitializing: isInitializing);
+    await setTwoFactorAuthCode(userData['two_factor_auth_code'], isInitializing: isInitializing);
+    await setTwoFactorAuthCodeRequested(userData['two_factor_auth_code_requested'], isInitializing: isInitializing);
+    await setEmailSignature(userData['email_signature'] ?? '', isInitializing: isInitializing);
+    await setGoogleAuthSecret(userData['google_auth_secret'], isInitializing: isInitializing);
+    await setDeviceId(userData['device_id'] ?? '', isInitializing: isInitializing);
+    await setIsLogin(userData['is_login'] ?? '', isInitializing: isInitializing);
+    await setLoginIpAddress(userData['login_ip_address'], isInitializing: isInitializing);
+    await setLoginTime(userData['login_time'] ?? '', isInitializing: isInitializing);
+  }
+
 }

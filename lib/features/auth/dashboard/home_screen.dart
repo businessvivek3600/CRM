@@ -1,8 +1,11 @@
 // import 'package:crm/features/auth/dashboard/components/drawer_fragment/drawer_widget.dart';
+import 'package:crm/constants/app_constants.dart';
 import 'package:crm/features/auth/dashboard/components/drawer_fragment/drawer_widget.dart';
 import 'package:crm/store/app_store.dart';
 import 'package:crm/utils/colors.dart';
+import 'package:crm/utils/default_logger.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,6 +17,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   // Define the list of data
+  @override
+  void initState() {
+    appStore.loadUserData();
+    infoLog("---------------------------------");
+    infoLog(appStore.token);
+    infoLog(appStore.userEmail);
+    super.initState();
+  }
   final List<Map<String, dynamic>> metricData = [
     {
       'icon': Icons.attach_money,
@@ -56,141 +67,145 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Profile and Welcome Section
-              Row(
+          child: Observer(builder: (context) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const CircleAvatar(
-                    radius: 30,
-                    backgroundImage: NetworkImage(
-                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRchTRZ8A5eyfaCmAQYhVZA4-vgU-dfV94Ufw&s"),
-                  ),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children:  [
-                      Text(
-                        'Welcome ${appStore.fullName}',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+
+                  // Profile and Welcome Section
+                  Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 30,
+                        backgroundImage: NetworkImage(
+                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRchTRZ8A5eyfaCmAQYhVZA4-vgU-dfV94Ufw&s"),
                       ),
-                      Text(
-                       appStore.userEmail,
-                        style: TextStyle(
-                          color: Colors.grey,
-                        ),
+                      const SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children:  [
+                          Text(
+                            'Welcome ${appStore.fullName}',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                           appStore.userEmail,
+                            style: const TextStyle(
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
+                  const SizedBox(height: 20),
+
+                  // Metrics Grid
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      childAspectRatio: 3 / 2.5,
+                      crossAxisCount: 2, // Number of columns
+                      crossAxisSpacing: 10, // Reduced spacing for smaller cards
+                      mainAxisSpacing: 10, // Reduced spacing for smaller cards
+                    ),
+                    itemCount: metricData.length,
+                    itemBuilder: (context, index) {
+                      final data = metricData[index];
+                      return _buildCard(
+                        data['icon'],
+                        data['count'],
+                        data['label'],
+                        data['color'],
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Invoice Progress Bars
+                  const Text(
+                    "Leads Overview",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const InvoiceProgressItem(
+                    label: "New Lead",
+                    value: 0.1, // Percentage of progress
+                    color: Colors.red,
+                    count: 2,
+                  ),
+                  const InvoiceProgressItem(
+                    label: "Contacted",
+                    value: 0.4,
+                    color: Colors.green,
+                    count: 4,
+                  ),
+                  const InvoiceProgressItem(
+                    label: "Qualified",
+                    value: 0.2,
+                    color: Colors.blue,
+                    count: 2,
+                  ),
+                  const InvoiceProgressItem(
+                    label: "Negotiating",
+                    value: 0.7,
+                    color: Colors.orange,
+                    count: 23,
+                  ),
+                  const InvoiceProgressItem(
+                    label: "Closed-Won",
+                    value: 0.5,
+                    color: Colors.green,
+                    count: 23,
+                  ),
+                  const InvoiceProgressItem(
+                    label: "Closed-Lost",
+                    value: 0.6,
+                    color: Colors.red,
+                    count: 23,
+                  ),
+                  const InvoiceProgressItem(
+                    label: "Pending",
+                    value: 0.7,
+                    color: Colors.orange,
+                    count: 23,
+                  ),
+                  const InvoiceProgressItem(
+                    label: "On Hold",
+                    value: 0.3,
+                    color: Colors.grey,
+                    count: 23,
+                  ),
+
+                  const InvoiceProgressItem(
+                    label: "Reopened",
+                    value: 0.4,
+                    color: Colors.purple,
+                    count: 23,
+                  ),
+                  const InvoiceProgressItem(
+                    label: "Converted",
+                    value: 0.4,
+                    color: Colors.blue,
+                    count: 23,
+                  ),
+                  const InvoiceProgressItem(
+                    label: "Customer",
+                    value: 0.7,
+                    color: Colors.lightGreen,
+                    count: 23,
+                  ),
                 ],
-              ),
-              const SizedBox(height: 20),
-
-              // Metrics Grid
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  childAspectRatio: 3 / 2.5,
-                  crossAxisCount: 2, // Number of columns
-                  crossAxisSpacing: 10, // Reduced spacing for smaller cards
-                  mainAxisSpacing: 10, // Reduced spacing for smaller cards
-                ),
-                itemCount: metricData.length,
-                itemBuilder: (context, index) {
-                  final data = metricData[index];
-                  return _buildCard(
-                    data['icon'],
-                    data['count'],
-                    data['label'],
-                    data['color'],
-                  );
-                },
-              ),
-
-              const SizedBox(height: 20),
-
-              // Invoice Progress Bars
-              const Text(
-                "Leads Overview",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              InvoiceProgressItem(
-                label: "New Lead",
-                value: 0.1, // Percentage of progress
-                color: Colors.red,
-                count: 2,
-              ),
-              InvoiceProgressItem(
-                label: "Contacted",
-                value: 0.4,
-                color: Colors.green,
-                count: 4,
-              ),
-              InvoiceProgressItem(
-                label: "Qualified",
-                value: 0.2,
-                color: Colors.blue,
-                count: 2,
-              ),
-              InvoiceProgressItem(
-                label: "Negotiating",
-                value: 0.7,
-                color: Colors.orange,
-                count: 23,
-              ),
-              InvoiceProgressItem(
-                label: "Closed-Won",
-                value: 0.5,
-                color: Colors.green,
-                count: 23,
-              ),
-              InvoiceProgressItem(
-                label: "Closed-Lost",
-                value: 0.6,
-                color: Colors.red,
-                count: 23,
-              ),
-              InvoiceProgressItem(
-                label: "Pending",
-                value: 0.7,
-                color: Colors.orange,
-                count: 23,
-              ),
-              InvoiceProgressItem(
-                label: "On Hold",
-                value: 0.3,
-                color: Colors.grey,
-                count: 23,
-              ),
-
-              InvoiceProgressItem(
-                label: "Reopened",
-                value: 0.4,
-                color: Colors.purple,
-                count: 23,
-              ),
-              InvoiceProgressItem(
-                label: "Converted",
-                value: 0.4,
-                color: Colors.blue,
-                count: 23,
-              ),
-              InvoiceProgressItem(
-                label: "Customer",
-                value: 0.7,
-                color: Colors.lightGreen,
-                count: 23,
-              ),
-            ],
+              );
+            }
           ),
         ),
       ),
