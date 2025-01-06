@@ -53,32 +53,32 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const CommonTextField(
-                  label: 'First Name *',
+                  label: 'First Name',
                   hint: 'Enter First Name',
                 ),
                 const SizedBox(height: 15),
                 const CommonTextField(
-                  label: 'Last Name *',
+                  label: 'Last Name ',
                   hint: 'Enter Last Name',
                 ),
                 const SizedBox(height: 15),
                 const CommonTextField(
-                  label: 'Position *',
+                  label: 'Position ',
                   hint: 'Enter Position',
                 ),
                 const SizedBox(height: 15),
                 const CommonTextField(
-                  label: 'Email *',
+                  label: 'Email ',
                   hint: 'Enter Email',
                 ),
                 const SizedBox(height: 15),
                 const CommonTextField(
-                  label: 'Company *',
+                  label: 'Company ',
                   hint: 'Enter Company Name',
                 ),
                 const SizedBox(height: 15),
                 const CommonTextField(
-                  label: 'Phone *',
+                  label: 'Phone ',
                   hint: 'Enter Phone Number',
                 ),
                 const SizedBox(height: 15),
