@@ -1,10 +1,13 @@
+import 'package:crm/Models/usercustomer_model.dart';
 import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
 import 'package:crm/features/auth/dashboard/customer/updatecustomer.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomerDetails extends StatefulWidget {
-  const CustomerDetails({Key? key}) : super(key: key);
+  final Customer customer;
+
+  const CustomerDetails({Key? key, required this.customer}) : super(key: key);
 
   @override
   State<CustomerDetails> createState() => _CustomerDetailsState();
@@ -13,18 +16,21 @@ class CustomerDetails extends StatefulWidget {
 class _CustomerDetailsState extends State<CustomerDetails> {
   @override
   Widget build(BuildContext context) {
+    final customer = widget.customer;
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Customer Details'),
+          title: Text(customer.company),
           backgroundColor: secondaryPrimaryColor,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CustomerScreen()),
+                MaterialPageRoute(
+                  builder: (context) => CustomerScreen(),
+                ),
               );
             },
           ),
@@ -33,9 +39,10 @@ class _CustomerDetailsState extends State<CustomerDetails> {
               icon: const Icon(Icons.edit),
               onPressed: () {
                 Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => UpdateCustomer()),
-                );
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UpdateCustomer(customer: customer),
+                    ));
               },
             ),
             IconButton(
@@ -62,8 +69,8 @@ class _CustomerDetailsState extends State<CustomerDetails> {
             Expanded(
               child: TabBarView(
                 children: [
-                  _buildProfileTab(),
-                  _BillingShippingDetailsTab(),
+                  _buildProfileTab(customer),
+                  _buildBillingShippingTab(customer),
                   Center(child: Text('Contact Information')),
                 ],
               ),
@@ -73,9 +80,8 @@ class _CustomerDetailsState extends State<CustomerDetails> {
       ),
     );
   }
-  //ProfileTab
 
-  Widget _buildProfileTab() {
+  Widget _buildProfileTab(Customer customer) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -85,11 +91,11 @@ class _CustomerDetailsState extends State<CustomerDetails> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildRow('Company', 'ABC Electronics'),
-                  _buildRow('VAT Number', 'US7654321'),
+                  _buildRow('Company', customer.company),
+                  _buildRow('VAT Number', customer.vat!),
                   const Divider(),
-                  _buildRow('Phone', '+1 (555) 555-5555'),
-                  _buildRow('Website', '-'),
+                  _buildRow('Phone', customer.phoneNumber),
+                  _buildRow('Website', customer.website),
                 ],
               ),
             ),
@@ -98,13 +104,52 @@ class _CustomerDetailsState extends State<CustomerDetails> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildRow('Address', '789 Electronics Avenue'),
+                  _buildRow('Address', customer.address),
                   const Divider(),
-                  _buildRow('City', 'San Francisco'),
-                  _buildRow('State', 'CA'),
+                  _buildRow('City', customer.city),
+                  _buildRow('State', customer.state),
                   const Divider(),
-                  _buildRow('Zip Code', '94101'),
-                  _buildRow('Country', '3'),
+                  _buildRow('Zip Code', customer.zip),
+                  _buildRow('Country', customer.country),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBillingShippingTab(Customer customer) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            _buildCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildRow('Company', customer.company),
+                  // _buildRow('VAT Number', customer.vatNumber),
+                  const Divider(),
+                  // _buildRow('Phone', customer.phone),
+                  _buildRow('Website', customer.website),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildRow('Address', customer.address),
+                  const Divider(),
+                  _buildRow('City', customer.city),
+                  _buildRow('State', customer.state),
+                  const Divider(),
+                  _buildRow('Zip Code', customer.zip ?? "--"),
+                  _buildRow('Country', customer.country),
                 ],
               ),
             ),
@@ -135,88 +180,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
         children: [
           Text(
             label,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[700],
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _BillingShippingDetailsTab() {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildRow('Company', 'ABC Electronics'),
-                  _buildRow('VAT Number', 'US7654321'),
-                  const Divider(),
-                  _buildRow('Phone', '+1 (555) 555-5555'),
-                  _buildRow('Website', '-'),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildRow('Address', '789 Electronics Avenue'),
-                  const Divider(),
-                  _buildRow('City', 'San Francisco'),
-                  _buildRow('State', 'CA'),
-                  const Divider(),
-                  _buildRow('Zip Code', '94101'),
-                  _buildRow('Country', '3'),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBillingCard({required Widget child}) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: child,
-      ),
-    );
-  }
-
-  Widget _buildBillingRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[700],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[700]),
           ),
           Text(
             value,
@@ -321,7 +285,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                             ),
                           );
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Lead deleted!")),
+                            const SnackBar(content: Text("Customer deleted!")),
                           );
                         },
                         child: const Text(

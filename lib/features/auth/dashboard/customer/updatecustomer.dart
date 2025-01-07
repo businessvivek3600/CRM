@@ -1,5 +1,6 @@
 import 'package:country_state_picker/components/index.dart';
 import 'package:country_state_picker/country_state_picker.dart';
+import 'package:crm/Models/usercustomer_model.dart';
 import 'package:crm/constants/app_constants.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/text_field.dart';
@@ -7,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 class UpdateCustomer extends StatefulWidget {
-  const UpdateCustomer({super.key});
+  const UpdateCustomer({super.key, required Customer customer});
 
   @override
   State<UpdateCustomer> createState() => _UpdateCustomerState();
