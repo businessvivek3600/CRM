@@ -62,7 +62,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
                   ? SingleChildScrollView(
                       child: GridView.builder(
                         shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         itemCount: 6,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
@@ -150,7 +150,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => CustomerDetails()),
+                                builder: (context) => const CustomerDetails()),
                           );
                         },
                         child: Card(
@@ -207,18 +207,18 @@ class _CustomerScreenState extends State<CustomerScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        shape: CircleBorder(),
+        shape: const CircleBorder(),
         backgroundColor: secondaryPrimaryColor,
         onPressed: () {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => AddCustomer(),
+                builder: (context) => const AddCustomer(),
               ));
         },
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: const Icon(
+        child: const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Icon(
             Icons.add,
             color: Colors.white,
             size: 30,

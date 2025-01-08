@@ -2,6 +2,7 @@
 import 'package:crm/Models/leads_model.dart';
 import 'package:crm/services/api_services.dart';
 import 'package:crm/utils/default_logger.dart';
+import 'package:crm/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
 
@@ -18,6 +19,15 @@ abstract class _LeadStore with Store {
   @observable
   List<Lead> leads = [];
 
+  @observable
+  List<LeadStatus> leadStatus = [];
+
+  @observable
+  List<LeadSource> leadSource = [];
+
+  @observable
+  List<Reminder> reminders = [];
+
   @action
   Future<void> getLeads({int page = 0}) async {
     infoLog("Leads Page Count --------$page");
@@ -31,10 +41,29 @@ abstract class _LeadStore with Store {
       }).toList());
       leads = _leads;
       pl('res _products length: ${_leads.length}');
+      if (data['status_data'] != null) {
+        leadStatus = (data['status_data'] as List)
+            .map((e) => LeadStatus.fromJson(e))
+            .toList();
+      }
+      if (data['sources'] != null) {
+        leadSource = (data['sources'] as List)
+            .map((e) => LeadSource.fromJson(e))
+            .toList();
+      }
       for (var lead in leads) {
         warningLog("Lead: ${lead.toJson()}");
       }
     }
     loadingLeads.value = false; // Ensure loading state is updated
+  }
+
+  @action
+  LeadStatus? getStatusById(String statusId) {
+    return leadStatus.firstWhereOrNull((status) => status.id == statusId);
+  }
+  @action
+  LeadSource? getSourceById(String sourceId) {
+    return leadSource.firstWhereOrNull((source) => source.id ==  sourceId);
   }
 }

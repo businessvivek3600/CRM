@@ -6,6 +6,7 @@ import 'package:crm/store/app_store.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -26,6 +27,7 @@ Future<void>  main() async{
   await setupAppStore();
   await initializeUserData();
   await initializeUserDatas();
+  requestLocationPermission();
   await initNbUtils().then((value) async => await initialize());
   runApp(const MyApp());
 }
@@ -94,6 +96,42 @@ Future<void> initNbUtils() async {
   textPrimarySizeGlobal = 14;
   textSecondarySizeGlobal = 12;
 }
+Future<void> requestLocationPermission() async {
+  LocationPermission permission;
+
+  // Check current permission status
+  permission = await Geolocator.checkPermission();
+
+  if (permission == LocationPermission.denied) {
+    // Request location permission
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      print('Location permissions are denied.');
+      return;
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    // Notify the user about permanently denied permissions
+    print('Location permissions are permanently denied.');
+    return;
+  }
+
+  if (permission == LocationPermission.whileInUse) {
+    // Upgrade to always permission
+    permission = await Geolocator.requestPermission();
+    if (permission != LocationPermission.always) {
+      print('Failed to get "always" location permission.');
+      return;
+    }
+  }
+
+  if (permission == LocationPermission.always) {
+    print('Location permission granted: Always');
+  }
+}
+
+
 
 Future<void> setupAppStore() async {
   ///check for login
@@ -115,10 +153,32 @@ class _MyAppState extends State<MyApp> {
         builder: (_) => MaterialApp.router(
               debugShowCheckedModeBanner: false,
               routerConfig: _goRouter,
-              theme: AppTheme.dynamicTheme(lightThemeSetColor),
-              darkTheme: AppTheme.dynamicTheme(darkThemeSetColor),
-              themeMode:
-             ThemeMode.light,
+            theme: ThemeData(
+              primaryColor: AppConst.defaultPrimaryColor,
+              scaffoldBackgroundColor: Colors.white,
+              appBarTheme: AppBarTheme(
+                backgroundColor: secondaryPrimaryColor,
+                foregroundColor: Colors.white,
+                titleTextStyle: GoogleFonts.lato(
+                  textStyle: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              textTheme: GoogleFonts.latoTextTheme(), // Apply Lato to all text
+              buttonTheme: ButtonThemeData(
+                buttonColor: AppConst.defaultPrimaryColor,
+                textTheme: ButtonTextTheme.primary,
+              ),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: secondaryPrimaryColor,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ),
               title: AppConst.appName,
               builder: (context, child) {
                 return LoadingWidget(
