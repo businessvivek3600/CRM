@@ -16,21 +16,44 @@ import '../widgets/toastification/toastification.dart';
 class ApiService {
   static String tag = 'ApiService';
 
+  /// Fetch leads from the API
   static Future<(bool, Map<String, dynamic>, String?)> getLeads({int page = 0}) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-      await ApiHandler.fetchData('${ApiConstant.getLeads}?page=$page',
-          method: ApiMethod.POST);
+          await ApiHandler.fetchData('${ApiConstant.getLeads}?page=$page',
+              method: ApiMethod.POST);
+
       if (status && data.isNotEmpty) {
         return (true, data, message);
       } else {
         message = message?.split('.').first;
-        // toast(message ?? 'Something went wrong',
-        //     gravity: ToastGravity.TOP, bgColor: Colors.red);
+        // Uncomment below line to show toast notification
+        // toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
         return (false, <String, dynamic>{}, message);
       }
     } catch (e) {
-      logger.e('getWishlist error : $e', tag: tag);
+      logger.e('getLeads error : $e', tag: tag);
+    }
+    return (false, <String, dynamic>{}, null);
+  }
+
+  /// Fetch customers from the API
+  static Future<(bool, Map<String, dynamic>, String?)> getCustomers({int page = 0}) async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+          await ApiHandler.fetchData('${ApiConstant.getCustomer}?page=$page',
+              method: ApiMethod.POST);
+
+      if (status && data.isNotEmpty) {
+        return (true, data, message);
+      } else {
+        message = message?.split('.').first;
+        // Uncomment below line to show toast notification
+        // toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
+        return (false, <String, dynamic>{}, message);
+      }
+    } catch (e) {
+      logger.e('getCustomers error : $e', tag: tag);
     }
     return (false, <String, dynamic>{}, null);
   }
