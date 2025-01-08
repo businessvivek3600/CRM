@@ -3,14 +3,16 @@ import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/text_field.dart';
 import 'package:flutter/material.dart';
 
-class Updatelead extends StatefulWidget {
-  const Updatelead({super.key});
+import '../../../../Models/leads_model.dart';
 
+class EditLead extends StatefulWidget {
+  const EditLead({super.key, required this.lead});
+  final Lead lead;
   @override
-  State<Updatelead> createState() => _UpdateleadState();
+  State<EditLead> createState() => _EditLeadState();
 }
 
-class _UpdateleadState extends State<Updatelead> {
+class _EditLeadState extends State<EditLead> {
   final List<String> _dropdownItems = [
     'Facebook',
     'Google',
@@ -37,6 +39,33 @@ class _UpdateleadState extends State<Updatelead> {
   ];
   String? _selectedItem;
   Map<String, dynamic>? _statusselectedItem;
+  late TextEditingController nameController;
+  late TextEditingController leadValueController;
+  late TextEditingController positionController;
+  late TextEditingController emailController;
+  late TextEditingController websiteController;
+  late TextEditingController companyController;
+  late TextEditingController addressController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize controllers with lead data
+    nameController = TextEditingController(text: widget.lead.name);
+    leadValueController = TextEditingController(text: widget.lead.leadValue?.toString());
+    positionController = TextEditingController(text: widget.lead.title);
+    emailController = TextEditingController(text: widget.lead.email);
+    websiteController = TextEditingController(text: widget.lead.website);
+    companyController = TextEditingController(text: widget.lead.company);
+    addressController = TextEditingController(text: widget.lead.address);
+
+    // Set initial dropdown values
+    _selectedItem = widget.lead.source;
+    _statusselectedItem = _statusdropdownItems.firstWhere(
+          (item) => item['label'] == widget.lead.status,
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

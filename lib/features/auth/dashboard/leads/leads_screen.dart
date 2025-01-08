@@ -201,79 +201,29 @@ class _LeadsScreenState extends State<LeadsScreen> {
               ),
               const SizedBox(height: 10),
               Observer(builder: (_) {
-                if (leadStore.leads == null) {
-                  return const Center(child: CircularProgressIndicator());
-                } else {
-                  List<Lead> leads = leadStore.leads;
+                List<Lead> leads = leadStore.leads;
 
-                  return Expanded(
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      itemCount: leads.length + (hasMore ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index == leads.length) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        }
+                return Expanded(
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    itemCount: leadStore.leads.length + (hasMore ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index ==  leadStore.leads.length) {
+                        return const Center(
+                            child: CircularProgressIndicator());
+                      }
 
-                        final lead = leads[index];
-                        return _buildLeadCard(lead);
-                      },
-                    ),
-                  );
-                }
-              }),
+                      final lead = leads[index];
+                      return _buildLeadCard(lead);
+                    },
+                  ),
+                );
+                            }),
             ],
           ),
         ),
       ),
     );
-  }
-  String getStatusText(status) {
-    switch (status) {
-      case "1":
-        return "Customer";
-      case "2":
-        return "New Lead";
-      case "3":
-        return "Calling";
-      case "4":
-        return "Contacted";
-      case "5":
-        return "Follow Up";
-      case "6":
-        return "Demo Sent";
-      case "7":
-        return "Proposal sent";
-      case "8":
-        return "Hot";
-      case "9":
-        return "Cold";
-      case "10":
-        return "Meeting Done";
-      case "11":
-        return "Budget Issues";
-      case "12":
-        return "Awaiting";
-      case "13":
-        return "Duplicate Lead";
-      case "14":
-        return "Not Required";
-      case "15":
-        return "Wrong";
-      case "16":
-        return "WA Sent";
-      case "17":
-        return "Language Barrier";
-      case "18":
-        return "Test Lead";
-      case "19":
-        return "Invalid Lead";
-      case "20":
-        return "Potential";
-      default:
-        return "";
-    }
   }
   Color getStatusColor(status) {
     switch (status) {
@@ -322,6 +272,8 @@ class _LeadsScreenState extends State<LeadsScreen> {
   }
 
   Widget _buildLeadCard(Lead lead) {
+    final status = leadStore.getStatusById(lead.status);
+    final source = leadStore.getSourceById(lead.source);
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -406,7 +358,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                               ),
                             ),
                             Text(
-                              lead.source,
+                              source?.name ?? "",
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: Colors.black,
@@ -428,7 +380,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                 getStatusText( lead.status),
+                                 status?.name ?? "",
                                   style:  TextStyle(
                                     color: Colors.grey.shade400,
                                     fontWeight: FontWeight.w600,

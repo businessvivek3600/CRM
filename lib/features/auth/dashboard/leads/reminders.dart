@@ -1,10 +1,16 @@
+import 'package:crm/Models/leads_model.dart';
 import 'package:crm/utils/colors.dart';
+import 'package:crm/utils/default_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:toastification/toastification.dart';
+
+import '../../../../utils/size_utils.dart';
+import '../../../../widgets/date_formation.dart';
 
 class RemindersTab extends StatefulWidget {
-  const RemindersTab({super.key});
-
+  const RemindersTab({super.key, required this.remainder});
+  final List<Reminder> remainder;
   @override
   State<RemindersTab> createState() => _RemindersTabState();
 }
@@ -134,22 +140,22 @@ class _RemindersTabState extends State<RemindersTab> {
                   text: const TextSpan(
                     children: <TextSpan>[
                       TextSpan(
-                        text: '*', // Red asterisk
+                        text: '*',
                         style: TextStyle(
                             color: Colors
-                                .red, // Set the color of the asterisk to red
+                                .red,
                             fontSize: 18,
                             fontWeight: FontWeight
-                                .bold // You can adjust the font size here if necessary
+                                .bold
                             ),
                       ),
                       TextSpan(
                         text: ' Set reminder to', // Bolded text
                         style: TextStyle(
                           color: Colors
-                              .black, // Set the color of the text to black
-                          fontWeight: FontWeight.w500, // Make the text bold
-                          fontSize: 16, // Adjust the font size if necessary
+                              .black,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
                         ),
                       ),
                     ],
@@ -182,7 +188,7 @@ class _RemindersTabState extends State<RemindersTab> {
                   text: const TextSpan(
                     children: <TextSpan>[
                       TextSpan(
-                        text: '*', // Red asterisk
+                        text: '*',
                         style: TextStyle(
                             color: Colors.red,
                             fontSize: 18,
@@ -204,7 +210,6 @@ class _RemindersTabState extends State<RemindersTab> {
                   controller: descriptionController,
                   maxLines: 4,
                   onTap: () {
-                    // Logic for description field interactions (if any)
                     FocusScope.of(context).requestFocus(FocusNode());
                   },
                   decoration: const InputDecoration(
@@ -273,6 +278,98 @@ class _RemindersTabState extends State<RemindersTab> {
                     ),
                   ],
                 ),
+
+                height20(),
+                ListView.separated(
+                    physics: NeverScrollableScrollPhysics(),
+                    separatorBuilder: (context, index) {
+                      return const Divider(
+                        thickness: 1.5,
+                        color: Colors.grey,
+                        height: 10,
+                      );
+                    },
+                    shrinkWrap: true,
+                    itemCount: widget.remainder.length,
+                    itemBuilder: (context, index) {
+                      final note = widget.remainder[index];
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 25,
+                                    backgroundColor: Colors.grey[200],
+                                    backgroundImage: note.smallImage.isNotEmpty
+                                        ? NetworkImage(note.smallImage)
+                                        : null,
+                                    child: note.smallImage.isEmpty
+                                        ? Text(
+                                      note.firstname.isNotEmpty
+                                          ? note.firstname[0]
+                                          .toUpperCase()
+                                          : '',
+                                      style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    )
+                                        : null,
+                                  ),
+                                  width10(),
+                                  Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${note.firstname} ${note.lastname}',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: acceptColor),
+                                      ),
+                                      Text(
+                                        "Note added: ${formatDate(note.date)}",
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+
+                                  Icon(
+                                    note.isnotified == "0" ?  Icons.notifications_outlined : Icons.notifications_active,
+                                  size: 25,
+                                    color: acceptColor,
+                                  ),
+
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            note.description,
+                            textAlign: TextAlign.justify,
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                        ],
+                      );
+                    })
               ],
             ),
           ),
