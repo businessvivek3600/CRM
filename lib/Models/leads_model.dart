@@ -2,6 +2,7 @@ import 'package:crm/Models/user_data.dart';
 
 class LeadsModel {
   List<LeadStatus> status;
+  List<LeadSource> sources;
   int isLoggedIn;
   String loginToken;
   User userData;
@@ -10,6 +11,7 @@ class LeadsModel {
 
   LeadsModel({
     required this.status,
+    required this.sources,
     required this.isLoggedIn,
     required this.loginToken,
     required this.userData,
@@ -19,8 +21,11 @@ class LeadsModel {
 
   factory LeadsModel.fromJson(Map<String, dynamic> json) {
     return LeadsModel(
-      status: (json['status'] as List)
+      status: (json["status_data"] as List)
           .map((statusJson) => LeadStatus.fromJson(statusJson))
+          .toList(),
+      sources: (json["sources"] as List)
+          .map((sourceJson) => LeadSource.fromJson(sourceJson))
           .toList(),
       isLoggedIn: json['is_logged_in'],
       loginToken: json['login_token'],
@@ -34,7 +39,8 @@ class LeadsModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'status': status.map((status) => status.toJson()).toList(),
+      "status_data": status.map((status) => status.toJson()).toList(),
+      "sources": sources.map((source) => source.toJson()).toList(),
       'is_logged_in': isLoggedIn,
       'login_token': loginToken,
       'userData': userData.toJson(),
@@ -79,7 +85,29 @@ class LeadStatus {
     };
   }
 }
+class LeadSource {
+  String id;
+  String name;
 
+  LeadSource({
+    required this.id,
+    required this.name,
+  });
+
+  factory LeadSource.fromJson(Map<String, dynamic> json) {
+    return LeadSource(
+      id: json['id'],
+      name: json['name'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+    };
+  }
+}
 class Lead {
   String id;
   String? hash;
@@ -115,6 +143,8 @@ class Lead {
   String? defaultLanguage;
   String clientId;
   String? leadValue;
+  List<NoteData>? notesData;
+  List<Reminder>? reminders;
 
   Lead({
     required this.id,
@@ -151,6 +181,8 @@ class Lead {
     this.defaultLanguage,
     required this.clientId,
     this.leadValue,
+    this.notesData,
+    this.reminders,
   });
 
   factory Lead.fromJson(Map<String, dynamic> json) {
@@ -190,6 +222,12 @@ class Lead {
       defaultLanguage: json['default_language'],
       clientId: json['client_id'] ?? '',
       leadValue: json['lead_value'],
+      notesData: (json['notes_data'] as List<dynamic>?)
+          ?.map((e) => NoteData.fromJson(e))
+          .toList(),
+      reminders: (json['reminders'] as List<dynamic>?)
+          ?.map((e) => Reminder.fromJson(e))
+          .toList(),
     );
   }
 
@@ -230,6 +268,109 @@ class Lead {
       'default_language': defaultLanguage,
       'client_id': clientId,
       'lead_value': leadValue,
+      'notes_data': notesData?.map((e) => e.toJson()).toList(),
+      'reminders': reminders?.map((e) => e.toJson()).toList(),
     };
   }
 }
+
+class NoteData {
+  String description;
+  String? dateContacted;
+  String addedfrom;
+  String firstname;
+  String lastname;
+  String profileImage;
+  String dateadded;
+  String thumbImage;
+  String smallImage;
+
+  NoteData({
+    required this.description,
+    this.dateContacted,
+    required this.addedfrom,
+    required this.firstname,
+    required this.lastname,
+    required this.profileImage,
+    required this.dateadded,
+    required this.thumbImage,
+    required this.smallImage,
+  });
+
+  factory NoteData.fromJson(Map<String, dynamic> json) {
+    return NoteData(
+      description: json['description'] ?? '',
+      dateContacted: json['date_contacted'],
+      addedfrom: json['addedfrom'] ?? '',
+      firstname: json['firstname'] ?? '',
+      lastname: json['lastname'] ?? '',
+      profileImage: json['profile_image'] ?? '',
+      dateadded: json['dateadded'] ?? '',
+      thumbImage: json['thumb_image'] ?? '',
+      smallImage: json['small_image'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'description': description,
+      'date_contacted': dateContacted,
+      'addedfrom': addedfrom,
+      'firstname': firstname,
+      'lastname': lastname,
+      'profile_image': profileImage,
+      'dateadded': dateadded,
+      'thumb_image': thumbImage,
+      'small_image': smallImage,
+    };
+  }
+}
+
+class Reminder {
+  String description;
+  String date;
+  String isnotified;
+  String firstname;
+  String lastname;
+  String profileImage;
+  String thumbImage;
+  String smallImage;
+
+  Reminder({
+    required this.description,
+    required this.date,
+    required this.isnotified,
+    required this.firstname,
+    required this.lastname,
+    required this.profileImage,
+    required this.thumbImage,
+    required this.smallImage,
+  });
+
+  factory Reminder.fromJson(Map<String, dynamic> json) {
+    return Reminder(
+      description: json['description'] ?? '',
+      date: json['date'] ?? '',
+      isnotified: json['isnotified'] ?? '',
+      firstname: json['firstname'] ?? '',
+      lastname: json['lastname'] ?? '',
+      profileImage: json['profile_image'] ?? '',
+      thumbImage: json['thumb_image'] ?? '',
+      smallImage: json['small_image'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'description': description,
+      'date': date,
+      'isnotified': isnotified,
+      'firstname': firstname,
+      'lastname': lastname,
+      'profile_image': profileImage,
+      'thumb_image': thumbImage,
+      'small_image': smallImage,
+    };
+  }
+}
+

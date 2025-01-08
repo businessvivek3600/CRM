@@ -3,10 +3,11 @@ import 'package:crm/features/auth/dashboard/customer/convertedto_customer.dart';
 import 'package:crm/features/auth/dashboard/leads/addnotes.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/features/auth/dashboard/leads/reminders.dart';
-import 'package:crm/features/auth/dashboard/leads/updatelead.dart';
+import 'package:crm/features/auth/dashboard/leads/update_lead.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../store/lead_store.dart';
 import '../../../../widgets/date_formation.dart';
 
 
@@ -54,7 +55,7 @@ class _LeadDetailsState extends State<LeadDetails> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const Updatelead(),
+                    builder: (context) =>  EditLead(lead: widget.lead,),
                   ),
                 );
               },
@@ -76,6 +77,7 @@ class _LeadDetailsState extends State<LeadDetails> {
             Material(
               color: const Color(0xfffef7ff), // Background color for TabBar
               child: TabBar(
+                indicatorSize: TabBarIndicatorSize.tab,
                 labelColor: textPrimaryColor, // Color for selected tab text
                 unselectedLabelColor:
                     textPrimaryColor.withOpacity(0.6), // Unselected tab text
@@ -93,8 +95,8 @@ class _LeadDetailsState extends State<LeadDetails> {
               child: TabBarView(
                 children: [
                   ProfileTab(lead: widget.lead), // Includes cards
-                  const AddNotesTab(),
-                  const RemindersTab()
+                   AddNotesTab(noteData: widget.lead.notesData ?? [],),
+                   RemindersTab(remainder : widget.lead.reminders ?? [],)
                 ],
               ),
             ),
@@ -224,6 +226,7 @@ class ProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final status = leadStore.getStatusById(lead.status);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -319,7 +322,7 @@ class ProfileTab extends StatelessWidget {
                           const Icon(Icons.check_circle, color: Colors.green),
                           const SizedBox(width: 8),
                           Text(
-                            getStatusText(lead.status)?? 'N/A',
+                            status?.name ?? 'N/A',
                             style: const TextStyle(color: Colors.green),
                           ),
                         ],
@@ -377,52 +380,7 @@ class ProfileTab extends StatelessWidget {
   }
 }
 
-String getStatusText(status) {
-  switch (status) {
-    case "1":
-      return "Customer";
-    case "2":
-      return "New Lead";
-    case "3":
-      return "Calling";
-    case "4":
-      return "Contacted";
-    case "5":
-      return "Follow Up";
-    case "6":
-      return "Demo Sent";
-    case "7":
-      return "Proposal sent";
-    case "8":
-      return "Hot";
-    case "9":
-      return "Cold";
-    case "10":
-      return "Meeting Done";
-    case "11":
-      return "Budget Issues";
-    case "12":
-      return "Awaiting";
-    case "13":
-      return "Duplicate Lead";
-    case "14":
-      return "Not Required";
-    case "15":
-      return "Wrong";
-    case "16":
-      return "WA Sent";
-    case "17":
-      return "Language Barrier";
-    case "18":
-      return "Test Lead";
-    case "19":
-      return "Invalid Lead";
-    case "20":
-      return "Potential";
-    default:
-      return "";
-  }
-}
+
 class DetailRow extends StatelessWidget {
   final String label;
   final String value;
