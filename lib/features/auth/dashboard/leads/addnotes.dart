@@ -1,15 +1,18 @@
-import 'package:crm/utils/colors.dart'; // Ensure textPrimaryColor is defined here
+import 'package:crm/Models/leads_model.dart';
+import 'package:crm/utils/colors.dart';
+import 'package:crm/utils/size_utils.dart';
+import 'package:crm/widgets/date_formation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class AddNotesTab extends StatefulWidget {
-  const AddNotesTab({super.key});
-
+  const AddNotesTab({super.key, required this.noteData});
+  final List<NoteData> noteData;
   @override
-  State<AddNotesTab> createState() => _AddnotesTabState();
+  State<AddNotesTab> createState() => _AddNotesTabState();
 }
 
-class _AddnotesTabState extends State<AddNotesTab> {
+class _AddNotesTabState extends State<AddNotesTab> {
   String selectedStatus = "I have not contacted this lead";
   final TextEditingController noteController = TextEditingController();
   final TextEditingController dateTimeController = TextEditingController();
@@ -58,16 +61,18 @@ class _AddnotesTabState extends State<AddNotesTab> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(10.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                height10(),
                 TextField(
                   controller: noteController,
                   maxLines: 4,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Add Note',
                     labelStyle: TextStyle(color: textPrimaryColor),
                     border: OutlineInputBorder(
@@ -80,9 +85,9 @@ class _AddnotesTabState extends State<AddNotesTab> {
                       borderSide: BorderSide(color: textPrimaryColor),
                     ),
                   ),
-                  style: TextStyle(color: textPrimaryColor),
+                  style: const TextStyle(color: textPrimaryColor),
                 ),
-                const SizedBox(height: 10),
+                height10(),
                 Visibility(
                   visible: selectedStatus == "I got in touch with this lead",
                   child: Column(
@@ -94,30 +99,30 @@ class _AddnotesTabState extends State<AddNotesTab> {
                         onTap: _pickDateTime, // Open calendar picker on tap
                         decoration: InputDecoration(
                           labelText: 'Select Date and Time',
-                          labelStyle: TextStyle(color: textPrimaryColor),
+                          labelStyle: const TextStyle(color: textPrimaryColor),
                           suffixIcon: IconButton(
-                            icon: Icon(Icons.calendar_today,
+                            icon: const Icon(Icons.calendar_today,
                                 color: textPrimaryColor),
                             onPressed: _pickDateTime,
                           ),
-                          border: OutlineInputBorder(
+                          border: const OutlineInputBorder(
                             borderSide: BorderSide(color: textPrimaryColor),
                           ),
-                          focusedBorder: OutlineInputBorder(
+                          focusedBorder: const OutlineInputBorder(
                             borderSide: BorderSide(color: textPrimaryColor),
                           ),
-                          enabledBorder: OutlineInputBorder(
+                          enabledBorder: const OutlineInputBorder(
                             borderSide: BorderSide(color: textPrimaryColor),
                           ),
                         ),
-                        style: TextStyle(color: textPrimaryColor),
+                        style: const TextStyle(color: textPrimaryColor),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 10),
+                height20(),
                 RadioListTile(
-                  title: Text(
+                  title: const Text(
                     "I got in touch with this lead",
                     style: TextStyle(color: textPrimaryColor),
                   ),
@@ -130,9 +135,9 @@ class _AddnotesTabState extends State<AddNotesTab> {
                     });
                   },
                 ),
-                const SizedBox(height: 10),
+                height20(),
                 RadioListTile(
-                  title: Text(
+                  title: const Text(
                     "I have not contacted this lead",
                     style: TextStyle(color: textPrimaryColor),
                   ),
@@ -145,27 +150,126 @@ class _AddnotesTabState extends State<AddNotesTab> {
                     });
                   },
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    print("Note: ${noteController.text}");
-                    print("Selected Status: $selectedStatus");
-                    if (selectedStatus == "I got in touch with this lead") {
-                      print("Date and Time: ${dateTimeController.text}");
-                    }
-                  },
-                  child: const Text(
-                    'Add Notes',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 17,
-                      color: Colors.white,
+                height20(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: secondaryPrimaryColor,
+                      ),
+                      child: const Text(
+                        'Add Notes',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 17,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: secondaryPrimaryColor,
-                  ),
+                  ],
                 ),
+                height20(),
+                ListView.separated(
+                    physics: NeverScrollableScrollPhysics(),
+                    separatorBuilder: (context, index) {
+                      return const Divider(
+                        thickness: 1.5,
+                        color: Colors.grey,
+                        height: 10,
+                      );
+                    },
+                    shrinkWrap: true,
+                    itemCount: widget.noteData.length,
+                    itemBuilder: (context, index) {
+                      final note = widget.noteData[index];
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 25,
+                                    backgroundColor: Colors.grey[200],
+                                    backgroundImage: note.smallImage.isNotEmpty
+                                        ? NetworkImage(note.smallImage)
+                                        : null,
+                                    child: note.smallImage.isEmpty
+                                        ? Text(
+                                            note.firstname.isNotEmpty
+                                                ? note.firstname[0]
+                                                    .toUpperCase()
+                                                : '',
+                                            style: const TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
+                                          )
+                                        : null,
+                                  ),
+                                  width10(),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${note.firstname} ${note.lastname}',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: acceptColor),
+                                      ),
+                                      Text(
+                                        "Note added: ${formatDate(note.dateadded)}",
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    Icons.edit_note_sharp,
+                                    size: 25,
+                                    color: acceptColor,
+                                  ),
+                                  Icon(
+                                    Icons.close,
+                                    color: Colors.red,
+                                    size: 25,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            note.description,
+                            textAlign: TextAlign.justify,
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                        ],
+                      );
+                    })
               ],
             ),
           ),
