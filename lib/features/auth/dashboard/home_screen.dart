@@ -6,6 +6,7 @@ import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -51,9 +52,38 @@ class _HomeScreenState extends State<HomeScreen> {
       'color': Colors.black,
     },
   ];
+  void getLocation() async {
+    LocationPermission permission;
+
+    // Check if permission is granted
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, handle appropriately
+        print('Location permissions are denied');
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately
+      print('Location permissions are permanently denied');
+      return;
+    }
+
+    // When permissions are granted, get the location
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.low,
+    );
+    print('Latitude: ${position.latitude}, Longitude: ${position.longitude}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(onPressed: getLocation,
+      child: Icon(Icons.location_history),),
       drawer: const CustomDrawer(), // Ensure CustomDrawer is defined properly
       appBar: AppBar(
         backgroundColor: secondaryPrimaryColor,
@@ -75,10 +105,24 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Profile and Welcome Section
                   Row(
                     children: [
-                      const CircleAvatar(
-                        radius: 30,
-                        backgroundImage: NetworkImage(
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRchTRZ8A5eyfaCmAQYhVZA4-vgU-dfV94Ufw&s"),
+                      CircleAvatar(
+                        radius: 45,
+                        backgroundColor: Colors.grey[200],
+                        backgroundImage: appStore.profileImage.isNotEmpty
+                            ? NetworkImage(appStore.profileImage)
+                            : null,
+                        child: appStore.profileImage.isEmpty
+                            ? Text(
+                          appStore.fullName.isNotEmpty
+                              ? appStore.fullName[0].toUpperCase()
+                              : '',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        )
+                            : null,
                       ),
                       const SizedBox(width: 16),
                       Column(

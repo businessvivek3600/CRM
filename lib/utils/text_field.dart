@@ -9,19 +9,19 @@ class CommonTextField extends StatefulWidget {
     this.controller,
     this.validation,
     this.isPassword = false,
-    this.dropdownItems, // New parameter for Dropdown
-    this.selectedValue, // New parameter to handle selected value
-    this.onChanged, // New parameter for onChanged callback
+    this.dropdownItems,
+    this.selectedValue,
+    this.onChanged,
   });
 
   final String? label, hint;
   final TextEditingController? controller;
   final Function? validation;
   final bool isPassword;
-  final List<String>? dropdownItems; // List of dropdown items
-  final String? selectedValue; // Selected value for dropdown
+  final List<String>? dropdownItems;
+  final String? selectedValue;
   final ValueChanged<String?>?
-      onChanged; // Callback when dropdown value changes
+      onChanged;
 
   @override
   State<CommonTextField> createState() => _CommonTextFieldState();
@@ -39,7 +39,6 @@ class _CommonTextFieldState extends State<CommonTextField> {
   @override
   Widget build(BuildContext context) {
     if (widget.dropdownItems != null) {
-      // DropdownButtonFormField is displayed if dropdownItems is passed
       return DropdownButtonFormField<String>(
         value: widget.selectedValue,
         items: widget.dropdownItems!
@@ -52,12 +51,12 @@ class _CommonTextFieldState extends State<CommonTextField> {
         decoration: InputDecoration(
           labelText: widget.label,
           labelStyle:
-              TextStyle(color: textPrimaryColor), // Primary color for label
+              const TextStyle(color: textPrimaryColor),
           hintText: widget.hint,
           hintStyle: TextStyle(color: textPrimaryColor.withOpacity(0.6)),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(color: textPrimaryColor), // Border color
+            borderSide: const BorderSide(color: textPrimaryColor),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
@@ -72,12 +71,12 @@ class _CommonTextFieldState extends State<CommonTextField> {
         controller: widget.controller,
         decoration: InputDecoration(
           labelText: widget.label,
-          labelStyle: TextStyle(color: textPrimaryColor), // Primary color
+          labelStyle: const TextStyle(color: textPrimaryColor), // Primary color
           hintText: widget.hint,
           hintStyle: TextStyle(color: textPrimaryColor.withOpacity(0.6)),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(color: textPrimaryColor), // Border color
+            borderSide: const BorderSide(color: textPrimaryColor), // Border color
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
