@@ -65,7 +65,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
     });
 
     currentPage++; // Increment the current page
-    await leadStore.getLeads(page: currentPage); // Fetch the next page of leads
+    await leadStore.getLeads(page: currentPage);
 
     setState(() {
       isLoadingMore = false; // Stop the loading state
