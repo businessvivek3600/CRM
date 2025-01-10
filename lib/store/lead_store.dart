@@ -28,6 +28,14 @@ abstract class _LeadStore with Store {
   @observable
   List<Reminder> reminders = [];
 
+  @observable
+  List<Staff> staff = [];
+
+  @observable
+List<Tag> tags = [];
+
+  @observable
+  List<Tag> leadTags = [];
   @action
   Future<void> getLeads({int page = 0}) async {
     infoLog("Leads Page Count --------$page");
@@ -51,11 +59,25 @@ abstract class _LeadStore with Store {
             .map((e) => LeadSource.fromJson(e))
             .toList();
       }
-      for (var lead in leads) {
-        warningLog("Lead: ${lead.toJson()}");
+      if (data['staff'] != null) {
+        staff = (data['staff'] as List)
+            .map((e) =>Staff.fromJson(e))
+            .toList();
+      }if (data['tags'] != null) {
+        tags = (data['tags'] as List)
+            .map((e) =>Tag.fromJson(e))
+            .toList();
       }
+
+      List<Tag> allTags = [];
+      for (var lead in leads) {
+        if (lead.tags != null) {
+          allTags.addAll(lead.tags!);
+        }
+      }
+      leadTags = allTags.toSet().toList();
     }
-    loadingLeads.value = false; // Ensure loading state is updated
+    loadingLeads.value = false;
   }
 
   @action
@@ -65,5 +87,10 @@ abstract class _LeadStore with Store {
   @action
   LeadSource? getSourceById(String sourceId) {
     return leadSource.firstWhereOrNull((source) => source.id ==  sourceId);
+  }
+
+  @action
+  Staff? getAssignedById(String sourceId) {
+    return staff.firstWhereOrNull((source) => source.staffId ==  sourceId);
   }
 }

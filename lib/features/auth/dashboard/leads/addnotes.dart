@@ -172,7 +172,7 @@ class _AddNotesTabState extends State<AddNotesTab> {
                 ),
                 height20(),
                 ListView.separated(
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     separatorBuilder: (context, index) {
                       return const Divider(
                         thickness: 1.5,
@@ -182,7 +182,10 @@ class _AddNotesTabState extends State<AddNotesTab> {
                     },
                     shrinkWrap: true,
                     itemCount: widget.noteData.length,
+
                     itemBuilder: (context, index) {
+                      widget.noteData.sort((a, b) => b.dateadded.compareTo(a.dateadded));
+
                       final note = widget.noteData[index];
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,6 +242,7 @@ class _AddNotesTabState extends State<AddNotesTab> {
                                   ),
                                 ],
                               ),
+                              if(note.editDelete == 1)
                               const Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,

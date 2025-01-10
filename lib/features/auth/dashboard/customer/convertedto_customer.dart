@@ -30,20 +30,7 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
           'Convert to Customer',
           style: TextStyle(color: Colors.white),
         ),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => LeadDetails(),
-            //   ),
-            // );
-          },
-        ),
+       automaticallyImplyLeading: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
