@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:crm/constants/api_constant.dart';
 import 'package:crm/database/function.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
 
@@ -15,6 +16,7 @@ import '../widgets/toastification/toastification.dart';
 
 class ApiService {
   static String tag = 'ApiService';
+  ///--------------------Leads--------------------
 
   /// Fetch leads from the API
   static Future<(bool, Map<String, dynamic>, String?)> getLeads({int page = 0}) async {
@@ -37,6 +39,25 @@ class ApiService {
     return (false, <String, dynamic>{}, null);
   }
 
+  static Future<(bool, Map<String, dynamic>, String?)> addLeads(
+      FormData info) async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+      await await ApiHandler.fetchData(ApiConstant.addLead,data: info);
+      log('data : $data');
+      if (status) {
+       log("message --$message");
+      } else {
+        return (false, data, message);
+      }
+    } catch (e) {
+      logger.e('register error : $e', tag: tag);
+    }
+    return (false, <String, dynamic>{}, '');
+  }
+
+
+  ///------------------------Customers-----------------------
   /// Fetch customers from the API
   static Future<(bool, Map<String, dynamic>, String?)> getCustomers({int page = 0}) async {
     try {
