@@ -281,7 +281,7 @@ class _RemindersTabState extends State<RemindersTab> {
 
                 height20(),
                 ListView.separated(
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     separatorBuilder: (context, index) {
                       return const Divider(
                         thickness: 1.5,
@@ -292,6 +292,7 @@ class _RemindersTabState extends State<RemindersTab> {
                     shrinkWrap: true,
                     itemCount: widget.remainder.length,
                     itemBuilder: (context, index) {
+                      widget.remainder.sort((a, b) => b.date.compareTo(a.date));
                       final note = widget.remainder[index];
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
