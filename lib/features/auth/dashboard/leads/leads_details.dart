@@ -1,7 +1,6 @@
 import 'package:country_list_pick/country_list_pick.dart';
 import 'package:crm/Models/leads_model.dart';
 import 'package:crm/features/auth/dashboard/customer/convertedto_customer.dart';
-import 'package:open_whatsapp/open_whatsapp.dart';
 import 'package:crm/features/auth/dashboard/leads/addnotes.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/features/auth/dashboard/leads/reminders.dart';
@@ -480,7 +479,7 @@ class DetailRow extends StatelessWidget {
   final String label;
   final String value;
 
-  DetailRow({required this.label, required this.value});
+  const DetailRow({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
