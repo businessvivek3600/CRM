@@ -108,6 +108,7 @@ class LeadSource {
     };
   }
 }
+///----Staff-Member------
 class Lead {
   String id;
   String? hash;
@@ -143,6 +144,7 @@ class Lead {
   String? defaultLanguage;
   String clientId;
   String? leadValue;
+  List<Tag>? tags;
   List<NoteData>? notesData;
   List<Reminder>? reminders;
 
@@ -181,6 +183,7 @@ class Lead {
     this.defaultLanguage,
     required this.clientId,
     this.leadValue,
+    this.tags,
     this.notesData,
     this.reminders,
   });
@@ -222,6 +225,9 @@ class Lead {
       defaultLanguage: json['default_language'],
       clientId: json['client_id'] ?? '',
       leadValue: json['lead_value'],
+      tags: (json['tags'] as List<dynamic>?)
+          ?.map((e) => Tag.fromJson(e))
+          .toList(),
       notesData: (json['notes_data'] as List<dynamic>?)
           ?.map((e) => NoteData.fromJson(e))
           .toList(),
@@ -268,12 +274,14 @@ class Lead {
       'default_language': defaultLanguage,
       'client_id': clientId,
       'lead_value': leadValue,
+      'tags': tags?.map((e) => e.toJson()).toList(),
       'notes_data': notesData?.map((e) => e.toJson()).toList(),
       'reminders': reminders?.map((e) => e.toJson()).toList(),
     };
   }
 }
 
+///----Note-Data------
 class NoteData {
   String description;
   String? dateContacted;
@@ -284,6 +292,7 @@ class NoteData {
   String dateadded;
   String thumbImage;
   String smallImage;
+  int? editDelete;
 
   NoteData({
     required this.description,
@@ -295,6 +304,7 @@ class NoteData {
     required this.dateadded,
     required this.thumbImage,
     required this.smallImage,
+    this.editDelete
   });
 
   factory NoteData.fromJson(Map<String, dynamic> json) {
@@ -308,6 +318,7 @@ class NoteData {
       dateadded: json['dateadded'] ?? '',
       thumbImage: json['thumb_image'] ?? '',
       smallImage: json['small_image'] ?? '',
+      editDelete: json['can_edit_delete'] ?? 0,
     );
   }
 
@@ -322,10 +333,12 @@ class NoteData {
       'dateadded': dateadded,
       'thumb_image': thumbImage,
       'small_image': smallImage,
+      'can_edit_delete': editDelete
     };
   }
 }
 
+///----Reminder------
 class Reminder {
   String description;
   String date;
@@ -374,3 +387,53 @@ class Reminder {
   }
 }
 
+
+///----Staff-Member------
+class Staff {
+  final String staffId;
+  final String firstName;
+  final String lastName;
+
+  Staff({required this.staffId, required this.firstName, required this.lastName});
+
+  // Factory constructor for creating a new instance from a JSON map
+  factory Staff.fromJson(Map<String, dynamic> json) {
+    return Staff(
+      staffId: json['staffid'],
+      firstName: json['firstname'],
+      lastName: json['lastname'],
+    );
+  }
+
+  // Method for converting the object to a JSON map
+  Map<String, dynamic> toJson() {
+    return {
+      'staffid': staffId,
+      'firstname': firstName,
+      'lastname': lastName,
+    };
+  }
+}
+///----Tags ----
+class Tag {
+  final String id;
+  final String name;
+
+  Tag({required this.id, required this.name});
+
+  // Factory constructor for creating a new instance from a JSON map
+  factory Tag.fromJson(Map<String, dynamic> json) {
+    return Tag(
+      id: json['id'].toString(),
+      name: json['name'],
+    );
+  }
+
+  // Method for converting the object to a JSON map
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id.toString(),
+      'name': name,
+    };
+  }
+}

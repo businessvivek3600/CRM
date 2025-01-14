@@ -12,14 +12,22 @@ class CommonTextField extends StatefulWidget {
     this.dropdownItems,
     this.selectedValue,
     this.onChanged,
+    this.initialValue,
+    this.style,
+    this.suffix,
+    this.onTap,this.maxLines
   });
 
-  final String? label, hint;
+  final String? label, hint,initialValue;
   final TextEditingController? controller;
   final Function? validation;
   final bool isPassword;
+  final Widget? suffix;
+  final GestureTapCallback? onTap;
+  final TextStyle? style;
   final List<String>? dropdownItems;
   final String? selectedValue;
+  final int? maxLines;
   final ValueChanged<String?>?
       onChanged;
 
@@ -67,8 +75,12 @@ class _CommonTextFieldState extends State<CommonTextField> {
     } else {
       // Regular TextFormField is displayed
       return TextFormField(
+        onTap: widget.onTap,
+        maxLines: widget.maxLines,
         obscureText: _obscureText,
         controller: widget.controller,
+        initialValue: widget.initialValue,
+        style: widget.style,
         decoration: InputDecoration(
           labelText: widget.label,
           labelStyle: const TextStyle(color: textPrimaryColor), // Primary color
@@ -82,6 +94,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
             borderRadius: BorderRadius.circular(8.0),
             borderSide: BorderSide(color: textPrimaryColor.withOpacity(0.6)),
           ),
+          suffix: widget.suffix,
           suffixIcon: widget.isPassword
               ? IconButton(
                   icon: Icon(

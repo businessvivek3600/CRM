@@ -161,6 +161,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         label: "Password",
                         controller: _passwordController,
                         isPassword: true,
+                     maxLines: 1,
                       ),
                       const SizedBox(height: 20),
                       // Remember Me and Forgot Password

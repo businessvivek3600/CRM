@@ -1,20 +1,21 @@
+import 'package:country_list_pick/country_list_pick.dart';
 import 'package:crm/Models/leads_model.dart';
 import 'package:crm/features/auth/dashboard/customer/convertedto_customer.dart';
+import 'package:open_whatsapp/open_whatsapp.dart';
 import 'package:crm/features/auth/dashboard/leads/addnotes.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/features/auth/dashboard/leads/reminders.dart';
 import 'package:crm/features/auth/dashboard/leads/update_lead.dart';
 import 'package:crm/utils/colors.dart';
+import 'package:crm/utils/size_utils.dart';
 import 'package:flutter/material.dart';
-
+import 'package:intl/intl.dart';
 import '../../../../store/lead_store.dart';
 import '../../../../widgets/date_formation.dart';
 
-
-
 class LeadDetails extends StatefulWidget {
   const LeadDetails({Key? key, required this.lead}) : super(key: key);
-   final Lead lead;
+  final Lead lead;
   @override
   State<LeadDetails> createState() => _LeadDetailsState();
 }
@@ -27,9 +28,9 @@ class _LeadDetailsState extends State<LeadDetails> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: secondaryPrimaryColor,
-          title: const Text(
-            'Lead Details',
-            style: TextStyle(color: Colors.white),
+          title: Text(
+            '#${widget.lead.id} - ${widget.lead.name.toUpperCase()}',
+            style: const TextStyle(color: Colors.white),
           ),
           leading: IconButton(
             icon: const Icon(
@@ -55,7 +56,9 @@ class _LeadDetailsState extends State<LeadDetails> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>  EditLead(lead: widget.lead,),
+                    builder: (context) => EditLead(
+                      lead: widget.lead,
+                    ),
                   ),
                 );
               },
@@ -77,12 +80,14 @@ class _LeadDetailsState extends State<LeadDetails> {
             Material(
               color: const Color(0xfffef7ff), // Background color for TabBar
               child: TabBar(
+                dividerColor: Colors.black.withOpacity(0.1),
                 indicatorSize: TabBarIndicatorSize.tab,
+
                 labelColor: textPrimaryColor, // Color for selected tab text
                 unselectedLabelColor:
                     textPrimaryColor.withOpacity(0.6), // Unselected tab text
                 indicatorColor:
-                    textPrimaryColor.withOpacity(0.8), // Tab indicator color
+                   acceptColor, // Tab indicator color
                 tabs: const [
                   Tab(text: 'Profile'),
                   Tab(text: 'Notes'),
@@ -95,8 +100,12 @@ class _LeadDetailsState extends State<LeadDetails> {
               child: TabBarView(
                 children: [
                   ProfileTab(lead: widget.lead), // Includes cards
-                   AddNotesTab(noteData: widget.lead.notesData ?? [],),
-                   RemindersTab(remainder : widget.lead.reminders ?? [],)
+                  AddNotesTab(
+                    noteData: widget.lead.notesData ?? [],
+                  ),
+                  RemindersTab(
+                    remainder: widget.lead.reminders ?? [],
+                  )
                 ],
               ),
             ),
@@ -198,7 +207,8 @@ class _LeadDetailsState extends State<LeadDetails> {
                             ),
                           ); // Close dialog
                           // Add delete functionality here
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
                             content: Text("Lead deleted!"),
                           ));
                         },
@@ -219,14 +229,26 @@ class _LeadDetailsState extends State<LeadDetails> {
   }
 }
 
-class ProfileTab extends StatelessWidget {
+class ProfileTab extends StatefulWidget {
   final Lead lead;
 
-  const ProfileTab({required this.lead, Key? key}) : super(key: key);
+  const ProfileTab({required this.lead, super.key});
 
   @override
+  State<ProfileTab> createState() => _ProfileTabState();
+}
+
+class _ProfileTabState extends State<ProfileTab> {
+  bool showAll = false;
+  @override
   Widget build(BuildContext context) {
-    final status = leadStore.getStatusById(lead.status);
+
+    final status = leadStore.getStatusById(widget.lead.status);
+    final source = leadStore.getSourceById(widget.lead.source);
+    final assigned = leadStore.getAssignedById(widget.lead.assigned);
+    List<Tag> displayedTags = showAll
+        ? leadStore.leadTags
+        : leadStore.leadTags.take(3).toList();
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -236,12 +258,12 @@ class ProfileTab extends StatelessWidget {
             children: [
               ElevatedButton(
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
-                  foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                  padding: MaterialStateProperty.all<EdgeInsets>(
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  backgroundColor: WidgetStateProperty.all<Color>(Colors.green),
+                  foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+                  padding: WidgetStateProperty.all<EdgeInsets>(
+                    const EdgeInsets.all(8),
                   ),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -255,9 +277,21 @@ class ProfileTab extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Text(
-                  'Convert To Customer',
-                  style: TextStyle(fontSize: 16),
+                child: const Row(
+                  children: [
+                    Icon(
+                      Icons.person_outline,
+                      color: Colors.white,
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      'Convert To Customer',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -265,6 +299,7 @@ class ProfileTab extends StatelessWidget {
           const SizedBox(height: 10),
           // Top Summary Card
           Card(
+            color: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
@@ -272,7 +307,17 @@ class ProfileTab extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const Text(
+                    "Lead Information",
+                    style: TextStyle(
+                        color: acceptColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline),
+                  ),
+                  height20(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -280,16 +325,11 @@ class ProfileTab extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            lead.name ?? '',
+                            widget.lead.name ?? '',
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            lead.title ?? 'N/A',
-                            style: const TextStyle(color: Colors.grey),
                           ),
                         ],
                       ),
@@ -297,23 +337,17 @@ class ProfileTab extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            lead.leadValue ?? '0.00',
+                            "₹ ${widget.lead.leadValue}" ?? '0.00',
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            lead.company ?? 'N/A',
-                            style: const TextStyle(color: Colors.grey),
-                          ),
                         ],
                       ),
                     ],
                   ),
-                  const Divider(),
-                  const SizedBox(height: 16),
+                 height10(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -332,22 +366,42 @@ class ProfileTab extends StatelessWidget {
                           const Icon(Icons.calendar_today, color: Colors.blue),
                           const SizedBox(width: 8),
                           Text(
-                            formatDate(lead.dateadded) ?? 'N/A',
+                            formatDate(widget.lead.dateadded) ?? 'N/A',
                             style: const TextStyle(color: Colors.grey),
                           ),
                         ],
                       ),
                     ],
                   ),
+                  const Divider(),
+                  const SizedBox(height: 16),
+                  // Details Card
+                  DetailRow(label: 'Position', value: widget.lead.title ?? 'N/A'),
+                  const Divider(),
+                  DetailRow(label: 'Company', value: widget.lead.company ?? 'N/A'),
+                  const Divider(),
+                  DetailRow(label: 'Phone', value: widget.lead.phonenumber ?? 'N/A'),
+                  const Divider(),
+                  DetailRow(label: 'Website', value: widget.lead.website ?? 'N/A'),
+                  const Divider(),
+                  DetailRow(label: 'Address', value: widget.lead.address ?? 'N/A'),
+                  const Divider(),
+                  DetailRow(label: 'City', value: widget.lead.city ?? 'N/A'),
+                  const Divider(),
+                  DetailRow(label: 'State', value: widget.lead.state ?? 'N/A'),
+                  const Divider(),
+                  DetailRow(label: 'Country', value: widget.lead.country ?? 'N/A'),
+                  const Divider(),
+                  DetailRow(label: 'Zip Code', value: widget.lead.zip ?? 'N/A'),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 16),
-          // Details Card
+          height10(),
           Card(
+            color: Colors.white,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(15),
             ),
             elevation: 4,
             child: Padding(
@@ -355,21 +409,63 @@ class ProfileTab extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  DetailRow(label: 'Company', value: lead.company ?? 'N/A'),
+                  const Text(
+                    "General Information",
+                    style: TextStyle(
+                        color: acceptColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline),
+                  ),
+                  height20(),
+                  DetailRow(label: 'Source', value: source?.name ?? 'N/A'),
                   const Divider(),
-                  DetailRow(label: 'Phone', value: lead.phonenumber ?? 'N/A'),
+                  DetailRow(label: 'Assigned', value: "${assigned?.firstName} ${assigned?.lastName}" ?? 'N/A'),
                   const Divider(),
-                  DetailRow(label: 'Website', value: lead.website ?? 'N/A'),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Tags',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 30),
+                        Expanded(
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.end,
+                            alignment: WrapAlignment.end,
+                            spacing: 2,
+                            children:[  ...displayedTags.map((tag) => Text("${tag.name}, ")).toList(),
+                // Show "..." or "Show Less" button
+                if (leadStore.leadTags.length > 3)
+              GestureDetector(
+              onTap: () {
+    setState(() {
+    showAll = !showAll; // Toggle visibility
+    });
+    },
+      child: Text(
+        showAll ? 'Show Less' : '...',
+        style: const TextStyle(
+          color: Colors.blue,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ),
+                      ]    ),
+                        ),
+                      ],
+                    ),
+                  ),
                   const Divider(),
-                  DetailRow(label: 'Address', value: lead.address ?? 'N/A'),
+                  DetailRow(label: 'Last Contact', value: formatDate(widget.lead.lastcontact.toString()) ?? 'N/A'),
                   const Divider(),
-                  DetailRow(label: 'City', value: lead.city ?? 'N/A'),
-                  const Divider(),
-                  DetailRow(label: 'State', value: lead.state ?? 'N/A'),
-                  const Divider(),
-                  DetailRow(label: 'Country', value: lead.country ?? 'N/A'),
-                  const Divider(),
-                  DetailRow(label: 'Zip Code', value: lead.zip ?? 'N/A'),
+                  DetailRow(label: 'Public', value: widget.lead.isPublic == "1" ? "Yes" : "No" ?? 'N/A'),
                 ],
               ),
             ),
@@ -379,7 +475,6 @@ class ProfileTab extends StatelessWidget {
     );
   }
 }
-
 
 class DetailRow extends StatelessWidget {
   final String label;
