@@ -3,6 +3,7 @@ import 'package:crm/Models/leads_model.dart';
 import 'package:crm/services/api_services.dart';
 import 'package:crm/utils/default_logger.dart';
 import 'package:crm/utils/extensions.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
 
@@ -36,6 +37,8 @@ List<Tag> tags = [];
 
   @observable
   List<Tag> leadTags = [];
+
+
   @action
   Future<void> getLeads({int page = 0}) async {
     infoLog("Leads Page Count --------$page");
@@ -93,4 +96,14 @@ List<Tag> tags = [];
   Staff? getAssignedById(String sourceId) {
     return staff.firstWhereOrNull((source) => source.staffId ==  sourceId);
   }
+
+  ///Add a new Lead
+  @action
+  Future<void> addLead(FormData data) async {
+    loadingLeads.value = true;
+    var (status, responsedata, message) = await ApiService.addLeads(data);
+    infoLog("API Response Data according page: ${responsedata['leads']}");
+    if (status) {
+  }
+}
 }

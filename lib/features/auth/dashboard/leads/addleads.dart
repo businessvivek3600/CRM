@@ -7,6 +7,7 @@ import 'package:crm/utils/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
 
+import '../../../../store/lead_store.dart';
 import '../../../../utils/size_utils.dart';
 
 class Addleads extends StatefulWidget {
@@ -17,17 +18,8 @@ class Addleads extends StatefulWidget {
 }
 
 class _MyWidgetState extends State<Addleads> {
-  final List<String> _dropdownItems = [
-    'Facebook',
-    'Google',
-    'Instagram',
-    'LinkedIn',
-    'Pinterest',
-    'Reddit',
-    'Snapchat',
-    'Twitter',
-    'Youtube'
-  ];
+  late  List<String> _dropdownItems = [];
+
   final List<Map<String, dynamic>> _statusdropdownItems = [
     {'label': 'New Lead', 'color': Colors.blue},
     {'label': 'Contacted', 'color': Colors.green},
@@ -68,7 +60,14 @@ class _MyWidgetState extends State<Addleads> {
     "Binary MLM Software",
     "Binary plan",
   ];
-
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {
+      _dropdownItems = leadStore.leadSource.map((source) => source.name).toList();
+    });
+  }
   List<String> selectedTags = [];
   @override
   Widget build(BuildContext context) {
@@ -170,7 +169,7 @@ class _MyWidgetState extends State<Addleads> {
                     ),
                   ),
                   const SizedBox(height: 15),
-                  Row(
+                  const Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Icon(Icons.local_offer,size: 18,),
@@ -187,7 +186,7 @@ class _MyWidgetState extends State<Addleads> {
                     children: selectedTags
                         .map((tag) => Chip(
                       label: Text(tag),
-                      deleteIcon: Icon(Icons.close),
+                      deleteIcon: const Icon(Icons.close),
                       onDeleted: () {
                         setState(() {
                           selectedTags.remove(tag);
@@ -198,7 +197,7 @@ class _MyWidgetState extends State<Addleads> {
                   ),
                   const SizedBox(height: 5),
                   DropdownButton<String>(
-                    hint: Text("Select a tag"),
+                    hint: const Text("Select a tag"),
                     isExpanded: true,
                     items: availableTags.map((String tag) {
                       return DropdownMenuItem<String>(
@@ -356,17 +355,17 @@ class _MyWidgetState extends State<Addleads> {
         padding: const EdgeInsets.all(10),
         child: ElevatedButton(
           onPressed: () {},
-          child: const Text(
-            'Submit',
-            style: TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 17, color: Colors.white),
-          ),
           style: ElevatedButton.styleFrom(
             backgroundColor: secondaryPrimaryColor,
             padding: const EdgeInsets.symmetric(
               horizontal: 135,
               vertical: 12,
             ),
+          ),
+          child: const Text(
+            'Submit',
+            style: TextStyle(
+                fontWeight: FontWeight.bold, fontSize: 17, color: Colors.white),
           ),
         ),
       ),
