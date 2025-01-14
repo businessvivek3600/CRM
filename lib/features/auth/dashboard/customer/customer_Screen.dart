@@ -83,7 +83,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
             return SingleChildScrollView(
               child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                     EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -152,9 +152,9 @@ class _CustomerScreenState extends State<CustomerScreen> {
                                               ),
                                             ],
                                           ),
-                                          const SizedBox(height: 10),
+                                           SizedBox(height: 10),
                                           Expanded(
-                                            child: const Text(
+                                            child:  Text(
                                               'Total Customers',
                                               style: TextStyle(
                                                 fontSize: 14,
@@ -292,6 +292,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
                         itemCount: userCustomer.customers.length,
                       ),
                     ),
+                    
                   ],
                 ),
               ),
