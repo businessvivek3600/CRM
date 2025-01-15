@@ -9,6 +9,21 @@ part of 'customer_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$CustomerStore on _CustomerStore, Store {
+  Computed<int>? _$totalCustomerComputed;
+
+  @override
+  int get totalCustomer =>
+      (_$totalCustomerComputed ??= Computed<int>(() => super.totalCustomer,
+              name: '_CustomerStore.totalCustomer'))
+          .value;
+  Computed<int>? _$activeCustomerComputed;
+
+  @override
+  int get activeCustomer =>
+      (_$activeCustomerComputed ??= Computed<int>(() => super.activeCustomer,
+              name: '_CustomerStore.activeCustomer'))
+          .value;
+
   late final _$customerFutureAtom =
       Atom(name: '_CustomerStore.customerFuture', context: context);
 
@@ -85,7 +100,9 @@ mixin _$CustomerStore on _CustomerStore, Store {
     return '''
 customerFuture: ${customerFuture},
 customers: ${customers},
-isShow: ${isShow}
+isShow: ${isShow},
+totalCustomer: ${totalCustomer},
+activeCustomer: ${activeCustomer}
     ''';
   }
 }
