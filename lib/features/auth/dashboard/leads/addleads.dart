@@ -1,40 +1,33 @@
+import 'dart:convert';
+
 import 'package:country_state_picker/components/index.dart';
 import 'package:country_state_picker/country_state_picker.dart';
 import 'package:crm/constants/app_constants.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/utils/colors.dart';
+import 'package:crm/utils/default_logger.dart';
 import 'package:crm/utils/text_field.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
 
+import '../../../../Models/leads_model.dart';
+import '../../../../services/api_services.dart';
 import '../../../../store/lead_store.dart';
-import '../../../../utils/size_utils.dart';
 
-class Addleads extends StatefulWidget {
-  const Addleads({super.key});
+class AddLeads extends StatefulWidget {
+  const AddLeads({super.key});
 
   @override
-  State<Addleads> createState() => _MyWidgetState();
+  State<AddLeads> createState() => _MyWidgetState();
 }
 
-class _MyWidgetState extends State<Addleads> {
-  late  List<String> _dropdownItems = [];
+class _MyWidgetState extends State<AddLeads> {
+  String? _selectedSourceId;
+  String? _selectedEmployeeId;
+  String? _selectedStatusId;
 
-  final List<Map<String, dynamic>> _statusdropdownItems = [
-    {'label': 'New Lead', 'color': Colors.blue},
-    {'label': 'Contacted', 'color': Colors.green},
-    {'label': 'Qualified', 'color': Colors.yellow},
-    {'label': 'Negotiating', 'color': Colors.pink},
-    {'label': 'Closed - Won', 'color': Colors.green},
-    {'label': 'Closed - Lost', 'color': Colors.red},
-    {'label': 'Pending', 'color': Colors.orange},
-    {'label': 'On Hold', 'color': Colors.grey},
-    {'label': 'Reopened', 'color': Colors.purple},
-    {'label': 'Converted', 'color': Colors.blue},
-    {'label': 'Customer', 'color': Colors.green},
-  ];
-  String? _selectedItem;
-  Map<String, dynamic>? _statusselectedItem;
+  final List<String> _dropDownTagId = [];
   TextEditingController nameController = TextEditingController();
   TextEditingController leadValueController = TextEditingController();
   TextEditingController positionController = TextEditingController();
@@ -51,23 +44,8 @@ class _MyWidgetState extends State<Addleads> {
   String? country;
   bool isPublic = false;
   bool isContactNow = false;
-  List<String> availableTags = [
-    "Android and iOS",
-    "application",
-    "B2B",
-    "Binary",
-    "Binary Global Income",
-    "Binary MLM Software",
-    "Binary plan",
-  ];
-@override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    setState(() {
-      _dropdownItems = leadStore.leadSource.map((source) => source.name).toList();
-    });
-  }
+  List<String> availableTags = [];
+
   List<String> selectedTags = [];
   @override
   Widget build(BuildContext context) {
@@ -101,16 +79,16 @@ class _MyWidgetState extends State<Addleads> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   DropdownButtonFormField<String>(
-                    value: _selectedItem,
-                    items: _dropdownItems
+                    value: _selectedSourceId,
+                    items: leadStore.leadSource
                         .map((item) => DropdownMenuItem<String>(
-                              value: item,
-                              child: Text(item),
+                              value: item.id,
+                              child: Text(item.name),
                             ))
                         .toList(),
                     onChanged: (value) {
                       setState(() {
-                        _selectedItem = value;
+                        _selectedSourceId = value;
                       });
                     },
                     decoration: InputDecoration(
@@ -121,23 +99,38 @@ class _MyWidgetState extends State<Addleads> {
                     ),
                   ),
                   const SizedBox(height: 15),
-                  DropdownButtonFormField<Map<String, dynamic>>(
-                    value: _statusselectedItem,
-                    items: _statusdropdownItems.map((item) {
-                      return DropdownMenuItem<Map<String, dynamic>>(
-                        value: item,
-                        child: Text(
-                          item['label'],
-                          style: TextStyle(
-                            color: item['color'],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                  DropdownButtonFormField<String>(
+                    value: _selectedStatusId,
+                    items: leadStore.leadStatus
+                        .map((item) => DropdownMenuItem<String>(
+                              value: item.id,
+                              child: Text(item.name),
+                            ))
+                        .toList(),
                     onChanged: (value) {
                       setState(() {
-                        _statusselectedItem = value;
+                        _selectedStatusId = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Status',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  DropdownButtonFormField<String>(
+                    value: _selectedEmployeeId,
+                    items: leadStore.staff
+                        .map((item) => DropdownMenuItem<String>(
+                              value: item.staffId,
+                              child: Text("${item.firstName} ${item.lastName}"),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedEmployeeId = value;
                       });
                     },
                     decoration: InputDecoration(
@@ -148,32 +141,13 @@ class _MyWidgetState extends State<Addleads> {
                     ),
                   ),
                   const SizedBox(height: 15),
-                  DropdownButtonFormField<String>(
-                    value: _selectedItem,
-                    items: _dropdownItems
-                        .map((item) => DropdownMenuItem<String>(
-                      value: item,
-                      child: Text(item),
-                    ))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedItem = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Select Employee',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
                   const Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Icon(Icons.local_offer,size: 18,),
-
+                      Icon(
+                        Icons.local_offer,
+                        size: 18,
+                      ),
                       Text(
                         " Tags",
                         style: TextStyle(fontSize: 16),
@@ -185,31 +159,45 @@ class _MyWidgetState extends State<Addleads> {
                     spacing: 8,
                     children: selectedTags
                         .map((tag) => Chip(
-                      label: Text(tag),
-                      deleteIcon: const Icon(Icons.close),
-                      onDeleted: () {
-                        setState(() {
-                          selectedTags.remove(tag);
-                        });
-                      },
-                    ))
+                              label: Text(tag),
+                              deleteIcon: const Icon(Icons.close),
+                              onDeleted: () {
+                                setState(() {
+                                  // Remove the tag name and its corresponding ID
+                                  int index = selectedTags.indexOf(tag);
+                                  selectedTags.removeAt(index);
+                                  _dropDownTagId.removeAt(index);
+                                });
+                              },
+                            ))
                         .toList(),
                   ),
                   const SizedBox(height: 5),
                   DropdownButton<String>(
                     hint: const Text("Select a tag"),
                     isExpanded: true,
-                    items: availableTags.map((String tag) {
+                    value: null,
+                    items: leadStore.tags.map((tag) {
                       return DropdownMenuItem<String>(
-                        value: tag,
-                        child: Text(tag),
+                        value: tag.id,
+                        child: Text(tag.name),
                       );
                     }).toList(),
-                    onChanged: (String? tag) {
-                      if (tag != null && !selectedTags.contains(tag)) {
-                        setState(() {
-                          selectedTags.add(tag);
-                        });
+                    onChanged: (String? tagId) {
+                      if (tagId != null) {
+                        // Find the tag corresponding to the selected ID
+                        Tag? selectedTag = leadStore.tags.firstWhere(
+                          (tag) => tag.id == tagId,
+                          orElse: null,
+                        );
+
+                        if (!_dropDownTagId.contains(selectedTag.id)) {
+                          setState(() {
+                            // Add the selected tag's ID and name
+                            _dropDownTagId.add(selectedTag.id);
+                            selectedTags.add(selectedTag.name);
+                          });
+                        }
                       }
                     },
                   ),
@@ -319,55 +307,110 @@ class _MyWidgetState extends State<Addleads> {
                     children: [
                       Expanded(
                         child: CheckboxListTile(
-                          value: isPublic, // Declare this boolean variable in the state
+                          value:
+                              isPublic, // Declare this boolean variable in the state
                           onChanged: (bool? value) {
                             setState(() {
                               isPublic = value!;
                             });
                           },
-                          title: const Text('Public',style: TextStyle(fontSize: 14),),
-                          activeColor:acceptColor,
+                          title: const Text(
+                            'Public',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          activeColor: acceptColor,
                           controlAffinity: ListTileControlAffinity.leading,
                         ),
                       ),
                       Expanded(
                         child: CheckboxListTile(
-                          value: isContactNow, // Declare this boolean variable in the state
+                          value:
+                              isContactNow, // Declare this boolean variable in the state
                           onChanged: (bool? value) {
                             setState(() {
                               isContactNow = value!;
                             });
                           },
-                          title: const Text('Contacted Today',style: TextStyle(fontSize: 14),),
-                          activeColor:acceptColor,
+                          title: const Text(
+                            'Contacted Today',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          activeColor: acceptColor,
                           controlAffinity: ListTileControlAffinity.leading,
                         ),
                       ),
                     ],
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      infoLog("________Tags $_dropDownTagId");
+                      // Create form data
+                      FormData formData = FormData.fromMap({
+                        'name': nameController.text.trim(),
+                        'lead_value': leadValueController.text.trim(),
+                        'title': positionController.text.trim(),
+                        'email': emailController.text.trim(),
+                        'website': websiteController.text.trim(),
+                        'phonenumber': phoneController.text.trim(),
+                        'company': companyController.text.trim(),
+                        'address': addressController.text.trim(),
+                        'city': cityController.text.trim(),
+                        'zip': zipController.text.trim(),
+                        'state': state,
+                        'country': country,
+                        'is_public': isPublic ? 1 : 0,
+                        'contacted_today': isContactNow ? 1 : 0,
+                        'source': _selectedSourceId,
+                        'status': _selectedStatusId,
+                        'assigned': _selectedEmployeeId,
+                        'tags': jsonEncode(_dropDownTagId), // Assuming IDs for tags
+                        'description': descriptionController.text.trim(),
+                      });
+
+                      try {
+                        // Print data to console for debugging
+                        errorLog("--------${formData.fields}");
+
+                        // Make API call (replace `apiClient.post` with your actual API call method)
+                        final (
+                        bool status,
+                        Map<String, dynamic> response,
+                        String? message
+                        ) = await ApiService.addLeads(formData);
+
+                        if (status) {
+                          print('Success: ${message}');
+                          // Handle success (e.g., show a success message or navigate)
+                        } else {
+                          print(
+                              'Error: ${status} - ${response}');
+                          // Handle API error
+                        }
+                      } catch (e) {
+                        print('Exception: $e');
+                        // Handle network or other errors
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: secondaryPrimaryColor,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 135,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: const Text(
+                      'Submit',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17,
+                          color: Colors.white),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
         ],
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(10),
-        child: ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: secondaryPrimaryColor,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 135,
-              vertical: 12,
-            ),
-          ),
-          child: const Text(
-            'Submit',
-            style: TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 17, color: Colors.white),
-          ),
-        ),
       ),
     );
   }

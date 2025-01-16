@@ -100,7 +100,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
           // Add your action here, e.g., navigate to a new screen.
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const Addleads()),
+            MaterialPageRoute(builder: (context) => const AddLeads()),
           );
         },
         shape: const CircleBorder(),

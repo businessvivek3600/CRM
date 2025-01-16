@@ -69,7 +69,7 @@ class _LeadDetailsState extends State<LeadDetails> {
               ),
               onPressed: () {
                 _showDeleteDialog(
-                    context); // Show the delete confirmation dialog
+                    context);
               },
             ),
           ],
@@ -77,14 +77,14 @@ class _LeadDetailsState extends State<LeadDetails> {
         body: Column(
           children: [
             Material(
-              color: const Color(0xfffef7ff), // Background color for TabBar
+              color: const Color(0xfffef7ff),
               child: TabBar(
                 dividerColor: Colors.black.withOpacity(0.1),
                 indicatorSize: TabBarIndicatorSize.tab,
 
-                labelColor: textPrimaryColor, // Color for selected tab text
+                labelColor: textPrimaryColor,
                 unselectedLabelColor:
-                    textPrimaryColor.withOpacity(0.6), // Unselected tab text
+                    textPrimaryColor.withOpacity(0.6),
                 indicatorColor:
                    acceptColor, // Tab indicator color
                 tabs: const [
@@ -95,15 +95,16 @@ class _LeadDetailsState extends State<LeadDetails> {
               ),
             ),
             Expanded(
-              // Ensures TabBarView takes remaining space
-              child: TabBarView(
+          child: TabBarView(
                 children: [
                   ProfileTab(lead: widget.lead), // Includes cards
                   AddNotesTab(
                     noteData: widget.lead.notesData ?? [],
+                    lead:   widget.lead,
                   ),
                   RemindersTab(
                     remainder: widget.lead.reminders ?? [],
+                    lead:   widget.lead,
                   )
                 ],
               ),

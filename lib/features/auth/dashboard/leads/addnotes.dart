@@ -1,13 +1,18 @@
 import 'package:crm/Models/leads_model.dart';
 import 'package:crm/utils/colors.dart';
+import 'package:crm/utils/default_logger.dart';
 import 'package:crm/utils/size_utils.dart';
 import 'package:crm/widgets/date_formation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../services/api_services.dart';
+import '../../../../widgets/toastification/toastification.dart';
+
 class AddNotesTab extends StatefulWidget {
-  const AddNotesTab({super.key, required this.noteData});
+  const AddNotesTab({super.key, required this.noteData, required this.lead});
   final List<NoteData> noteData;
+  final Lead lead;
   @override
   State<AddNotesTab> createState() => _AddNotesTabState();
 }
@@ -155,7 +160,51 @@ class _AddNotesTabState extends State<AddNotesTab> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        // Prepare the data to be passed to the API
+                        final String noteDescription = noteController.text;
+                        final int contactedIndicator =
+                            selectedStatus == "I got in touch with this lead"
+                                ? 1
+                                : 0;
+
+                        // Create the data map
+                        final Map<String, dynamic> data = {
+                          'rel_id': widget.lead.id.toString(),
+                          'lead_note_description': noteDescription.toString(),
+                          'contacted_indicator': contactedIndicator.toString(),
+                          'custom_contact_date': selectedDateTime.toString()
+                        };
+
+                        // Call the API to add the note
+                        final (
+                          bool status,
+                          Map<String, dynamic> response,
+                          String? message
+                        ) = await ApiService.addNote(data);
+
+                        // Check the status and handle accordingly
+                        if (status) {
+                          // Success - Optionally show a success message and clear the form or do other actions
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content:
+                                    Text(message ?? "Note added successfully")),
+                          );
+                          // Optionally clear the input fields
+                          noteController.clear();
+                          setState(() {
+                            selectedStatus =
+                                "I have not contacted this lead"; // Reset status if needed
+                          });
+                        } else {
+                          // Failure - Show an error message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(message ?? "Failed to add note")),
+                          );
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: secondaryPrimaryColor,
                       ),
@@ -172,22 +221,29 @@ class _AddNotesTabState extends State<AddNotesTab> {
                 ),
                 height20(),
                 ListView.separated(
-                    physics: const NeverScrollableScrollPhysics(),
-                    separatorBuilder: (context, index) {
-                      return const Divider(
-                        thickness: 1.5,
-                        color: Colors.grey,
-                        height: 10,
-                      );
-                    },
-                    shrinkWrap: true,
-                    itemCount: widget.noteData.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  separatorBuilder: (context, index) {
+                    return const Divider(
+                      thickness: 1.5,
+                      color: Colors.grey,
+                      height: 10,
+                    );
+                  },
+                  shrinkWrap: true,
+                  itemCount: widget.noteData.length,
+                  itemBuilder: (context, index) {
+                    widget.noteData
+                        .sort((a, b) => b.dateadded.compareTo(a.dateadded));
 
-                    itemBuilder: (context, index) {
-                      widget.noteData.sort((a, b) => b.dateadded.compareTo(a.dateadded));
+                    final note = widget.noteData[index];
+                    final TextEditingController descriptionController =
+                        TextEditingController(text: note.description);
 
-                      final note = widget.noteData[index];
-                      return Column(
+                    // State variable for inline editing
+                    bool isEditing = false;
+
+                    return StatefulBuilder(
+                      builder: (context, setState) => Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(
@@ -242,38 +298,201 @@ class _AddNotesTabState extends State<AddNotesTab> {
                                   ),
                                 ],
                               ),
-                              if(note.editDelete == 1)
-                              const Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Icon(
-                                    Icons.edit_note_sharp,
-                                    size: 25,
-                                    color: acceptColor,
-                                  ),
-                                  Icon(
-                                    Icons.close,
-                                    color: Colors.red,
-                                    size: 25,
-                                  ),
-                                ],
-                              ),
+                              if (note.editDelete == 1)
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          isEditing = true;
+                                        });
+                                      },
+                                      child: const Icon(
+                                        Icons.edit_note_sharp,
+                                        size: 25,
+                                        color: acceptColor,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    GestureDetector(
+                                      onTap: () {
+                                        // Show warning dialog when delete icon is tapped
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title:
+                                                  const Text('Are you sure?'),
+                                              content: const Text(
+                                                  'Do you want to delete this note?'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context)
+                                                        .pop(); // Close dialog
+                                                  },
+                                                  child: const Text('Cancel'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () async {
+                                                    Navigator.of(context)
+                                                        .pop(); // Close dialog
+                                                    final Map<String, dynamic>
+                                                        deleteNote = {
+                                                      'id': note.id,
+                                                    };
+                                                    // Call API to delete the note
+                                                    final (
+                                                      bool status,
+                                                      Map<String, dynamic> data,
+                                                      String? message
+                                                    ) = await ApiService
+                                                        .deleteNote(deleteNote);
+                                                    if (status) {
+                                                      // Remove the note from the list if deletion is successful
+                                                      setState(() {
+                                                        widget.noteData
+                                                            .removeAt(index);
+                                                      });
+                                                    } else {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                            content: Text(
+                                                                "Failed to delete note")),
+                                                      );
+                                                    }
+                                                  },
+                                                  child: const Text('Yes'),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      },
+                                      child: const Icon(
+                                        Icons.delete_outline,
+                                        color: Colors.red,
+                                        size: 25,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                             ],
                           ),
                           const SizedBox(
                             height: 10,
                           ),
-                          Text(
-                            note.description,
-                            textAlign: TextAlign.justify,
-                          ),
+                          if (isEditing)
+                            Column(
+                              children: [
+                                TextField(
+                                  controller: descriptionController,
+                                  maxLines: 5,
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          isEditing = false; // Cancel editing
+                                          descriptionController.text = note
+                                              .description; // Reset to original value
+                                        });
+                                      },
+                                      child: const Text('Cancel'),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        // Show a loading indicator (optional)
+                                        setState(() {
+                                          isEditing = false;
+                                        });
+
+                                        // Prepare data for the API call
+                                        final Map<String, dynamic>
+                                            editNoteData = {
+                                          'rel_id': widget.lead.id,
+                                          'lead_note_description':
+                                              descriptionController.text,
+                                          'id': note.id,
+                                        };
+                                        infoLog("edit Note----------------");
+                                        infoLog("$editNoteData");
+                                        // Call the API
+                                        final (
+                                          bool status,
+                                          Map<String, dynamic> data,
+                                          String? message
+                                        ) = await ApiService.editNote(
+                                            editNoteData);
+
+                                        if (status) {
+                                          // Update the note's description locally
+                                          setState(() {
+                                            note.description =
+                                                descriptionController.text;
+                                            isEditing = false; // Exit edit mode
+                                          });
+
+                                          // Show success message (optional)
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(message ??
+                                                    "Note updated successfully")),
+                                          );
+                                        } else {
+                                          // Show error message
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(message ??
+                                                    "Failed to update note")),
+                                          );
+
+                                          // Restore the previous state
+                                          setState(() {
+                                            isEditing =
+                                                true; // Keep editing mode active
+                                          });
+                                        }
+                                      },
+                                      child: const Text('Save'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                          else
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isEditing = true;
+                                });
+                              },
+                              child: Text(
+                                note.description,
+                                textAlign: TextAlign.justify,
+                              ),
+                            ),
                           const SizedBox(
                             height: 20,
                           ),
                         ],
-                      );
-                    })
+                      ),
+                    );
+                  },
+                )
               ],
             ),
           ),
