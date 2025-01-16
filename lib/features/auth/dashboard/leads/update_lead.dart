@@ -21,21 +21,13 @@ class EditLead extends StatefulWidget {
 
 class _EditLeadState extends State<EditLead> {
   late  List<String> _dropdownItems = [];
-  final List<Map<String, dynamic>> _statusDropDownItems = [
-    {'label': 'New Lead', 'color': Colors.blue},
-    {'label': 'Contacted', 'color': Colors.green},
-    {'label': 'Qualified', 'color': Colors.yellow},
-    {'label': 'Negotiating', 'color': Colors.pink},
-    {'label': 'Closed - Won', 'color': Colors.green},
-    {'label': 'Closed - Lost', 'color': Colors.red},
-    {'label': 'Pending', 'color': Colors.orange},
-    {'label': 'On Hold', 'color': Colors.grey},
-    {'label': 'Reopened', 'color': Colors.purple},
-    {'label': 'Converted', 'color': Colors.blue},
-    {'label': 'Customer', 'color': Colors.green},
-  ];
+  String? _selectedEmployeeId;
   String? _selectedItem;
-  Map<String, dynamic>? _statusSelectedItem;
+  String? _selectedStatusId;
+  List<String> availableTags = [];
+  final List<String> _dropDownTagId = [];
+  List<String> selectedTags = [];
+  String? _statusSelectedItem;
   late TextEditingController nameController;
   late TextEditingController leadValueController;
   late TextEditingController positionController;
@@ -76,6 +68,7 @@ class _EditLeadState extends State<EditLead> {
       }
     } else {
       lastContactController = TextEditingController();
+
     }
     country = widget.lead.country;
     state = widget.lead.state;
@@ -166,24 +159,18 @@ class _EditLeadState extends State<EditLead> {
                     ),
                   ),
                   const SizedBox(height: 15),
-                  DropdownButtonFormField<Map<String, dynamic>>(
+                  DropdownButtonFormField<String>(
 
                     value: _statusSelectedItem,
-                    items: _statusDropDownItems.map((item) {
-                      return DropdownMenuItem<Map<String, dynamic>>(
-                        value: item,
-                        child: Text(
-                          item['label'],
-                          style: TextStyle(
-                            color: item['color'],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                    items: leadStore.leadStatus
+                        .map((item) => DropdownMenuItem<String>(
+                      value: item.id,
+                      child: Text(item.name),
+                    ))
+                        .toList(),
                     onChanged: (value) {
                       setState(() {
-                        _statusSelectedItem = value;
+                        _selectedStatusId = value;
                       });
                     },
                     decoration: InputDecoration(
@@ -192,6 +179,88 @@ class _EditLeadState extends State<EditLead> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 15),
+                  DropdownButtonFormField<String>(
+                    value: _selectedEmployeeId,
+                    items: leadStore.staff
+                        .map((item) => DropdownMenuItem<String>(
+                      value: item.staffId,
+                      child: Text("${item.firstName} ${item.lastName}"),
+                    ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedEmployeeId = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Assigned Lead',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  const Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Icon(
+                        Icons.local_offer,
+                        size: 18,
+                      ),
+                      Text(
+                        " Tags",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    children: selectedTags
+                        .map((tag) => Chip(
+                      label: Text(tag),
+                      deleteIcon: const Icon(Icons.close),
+                      onDeleted: () {
+                        setState(() {
+                          // Remove the tag name and its corresponding ID
+                          int index = selectedTags.indexOf(tag);
+                          selectedTags.removeAt(index);
+                          _dropDownTagId.removeAt(index);
+                        });
+                      },
+                    ))
+                        .toList(),
+                  ),
+                  const SizedBox(height: 5),
+                  DropdownButton<String>(
+                    hint: const Text("Select a tag"),
+                    isExpanded: true,
+                    value: null,
+                    items: leadStore.tags.map((tag) {
+                      return DropdownMenuItem<String>(
+                        value: tag.id,
+                        child: Text(tag.name),
+                      );
+                    }).toList(),
+                    onChanged: (String? tagId) {
+                      if (tagId != null) {
+                        // Find the tag corresponding to the selected ID
+                        Tag? selectedTag = leadStore.tags.firstWhere(
+                              (tag) => tag.id == tagId,
+                          orElse: null,
+                        );
+
+                        if (!_dropDownTagId.contains(selectedTag.id)) {
+                          setState(() {
+                            // Add the selected tag's ID and name
+                            _dropDownTagId.add(selectedTag.id);
+                            selectedTags.add(selectedTag.name);
+                          });
+                        }
+                      }
+                    },
                   ),
                   const SizedBox(height: 15),
                   CommonTextField(

@@ -1,4 +1,6 @@
 
+import 'dart:math';
+
 import 'package:crm/Models/leads_model.dart';
 import 'package:crm/services/api_services.dart';
 import 'package:crm/utils/default_logger.dart';
@@ -56,6 +58,7 @@ List<Tag> tags = [];
         leadStatus = (data['status_data'] as List)
             .map((e) => LeadStatus.fromJson(e))
             .toList();
+        infoLog("${data['status_data']}");
       }
       if (data['sources'] != null) {
         leadSource = (data['sources'] as List)
@@ -106,4 +109,6 @@ List<Tag> tags = [];
     if (status) {
   }
 }
+
+
 }

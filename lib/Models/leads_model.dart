@@ -293,6 +293,7 @@ class NoteData {
   String thumbImage;
   String smallImage;
   int? editDelete;
+  String id;
 
   NoteData({
     required this.description,
@@ -304,7 +305,8 @@ class NoteData {
     required this.dateadded,
     required this.thumbImage,
     required this.smallImage,
-    this.editDelete
+    this.editDelete,
+    required this.id,
   });
 
   factory NoteData.fromJson(Map<String, dynamic> json) {
@@ -319,6 +321,7 @@ class NoteData {
       thumbImage: json['thumb_image'] ?? '',
       smallImage: json['small_image'] ?? '',
       editDelete: json['can_edit_delete'] ?? 0,
+      id: json['id'] ?? '',
     );
   }
 
@@ -333,59 +336,81 @@ class NoteData {
       'dateadded': dateadded,
       'thumb_image': thumbImage,
       'small_image': smallImage,
-      'can_edit_delete': editDelete
+      'can_edit_delete': editDelete,
+      'id': id,
     };
   }
 }
 
 ///----Reminder------
 class Reminder {
+  String id;
   String description;
   String date;
   String isnotified;
+  String staffid;
   String firstname;
   String lastname;
   String profileImage;
   String thumbImage;
   String smallImage;
+  String creator;
+  int canEdit;
+  int canDelete;
 
   Reminder({
+    required this.id,
     required this.description,
     required this.date,
     required this.isnotified,
+    required this.staffid,
     required this.firstname,
     required this.lastname,
     required this.profileImage,
     required this.thumbImage,
     required this.smallImage,
+    required this.creator,
+    required this.canEdit,
+    required this.canDelete,
   });
 
   factory Reminder.fromJson(Map<String, dynamic> json) {
     return Reminder(
+      id: json['id'] ?? '',
       description: json['description'] ?? '',
       date: json['date'] ?? '',
       isnotified: json['isnotified'] ?? '',
+      staffid: json['staffid'] ?? '',
       firstname: json['firstname'] ?? '',
       lastname: json['lastname'] ?? '',
       profileImage: json['profile_image'] ?? '',
       thumbImage: json['thumb_image'] ?? '',
       smallImage: json['small_image'] ?? '',
+      creator: json['creator'] ?? '',
+      canEdit: json['can_edit'] ?? 0,
+      canDelete: json['can_delete'] ?? 0,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'description': description,
       'date': date,
       'isnotified': isnotified,
+      'staffid': staffid,
       'firstname': firstname,
       'lastname': lastname,
       'profile_image': profileImage,
       'thumb_image': thumbImage,
       'small_image': smallImage,
+      'creator': creator,
+      'can_edit': canEdit,
+      'can_delete': canDelete,
     };
   }
 }
+
 
 
 ///----Staff-Member------
