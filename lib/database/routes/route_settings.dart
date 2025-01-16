@@ -66,7 +66,7 @@ final GoRouter goRouter = GoRouter(
     path: Paths.addLead,
     name: Routes.addLead,
     pageBuilder: (context, state) =>
-        animatedRoute(state, (state) => const Addleads()),
+        animatedRoute(state, (state) => const AddLeads()),
   ),
   GoRoute(
     path: Paths.customer,
