@@ -5,6 +5,9 @@ class UserCustomer {
   final String title;
   late final List<Customer> customers;
   final int page;
+  final int totalCustomer;
+  final int activeCustomer;
+  final int inactiveCustomer;
 
   UserCustomer({
     required this.status,
@@ -13,6 +16,9 @@ class UserCustomer {
     required this.title,
     required this.customers,
     required this.page,
+    required this.totalCustomer,
+    required this.activeCustomer,
+    required this.inactiveCustomer,
   });
 
   factory UserCustomer.fromJson(Map<String, dynamic> json) {
@@ -25,6 +31,9 @@ class UserCustomer {
           .map((customer) => Customer.fromJson(customer))
           .toList(),
       page: json['page'],
+      totalCustomer: int.parse(json['total_customer'] ?? '0'),
+      activeCustomer: int.parse(json['active_customer'] ?? '0'),
+      inactiveCustomer: int.parse(json['inactive_customer'] ?? '0'),
     );
   }
 
@@ -36,6 +45,9 @@ class UserCustomer {
       'title': title,
       'customers': customers.map((customer) => customer.toJson()).toList(),
       'page': page,
+      'total_customer': totalCustomer,
+      'active_customer': activeCustomer,
+      'inactive_customer': inactiveCustomer,
     };
   }
 }
@@ -43,7 +55,7 @@ class UserCustomer {
 class Customer {
   final String userId;
   final String company;
-  final String? vat; // Nullable field
+  final String? vat;
   final String phoneNumber;
   final String country;
   final String city;
@@ -53,7 +65,17 @@ class Customer {
   final String website;
   final String dateCreated;
   final String active;
-  final String? leadId; // Nullable field
+  final String? leadId;
+  final String? billingStreet;
+  final String? billingCity;
+  final String? billingState;
+  final String? billingZip;
+  final String? billingCountry;
+  final String? shippingStreet;
+  final String? shippingCity;
+  final String? shippingState;
+  final String? shippingZip;
+  final String? shippingCountry;
 
   Customer({
     required this.userId,
@@ -69,23 +91,43 @@ class Customer {
     required this.dateCreated,
     required this.active,
     this.leadId,
+    this.billingStreet,
+    this.billingCity,
+    this.billingState,
+    this.billingZip,
+    this.billingCountry,
+    this.shippingStreet,
+    this.shippingCity,
+    this.shippingState,
+    this.shippingZip,
+    this.shippingCountry,
   });
 
   factory Customer.fromJson(Map<String, dynamic> json) {
     return Customer(
-      userId: json['userid'] ?? '', // Handle potential null value
-      company: json['company'] ?? '', // Handle potential null value
-      vat: json['vat'], // Nullable, no need for default value
-      phoneNumber: json['phonenumber'] ?? '', // Handle potential null value
-      country: json['country'] ?? '', // Handle potential null value
-      city: json['city'] ?? '', // Handle potential null value
-      zip: json['zip'] ?? '', // Handle potential null value
-      state: json['state'] ?? '', // Handle potential null value
-      address: json['address'] ?? '', // Handle potential null value
-      website: json['website'] ?? '', // Handle potential null value
-      dateCreated: json['datecreated'] ?? '', // Handle potential null value
-      active: json['active'] ?? '', // Handle potential null value
-      leadId: json['leadid'], // Nullable, no need for default value
+      userId: json['userid'] ?? '',
+      company: json['company'] ?? '',
+      vat: json['vat'],
+      phoneNumber: json['phonenumber'] ?? '',
+      country: json['country'] ?? '',
+      city: json['city'] ?? '',
+      zip: json['zip'] ?? '',
+      state: json['state'] ?? '',
+      address: json['address'] ?? '',
+      website: json['website'] ?? '',
+      dateCreated: json['datecreated'] ?? '',
+      active: json['active'] ?? '',
+      leadId: json['leadid'],
+      billingStreet: json['billing_street'],
+      billingCity: json['billing_city'],
+      billingState: json['billing_state'],
+      billingZip: json['billing_zip'],
+      billingCountry: json['billing_country'],
+      shippingStreet: json['shipping_street'],
+      shippingCity: json['shipping_city'],
+      shippingState: json['shipping_state'],
+      shippingZip: json['shipping_zip'],
+      shippingCountry: json['shipping_country'],
     );
   }
 
@@ -104,6 +146,45 @@ class Customer {
       'datecreated': dateCreated,
       'active': active,
       'leadid': leadId,
+      'billing_street': billingStreet,
+      'billing_city': billingCity,
+      'billing_state': billingState,
+      'billing_zip': billingZip,
+      'billing_country': billingCountry,
+      'shipping_street': shippingStreet,
+      'shipping_city': shippingCity,
+      'shipping_state': shippingState,
+      'shipping_zip': shippingZip,
+      'shipping_country': shippingCountry,
+    };
+  }
+}
+class CustomerCounts {
+  final String totalCustomer;
+  final String activeCustomer;
+  final String inactiveCustomer;
+
+  CustomerCounts({
+    required this.totalCustomer,
+    required this.activeCustomer,
+    required this.inactiveCustomer,
+  });
+
+  // Factory method to create a CustomerCounts from JSON
+  factory CustomerCounts.fromJson(Map<String, dynamic> json) {
+    return CustomerCounts(
+      totalCustomer: json['total_customer'] as String,
+      activeCustomer: json['active_customer'] as String,
+      inactiveCustomer: json['inactive_customer'] as String,
+    );
+  }
+
+  // Method to convert CustomerCounts to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'total_customer': totalCustomer,
+      'active_customer': activeCustomer,
+      'inactive_customer': inactiveCustomer,
     };
   }
 }
