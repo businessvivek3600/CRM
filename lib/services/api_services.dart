@@ -57,6 +57,110 @@ class ApiService {
   }
 
 
+  ///---ADD & Edit & delete note----
+  static Future<(bool, Map<String, dynamic>, String?)> addNote(
+        Map<String, dynamic> info) async {
+      try {
+        var (bool status, Map<String, dynamic> data, String? message) =
+        await await ApiHandler.fetchData(ApiConstant.addNote,data: info);
+        log('data : $data');
+        if (status) {
+          TF.success;
+        } else {
+          return (false, data, message);
+        }
+      } catch (e) {
+        logger.e('register error : $e', tag: tag);
+      }
+      return (false, <String, dynamic>{}, '');
+    }
+  static Future<(bool, Map<String, dynamic>, String?)> editNote(
+      Map<String, dynamic> info) async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+      await await ApiHandler.fetchData(ApiConstant.editNote,data: info);
+      log('data : $data');
+      if (status) {
+        log("message --$message");
+      } else {
+        return (false, data, message);
+      }
+    } catch (e) {
+      logger.e('register error : $e', tag: tag);
+    }
+    return (false, <String, dynamic>{}, '');
+  }
+
+  static Future<(bool, Map<String, dynamic>, String?)> deleteNote(
+      Map<String, dynamic> info) async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+      await await ApiHandler.fetchData(ApiConstant.deleteNote,data: info);
+      log('data : $data');
+      if (status) {
+        log("message --$message");
+      } else {
+        return (false, data, message);
+      }
+    } catch (e) {
+      logger.e('register error : $e', tag: tag);
+    }
+    return (false, <String, dynamic>{}, '');
+  }
+
+
+  ///------------------------Remainders-----------------------
+  static Future<(bool, Map<String, dynamic>, String?)> addReminder(
+      Map<String, dynamic> info) async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+      await await ApiHandler.fetchData(ApiConstant.addReminder,data: info);
+      log('data : $data');
+      if (status) {
+        log("message --$message");
+      } else {
+        return (false, data, message);
+      }
+    } catch (e) {
+      logger.e('register error : $e', tag: tag);
+    }
+    return (false, <String, dynamic>{}, '');
+  }
+  static Future<(bool, Map<String, dynamic>, String?)> editReminder(
+      Map<String, dynamic> info) async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+      await await ApiHandler.fetchData(ApiConstant.editReminder,data: info);
+      log('data : $data');
+      if (status) {
+        log("message --$message");
+      } else {
+        return (false, data, message);
+      }
+    } catch (e) {
+      logger.e('register error : $e', tag: tag);
+    }
+    return (false, <String, dynamic>{}, '');
+  }
+
+  static Future<(bool, Map<String, dynamic>, String?)> deleteReminder(
+      Map<String, dynamic> info) async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+      await await ApiHandler.fetchData(ApiConstant.deleteReminder,data: info);
+      log('data : $data');
+      if (status) {
+        log("message --$message");
+      } else {
+        return (false, data, message);
+      }
+    } catch (e) {
+      logger.e('register error : $e', tag: tag);
+    }
+    return (false, <String, dynamic>{}, '');
+  }
+
+
   ///------------------------Customers-----------------------
   /// Fetch customers from the API
   static Future<(bool, Map<String, dynamic>, String?)> getCustomers({int page = 0}) async {
