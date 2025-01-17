@@ -1,16 +1,24 @@
+import 'dart:convert';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:country_state_picker/components/index.dart';
 import 'package:country_state_picker/country_state_picker.dart';
-import 'package:crm/features/auth/dashboard/leads/leads_details.dart';
 import 'package:crm/store/lead_store.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
+import 'package:crm/utils/extensions.dart';
 import 'package:crm/utils/text_field.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
-
+import 'package:nb_utils/nb_utils.dart';
+import 'package:flutter_fast_forms/flutter_fast_forms.dart';
 import '../../../../Models/leads_model.dart';
+import '../../../../services/api_services.dart';
+import '../../../../store/app_store.dart';
 import '../../../../utils/size_utils.dart';
+import '../../../../utils/text.dart';
+
 
 class EditLead extends StatefulWidget {
   const EditLead({super.key, required this.lead});
@@ -24,6 +32,9 @@ class _EditLeadState extends State<EditLead> {
   String? _selectedEmployeeId;
   String? _selectedItem;
   String? _selectedStatusId;
+  ValueNotifier<List<CountryModel>> countries =
+  ValueNotifier<List<CountryModel>>([]);
+
   List<String> availableTags = [];
   final List<String> _dropDownTagId = [];
   List<String> selectedTags = [];
@@ -43,12 +54,13 @@ class _EditLeadState extends State<EditLead> {
   String? state;
   String? country;
   @override
+  @override
   void initState() {
     super.initState();
 
     // Initialize controllers with lead data
-    nameController = TextEditingController(text: widget.lead.name ?? 'empty');
-    leadValueController = TextEditingController(text:"₹ ${widget.lead.leadValue?.toString()}");
+    nameController = TextEditingController(text: widget.lead.name ?? '');
+    leadValueController = TextEditingController(text: "₹ ${widget.lead.leadValue ?? '0.00'}");
     positionController = TextEditingController(text: widget.lead.title);
     emailController = TextEditingController(text: widget.lead.email);
     websiteController = TextEditingController(text: widget.lead.website);
@@ -58,25 +70,53 @@ class _EditLeadState extends State<EditLead> {
     zipController = TextEditingController(text: widget.lead.zip);
     phoneController = TextEditingController(text: widget.lead.phonenumber);
     descriptionController = TextEditingController(text: widget.lead.description);
+
+    // Initialize dropdowns
+    _selectedItem = leadStore.leadSource
+        .firstWhere((source) => source.id == widget.lead.source, orElse:  null)
+        .name;
+    _statusSelectedItem = leadStore.leadStatus
+        .firstWhere((status) => status.id == widget.lead.status, orElse:  null)
+        .id;
+    _selectedEmployeeId = leadStore.staff
+        .firstWhere((staff) => staff.staffId == widget.lead.assigned, orElse:  null)
+        .staffId;
+
+    // Initialize tags
+    selectedTags = widget.lead.tags!.map((tag) => tag.name).toList();
+    _dropDownTagId.addAll(widget.lead.tags!.map((tag) => tag.id));
+
+    // Initialize country and state
+    country = widget.lead.country;
+    state = widget.lead.state;
+
+    // Handle last contact
     if (widget.lead.lastcontact != null) {
       try {
         DateTime lastContactDate = DateTime.parse(widget.lead.lastcontact!);
-        String formattedDateTime = DateFormat('yyyy-MM-dd h:mm a').format(lastContactDate);
-        lastContactController = TextEditingController(text: formattedDateTime);
+        lastContactController = TextEditingController(
+          text: DateFormat('yyyy-MM-dd h:mm a').format(lastContactDate),
+        );
       } catch (e) {
         lastContactController = TextEditingController(text: widget.lead.lastcontact);
       }
     } else {
       lastContactController = TextEditingController();
-
     }
-    country = widget.lead.country;
-    state = widget.lead.state;
+
     setState(() {
       _dropdownItems = leadStore.leadSource.map((source) => source.name).toList();
     });
-
   }
+  List<Map<String, dynamic>> formData = [
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+  ];
+  int activeStep = 0;
   Future<void> _selectLastContactDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -111,6 +151,7 @@ class _EditLeadState extends State<EditLead> {
 
   @override
   Widget build(BuildContext context) {
+    warningLog(" LOGIN TOKEN ____________${appStore.token}");
     infoLog("initial Value -----${widget.lead.name}");
     return Scaffold(
       appBar: AppBar(
@@ -137,12 +178,13 @@ class _EditLeadState extends State<EditLead> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   DropdownButtonFormField<String>(
-                    value: _selectedItem,
+                    value: _dropdownItems.contains(_selectedItem) ? _selectedItem : null,
                     items: _dropdownItems
+                        .toSet()
                         .map((item) => DropdownMenuItem<String>(
-                              value: item,
-                              child: Text(item),
-                            ))
+                      value: item,
+                      child: Text(item),
+                    ))
                         .toList(),
                     onChanged: (value) {
                       setState(() {
@@ -151,13 +193,13 @@ class _EditLeadState extends State<EditLead> {
                     },
                     decoration: InputDecoration(
                       labelText: 'Select Source',
-
-
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
                   ),
+
+
                   const SizedBox(height: 15),
                   DropdownButtonFormField<String>(
 
@@ -218,20 +260,17 @@ class _EditLeadState extends State<EditLead> {
                   const SizedBox(height: 10),
                   Wrap(
                     spacing: 8,
-                    children: selectedTags
-                        .map((tag) => Chip(
+                    children: selectedTags.map((tag) => Chip(
                       label: Text(tag),
                       deleteIcon: const Icon(Icons.close),
                       onDeleted: () {
                         setState(() {
-                          // Remove the tag name and its corresponding ID
                           int index = selectedTags.indexOf(tag);
                           selectedTags.removeAt(index);
                           _dropDownTagId.removeAt(index);
                         });
                       },
-                    ))
-                        .toList(),
+                    )).toList(),
                   ),
                   const SizedBox(height: 5),
                   DropdownButton<String>(
@@ -339,6 +378,66 @@ class _EditLeadState extends State<EditLead> {
                     stateHintText: "Select State",
                     noStateFoundText: "No State Found",
                   ),
+                  // ValueListenableBuilder(
+                  //     valueListenable: countries,
+                  //     builder: (BuildContext context, List<CountryModel> countryList,
+                  //         Widget? child) {
+                  //       CountryModel? country = countryList.firstWhereOrNull(
+                  //               (e) => e.id == (formData[activeStep]['country'] ?? ''));
+                  //
+                  //       pl('activestep{$activeStep} country ${country?.id} states: ${country?.states.validate().length} ${formData[activeStep]['country']}');
+                  //
+                  //       return Row(
+                  //         crossAxisAlignment: CrossAxisAlignment.start,
+                  //         children: [
+                  //           /// country dropdown
+                  //           Expanded(
+                  //             child: FastDropdown<CountryModel>(
+                  //               name: 'country',
+                  //               labelText: 'Country*',
+                  //               initialValue: country,
+                  //               items: countryList,
+                  //               selectedItemBuilder: (context) => countryList.map((e) {
+                  //                 String text = e.name.validate();
+                  //                 if (text.length > 15) text = text.substring(0, 15);
+                  //                 return bodyMedText(
+                  //                   text,
+                  //                   context,
+                  //                   autoSize: true,
+                  //                   minFontSize: 10,
+                  //                   maxLines: 1,
+                  //                   overflow: TextOverflow.ellipsis,
+                  //                 );
+                  //               }).toList(),
+                  //               itemsBuilder: (items, field) => items
+                  //                   .map(
+                  //                     (e) => DropdownMenuItem(
+                  //                   value: e,
+                  //                   child: bodyMedText(
+                  //                     e.name.validate(),
+                  //                     context,
+                  //                     autoSize: true,
+                  //                     minFontSize: 2,
+                  //                     maxLines: 2,
+                  //                     overflow: TextOverflow.ellipsis,
+                  //                     color: black,
+                  //                   ),
+                  //                 ),
+                  //               )
+                  //                   .toList(),
+                  //               onChanged: (value) async {
+                  //                 formData[activeStep]['country'] = countryList
+                  //                     .firstWhereOrNull((e) => e.id == value?.id)
+                  //                     ?.id;
+                  //
+                  //               },
+                  //             ),
+                  //           ),
+                  //
+                  //           10.width,
+                  //         ],
+                  //       );
+                  //     }),
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: cityController,
@@ -381,18 +480,142 @@ class _EditLeadState extends State<EditLead> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(10),
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed:() async {
+            infoLog("________Tags $_dropDownTagId");
+            // Create form data
+            FormData formData = FormData.fromMap({
+              "id":widget.lead.id,
+              'name': nameController.text.trim(),
+              'lead_value': leadValueController.text.toInt,
+              'title': positionController.text.trim(),
+              'email': emailController.text.trim(),
+              'website': websiteController.text.trim(),
+              'phonenumber': phoneController.text.trim(),
+              'company': companyController.text.trim(),
+              'address': addressController.text.trim(),
+              'city': cityController.text.trim(),
+              'zip': zipController.text.trim(),
+              'state': state,
+              'country': country,
+              'source': _selectedItem,
+              'status': _selectedStatusId,
+              'assigned': _selectedEmployeeId,
+              'tags': jsonEncode(_dropDownTagId), // Assuming IDs for tags
+              'description': descriptionController.text.trim(),
+              'lastcontact': lastContactController.text.trim(),
+            });
+
+            try {
+              // Print data to console for debugging
+              errorLog("--------${formData.fields}");
+
+              // Make API call (replace `apiClient.post` with your actual API call method)
+              final (
+              bool status,
+              Map<String, dynamic> response,
+              String? message
+              ) = await ApiService.addLeads(formData);
+
+              if (status) {
+                print('Success: ${message}');
+                // Handle success (e.g., show a success message or navigate)
+              } else {
+                print(
+                    'Error: ${status} - ${response}');
+                // Handle API error
+              }
+            } catch (e) {
+              print('Exception: $e');
+              // Handle network or other errors
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: secondaryPrimaryColor,
+            padding: const EdgeInsets.symmetric(horizontal: 135, vertical: 12),
+          ),
           child: const Text(
             'Update',
             style: TextStyle(
                 fontWeight: FontWeight.bold, fontSize: 17, color: Colors.white),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: secondaryPrimaryColor,
-            padding: const EdgeInsets.symmetric(horizontal: 135, vertical: 12),
           ),
         ),
       ),
     );
   }
 }
+Widget bodyMedText(
+    String text,
+    BuildContext context, {
+      TextAlign? textAlign,
+      int? maxLines,
+      TextOverflow? overflow,
+      TextStyle? style,
+      Color? color,
+      bool? isButton,
+      double? fontSize,
+      FontWeight? fontWeight,
+      double? letterSpacing,
+      double? lineHeight,
+      TextDecoration? decoration,
+      double opacity = 1,
+      bool autoSize = false,
+      double minFontSize = 12,
+    }) =>
+    autoSize
+        ? AutoSizeText(
+      text,
+      minFontSize: minFontSize,
+      textAlign: textAlign,
+      overflow: overflow,
+      maxLines: maxLines ?? 3,
+      style: GoogleFonts.ubuntu(
+        textStyle: style ??
+            getTheme(context).textTheme.bodyMedium!.copyWith(
+                fontWeight: fontWeight,
+                letterSpacing: letterSpacing,
+                color: (color ??
+                    (isButton != null
+                        ? (isButton
+                        ? (getTheme(context).brightness ==
+                        Brightness.dark
+                        ? Colors.white
+                        : Colors.black)
+                        : null)
+                        : null)),
+                decorationColor: color,
+                fontSize: fontSize,
+                height: lineHeight,
+                fontFamily:
+                getTheme(context).textTheme.bodyMedium?.fontFamily,
+                decoration: decoration)
+              ..color?.withOpacity(opacity),
+      ),
+    )
+        : Text(
+      text,
+      textAlign: textAlign,
+      overflow: overflow,
+      maxLines: maxLines ?? 3,
+      style: GoogleFonts.ubuntu(
+        textStyle: style ??
+            getTheme(context).textTheme.bodyMedium!.copyWith(
+                fontWeight: fontWeight,
+                letterSpacing: letterSpacing,
+                color: (color ??
+                    (isButton != null
+                        ? (isButton
+                        ? (getTheme(context).brightness ==
+                        Brightness.dark
+                        ? Colors.white
+                        : Colors.black)
+                        : null)
+                        : null)),
+                decorationColor: color,
+                fontSize: fontSize,
+                height: lineHeight,
+                fontFamily:
+                getTheme(context).textTheme.bodyMedium?.fontFamily,
+                decoration: decoration)
+              ..color?.withOpacity(opacity),
+      ),
+    );

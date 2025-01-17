@@ -10,6 +10,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../Models/leads_model.dart';
+import '../../../../store/app_store.dart';
 import '../../../../store/lead_store.dart';
 import '../../../../widgets/date_formation.dart';
 
@@ -24,26 +25,20 @@ class _LeadsScreenState extends State<LeadsScreen> {
   bool isShow = true;
   int currentPage = 0;
   bool isLoadingMore = false;
-  bool hasMore = true; // Indicates if there are more leads to load
+  bool hasMore = true;
   final ScrollController _scrollController = ScrollController();
-  final List<Map<String, String>> summaryData = [
-
-    {"count": "2", "label": "New Lead"},
-    {"count": "4", "label": "Contacted"},
-    {"count": "0", "label": "Qualified"},
-    {"count": "3", "label": "Missed"},
-    {"count": "2", "label": "New Lead"},
-    {"count": "4", "label": "Contacted"},
-    {"count": "0", "label": "Qualified"},
-    {"count": "3", "label": "Missed"},
-  ];
 
   @override
   void initState() {
     super.initState();
-    leadStore.getLeads(page: currentPage); // Fetch initial leads
+    leadStore.getLeads(page: currentPage).then((_) {
+      setState(() {
+        isShow = true;
+      });
+    });
     _scrollController.addListener(_onScroll);
   }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -52,7 +47,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
 
   void _onScroll() {
     if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent &&
+            _scrollController.position.maxScrollExtent &&
         !isLoadingMore &&
         hasMore) {
       _loadMoreLeads();
@@ -72,10 +67,9 @@ class _LeadsScreenState extends State<LeadsScreen> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
+    warningLog(" LOGIN TOKEN ____________${appStore.token}");
     return Scaffold(
       appBar: AppBar(
         backgroundColor: secondaryPrimaryColor,
@@ -151,21 +145,30 @@ class _LeadsScreenState extends State<LeadsScreen> {
               ),
               const SizedBox(height: 10),
               isShow
-                  ? SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: summaryData.map((data) {
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 2.0),
-                            child: _buildSummaryCard(
-                                data["count"]!, data["label"]!),
-                          );
-                        }).toList(),
-                      ),
-                    )
+                  ? Observer(builder: (_) {
+                      List<LeadSummary> leadsSummary = leadStore.leadSummary;
+                      if (leadsSummary.isEmpty) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      return SizedBox(
+                        height: 100,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: leadStore.leadSummary.length,
+                          itemBuilder: (context, index) {
+                            final summary = leadsSummary[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 8.0), // Add spacing between cards
+                              child: _buildSummaryCard(summary),
+                            );
+                          },
+                        ),
+                      );
+                    })
                   : const SizedBox(),
-
               const SizedBox(height: 20),
+
               // Leads Section
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -208,9 +211,8 @@ class _LeadsScreenState extends State<LeadsScreen> {
                     controller: _scrollController,
                     itemCount: leadStore.leads.length + (hasMore ? 1 : 0),
                     itemBuilder: (context, index) {
-                      if (index ==  leadStore.leads.length) {
-                        return const Center(
-                            child: CircularProgressIndicator());
+                      if (index == leadStore.leads.length) {
+                        return const Center(child: CircularProgressIndicator());
                       }
 
                       final lead = leads[index];
@@ -218,38 +220,27 @@ class _LeadsScreenState extends State<LeadsScreen> {
                     },
                   ),
                 );
-                            }),
+              }),
             ],
           ),
         ),
       ),
     );
   }
-  Color getStatusColor(status) {
-    switch (status) {
-      case "1":
-        return Colors.lightGreen;
-      case "2":
-        return  Colors.lightBlueAccent;
-      case "4":
-        return Colors.green;
-      default:
-        return Colors.redAccent;
-    }
-  }
-  Widget _buildSummaryCard(String count, String label) {
+
+  Widget _buildSummaryCard(LeadSummary leadSummary) {
     return Card(
       elevation: 8,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Container(
         width: 100,
-        height: 80,
+        height: 100,
         padding: const EdgeInsets.all(6),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              count,
+              leadSummary.total.toString(),
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -258,7 +249,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
             ),
             const SizedBox(height: 5),
             Text(
-              label,
+              leadSummary.name,
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -278,7 +269,10 @@ class _LeadsScreenState extends State<LeadsScreen> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) =>  LeadDetails(lead: lead,)),
+          MaterialPageRoute(
+              builder: (context) => LeadDetails(
+                    lead: lead,
+                  )),
         );
       },
       child: Stack(children: [
@@ -291,7 +285,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
               children: [
                 // Colored bar
                 Container(
-                  decoration:   BoxDecoration(
+                  decoration: BoxDecoration(
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(10),
                       bottomLeft: Radius.circular(10),
@@ -299,7 +293,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                     color: getStatusColor(lead.status),
                   ),
                   width: 5,
-                  height: 120,
+                  height: 137,
                 ),
                 Expanded(
                   child: Padding(
@@ -322,7 +316,9 @@ class _LeadsScreenState extends State<LeadsScreen> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  const SizedBox(height: 8,),
+                                  const SizedBox(
+                                    height: 8,
+                                  ),
                                   Text(
                                     lead.title ?? '',
                                     style: const TextStyle(
@@ -373,15 +369,15 @@ class _LeadsScreenState extends State<LeadsScreen> {
                           children: [
                             Row(
                               children: [
-                                  Icon(
+                                Icon(
                                   Icons.check_circle,
                                   size: 16,
                                   color: getStatusColor(lead.status),
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                 status?.name ?? "",
-                                  style:  TextStyle(
+                                  status?.name ?? "",
+                                  style: TextStyle(
                                     color: Colors.grey.shade400,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -434,4 +430,30 @@ class _LeadsScreenState extends State<LeadsScreen> {
       ]),
     );
   }
+}
+
+Color getStatusColor(String statusId) {
+
+  final summary = leadStore.leadSummary.firstWhere(
+    (leadSummary) => leadSummary.id == statusId,
+    orElse: () => LeadSummary(
+        id: '',
+        name: '',
+        total: 0,
+        color: '#5f615c',
+        statusOrder: '',
+        isDefault: ''), // Default value
+  );
+
+  // Return the dynamic color or a default color if not found
+  return _hexToColor(summary.color);
+}
+
+// Helper function to convert hex color to Flutter Color
+Color _hexToColor(String hexColor) {
+  hexColor = hexColor.replaceAll('#', '');
+  if (hexColor.length == 6) {
+    hexColor = 'FF$hexColor'; // Add alpha value if missing
+  }
+  return Color(int.parse(hexColor, radix: 16));
 }

@@ -404,6 +404,7 @@ class _RemindersTabState extends State<RemindersTab> {
                                       // Add your edit functionality here
                                     } else if (value == 'delete') {
                                       // Handle delete action
+                                      _showDeleteConfirmationDialog(remainder.id);
                                       print('Delete selected');
                                       // Add your delete functionality here
                                     }
@@ -502,6 +503,51 @@ class _RemindersTabState extends State<RemindersTab> {
       ),
     );
   }
+  void _showDeleteConfirmationDialog(String reminderId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Reminder'),
+          content: const Text('Are you sure you want to delete this reminder?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop(); // Close the dialog
+                await _deleteReminder(reminderId); // Call API to delete reminder
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteReminder(String reminderId) async {
+    final (bool success, _, String? message) =
+    await ApiService.deleteReminder({'id': reminderId});
+
+    if (success) {
+      setState(() {
+        widget.remainder.removeWhere((reminder) => reminder.id == reminderId);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Reminder deleted successfully')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message ?? 'Failed to delete reminder')),
+      );
+    }
+  }
+
   Future<void> _pickDateTime() async {
     // Step 1: Pick a date
     DateTime? pickedDate = await showDatePicker(
