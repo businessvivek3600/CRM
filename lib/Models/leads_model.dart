@@ -462,3 +462,107 @@ class Tag {
     };
   }
 }
+
+class CountryModel {
+  String? id;
+  String? sortname;
+  String? name;
+  String? phonecode;
+  List<StateModel>? states;
+
+  CountryModel(
+      {this.id,
+        this.sortname,
+        this.name,
+        this.phonecode,
+        this.states = const []});
+
+  CountryModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    sortname = json['sortname'];
+    name = json['name'];
+    phonecode = json['phonecode'];
+    states = <StateModel>[];
+    if (json['states'] != null) {
+      json['states'].forEach((v) {
+        states!.add(StateModel.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['sortname'] = sortname;
+    data['name'] = name;
+    data['phonecode'] = phonecode;
+    if (states != null) {
+      data['states'] = states!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+class StateModel {
+  String? id;
+  String? name;
+  String? countryId;
+
+  StateModel({this.id, this.name, this.countryId});
+
+  StateModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    countryId = json['country_id'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['name'] = name;
+    data['country_id'] = countryId;
+    return data;
+  }
+}
+
+
+class LeadSummary {
+  String id;
+  String name;
+  String statusOrder;
+  String color;
+  String isDefault;
+  int total;
+
+  LeadSummary({
+    required this.id,
+    required this.name,
+    required this.statusOrder,
+    required this.color,
+    required this.isDefault,
+    required this.total,
+  });
+
+  // Factory method to create a StatusData instance from JSON
+  factory LeadSummary.fromJson(Map<String, dynamic> json) {
+    return LeadSummary(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      statusOrder: json['statusorder'] ?? '',
+      color: json['color'] ?? '',
+      isDefault: json['isdefault'] ?? '',
+      total: json['total'] ?? 0,
+    );
+  }
+
+  // Method to convert a StatusData instance to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'statusorder': statusOrder,
+      'color': color,
+      'isdefault': isDefault,
+      'total': total,
+    };
+  }
+}

@@ -238,6 +238,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0"
+  country_codes:
+    dependency: "direct main"
+    description:
+      name: country_codes
+      sha256: "342358ec71f927e885aabc9cf43d1bf1fbb56989cb3579a5962cea8776b0e8d7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.0+1"
   country_list_pick:
     dependency: "direct main"
     description:
@@ -427,6 +435,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.1"
+  flutter_fast_forms:
+    dependency: "direct main"
+    description:
+      name: flutter_fast_forms
+      sha256: "3ae025611d06499a5500e4ef43c5d0bf993eba9fde387ae6be18d7a9032c6ab5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "18.0.0"
   flutter_linkify:
     dependency: "direct main"
     description:

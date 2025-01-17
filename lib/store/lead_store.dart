@@ -1,4 +1,3 @@
-
 import 'dart:math';
 
 import 'package:crm/Models/leads_model.dart';
@@ -35,23 +34,25 @@ abstract class _LeadStore with Store {
   List<Staff> staff = [];
 
   @observable
-List<Tag> tags = [];
+  List<Tag> tags = [];
+
+  @observable
+  List<LeadSummary> leadSummary = [];
 
   @observable
   List<Tag> leadTags = [];
-
 
   @action
   Future<void> getLeads({int page = 0}) async {
     infoLog("Leads Page Count --------$page");
     loadingLeads.value = true; // Update as observable
-    var (status, data, message) = await ApiService.getLeads(page:  page);
+    var (status, data, message) = await ApiService.getLeads(page: page);
     infoLog("API Response Data according page: ${data['leads']}");
     if (status) {
       List<Lead> _leads = [];
       tryCatch(() => _leads = (data['leads'] as List).map((e) {
-        return Lead.fromJson(e);
-      }).toList());
+            return Lead.fromJson(e);
+          }).toList());
       leads = _leads;
       pl('res _products length: ${_leads.length}');
       if (data['status_data'] != null) {
@@ -66,15 +67,16 @@ List<Tag> tags = [];
             .toList();
       }
       if (data['staff'] != null) {
-        staff = (data['staff'] as List)
-            .map((e) =>Staff.fromJson(e))
-            .toList();
-      }if (data['tags'] != null) {
-        tags = (data['tags'] as List)
-            .map((e) =>Tag.fromJson(e))
+        staff = (data['staff'] as List).map((e) => Staff.fromJson(e)).toList();
+      }
+      if (data['tags'] != null) {
+        tags = (data['tags'] as List).map((e) => Tag.fromJson(e)).toList();
+      }
+      if (data["status_data"] != null) {
+        leadSummary = (data["status_data"] as List)
+            .map((e) => LeadSummary.fromJson(e))
             .toList();
       }
-
       List<Tag> allTags = [];
       for (var lead in leads) {
         if (lead.tags != null) {
@@ -90,14 +92,15 @@ List<Tag> tags = [];
   LeadStatus? getStatusById(String statusId) {
     return leadStatus.firstWhereOrNull((status) => status.id == statusId);
   }
+
   @action
   LeadSource? getSourceById(String sourceId) {
-    return leadSource.firstWhereOrNull((source) => source.id ==  sourceId);
+    return leadSource.firstWhereOrNull((source) => source.id == sourceId);
   }
 
   @action
   Staff? getAssignedById(String sourceId) {
-    return staff.firstWhereOrNull((source) => source.staffId ==  sourceId);
+    return staff.firstWhereOrNull((source) => source.staffId == sourceId);
   }
 
   ///Add a new Lead
@@ -106,9 +109,6 @@ List<Tag> tags = [];
     loadingLeads.value = true;
     var (status, responsedata, message) = await ApiService.addLeads(data);
     infoLog("API Response Data according page: ${responsedata['leads']}");
-    if (status) {
+    if (status) {}
   }
-}
-
-
 }
