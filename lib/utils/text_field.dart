@@ -15,10 +15,14 @@ class CommonTextField extends StatefulWidget {
     this.initialValue,
     this.style,
     this.suffix,
-    this.onTap,this.maxLines
+    this.onTap,
+    this.maxLines,
+    this.textInputAction = TextInputAction.done,
+    this.focusNode,
+    this.onFieldSubmitted,
   });
 
-  final String? label, hint,initialValue;
+  final String? label, hint, initialValue;
   final TextEditingController? controller;
   final Function? validation;
   final bool isPassword;
@@ -28,8 +32,10 @@ class CommonTextField extends StatefulWidget {
   final List<String>? dropdownItems;
   final String? selectedValue;
   final int? maxLines;
-  final ValueChanged<String?>?
-      onChanged;
+  final ValueChanged<String?>? onChanged;
+  final TextInputAction textInputAction;
+  final FocusNode? focusNode;
+  final void Function(String)? onFieldSubmitted;
 
   @override
   State<CommonTextField> createState() => _CommonTextFieldState();
@@ -51,15 +57,14 @@ class _CommonTextFieldState extends State<CommonTextField> {
         value: widget.selectedValue,
         items: widget.dropdownItems!
             .map((item) => DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(item),
-                ))
+          value: item,
+          child: Text(item),
+        ))
             .toList(),
         onChanged: widget.onChanged,
         decoration: InputDecoration(
           labelText: widget.label,
-          labelStyle:
-              const TextStyle(color: textPrimaryColor),
+          labelStyle: const TextStyle(color: textPrimaryColor),
           hintText: widget.hint,
           hintStyle: TextStyle(color: textPrimaryColor.withOpacity(0.6)),
           border: OutlineInputBorder(
@@ -73,7 +78,6 @@ class _CommonTextFieldState extends State<CommonTextField> {
         ),
       );
     } else {
-      // Regular TextFormField is displayed
       return TextFormField(
         onTap: widget.onTap,
         maxLines: widget.maxLines,
@@ -81,14 +85,17 @@ class _CommonTextFieldState extends State<CommonTextField> {
         controller: widget.controller,
         initialValue: widget.initialValue,
         style: widget.style,
+        textInputAction: widget.textInputAction,
+        focusNode: widget.focusNode,
+        onFieldSubmitted: widget.onFieldSubmitted,
         decoration: InputDecoration(
           labelText: widget.label,
-          labelStyle: const TextStyle(color: textPrimaryColor), // Primary color
+          labelStyle: const TextStyle(color: textPrimaryColor),
           hintText: widget.hint,
           hintStyle: TextStyle(color: textPrimaryColor.withOpacity(0.6)),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(color: textPrimaryColor), // Border color
+            borderSide: const BorderSide(color: textPrimaryColor),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
@@ -97,17 +104,16 @@ class _CommonTextFieldState extends State<CommonTextField> {
           suffix: widget.suffix,
           suffixIcon: widget.isPassword
               ? IconButton(
-                  icon: Icon(
-                    _obscureText ? Icons.visibility_off : Icons.visibility,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscureText =
-                          !_obscureText; // Toggle password visibility
-                    });
-                  },
-                )
+            icon: Icon(
+              _obscureText ? Icons.visibility_off : Icons.visibility,
+              color: Theme.of(context).primaryColor,
+            ),
+            onPressed: () {
+              setState(() {
+                _obscureText = !_obscureText;
+              });
+            },
+          )
               : null,
         ),
         cursorColor: Theme.of(context).primaryColor,
