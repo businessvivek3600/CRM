@@ -1,3 +1,5 @@
+import 'package:crm/Models/dashboard_model.dart';
+
 class ApiConstant {
   ///api
   static const login = 'staff-login';
@@ -10,4 +12,5 @@ class ApiConstant {
   static const deleteReminder = 'delete-reminder';
   static const editReminder = 'add-reminder';
   static const addReminder = 'add-reminder';
+  static const dashboard = 'dashboard';
 }
