@@ -9,6 +9,8 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nb_utils/nb_utils.dart';
 
+import '../../../services/api_services.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -17,41 +19,72 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Define the list of data
   @override
   void initState() {
-    appStore.loadUserData();
-    infoLog("---------------------------------");
-    infoLog(appStore.token);
-    infoLog(appStore.userEmail);
     super.initState();
+    appStore.loadUserData();
+    infoLog("User Token: ${appStore.token}");
+    infoLog("User Email: ${appStore.userEmail}");
+    fetchDashboardData(); // Fetch data when the screen is initialized
   }
-  final List<Map<String, dynamic>> metricData = [
-    {
-      'icon': Icons.attach_money,
-      'count': '27 of 31',
-      'label': 'Invoices Awaiting Payment',
-      'color': Colors.black,
-    },
-    {
-      'icon': Icons.refresh,
-      'count': '0 of 0',
-      'label': 'Converted Leads',
-      'color': Colors.black,
-    },
-    {
-      'icon': Icons.file_copy,
-      'count': '121 of 121',
-      'label': 'Not Completed Tasks',
-      'color': Colors.black,
-    },
-    {
-      'icon': Icons.add_box,
-      'count': '8 of 21',
-      'label': 'Projects In Progress',
-      'color': Colors.black,
-    },
-  ];
+
+  final List<Map<String, dynamic>> metricData = [];
+  bool isLoading = true;
+
+  void fetchDashboardData() async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+          await ApiService.getDashboardData();
+      print('API Response: $data');
+
+      if (status && data.isNotEmpty) {
+        setState(() {
+          metricData.addAll([
+            {
+              'icon': Icons.attach_money,
+              'count':
+                  '${data['invoices']?['pending'] ?? 0} of ${data['invoices']?['total'] ?? 0}',
+              'label': 'Invoices Awaiting Payment',
+              'color': Colors.black,
+            },
+            {
+              'icon': Icons.refresh,
+              'count':
+                  '${data['leads']?['converted'] ?? 0} of ${data['leads']?['total'] ?? 0}',
+              'label': 'Converted Leads',
+              'color': Colors.black,
+            },
+            {
+              'icon': Icons.file_copy,
+              'count':
+                  '${data['tasks']?['incomplete'] ?? 0} of ${data['tasks']?['total'] ?? 0}',
+              'label': 'Not Completed Tasks',
+              'color': Colors.black,
+            },
+            {
+              'icon': Icons.add_box,
+              'count':
+                  '${data['projects']?['inProgress'] ?? 0} of ${data['projects']?['total'] ?? 0}',
+              'label': 'Projects In Progress',
+              'color': Colors.black,
+            },
+          ]);
+          isLoading = false;
+        });
+      } else {
+        logger.e("Dashboard API Error: ${message ?? 'Unknown error'}");
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      logger.e('Error fetching dashboard data: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   void getLocation() async {
     LocationPermission permission;
 
@@ -82,8 +115,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(onPressed: getLocation,
-      child: Icon(Icons.location_history),),
+      floatingActionButton: FloatingActionButton(
+        onPressed: getLocation,
+        child: Icon(Icons.location_history),
+      ),
       drawer: const CustomDrawer(), // Ensure CustomDrawer is defined properly
       appBar: AppBar(
         backgroundColor: secondaryPrimaryColor,
@@ -94,165 +129,164 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(fontSize: 23, color: white),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Observer(builder: (context) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-
-                  // Profile and Welcome Section
-                  Row(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Observer(builder: (context) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      CircleAvatar(
-                        radius: 45,
-                        backgroundColor: Colors.grey[200],
-                        backgroundImage: appStore.profileImage.isNotEmpty
-                            ? NetworkImage(appStore.profileImage)
-                            : null,
-                        child: appStore.profileImage.isEmpty
-                            ? Text(
-                          appStore.fullName.isNotEmpty
-                              ? appStore.fullName[0].toUpperCase()
-                              : '',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 45,
+                            backgroundColor: Colors.grey[200],
+                            backgroundImage: appStore.profileImage.isNotEmpty
+                                ? NetworkImage(appStore.profileImage)
+                                : null,
+                            child: appStore.profileImage.isEmpty
+                                ? Text(
+                                    appStore.fullName.isNotEmpty
+                                        ? appStore.fullName[0].toUpperCase()
+                                        : '',
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  )
+                                : null,
                           ),
-                        )
-                            : null,
-                      ),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children:  [
-                          Text(
-                            'Welcome ${appStore.fullName}',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                           appStore.userEmail,
-                            style: const TextStyle(
-                              color: Colors.grey,
-                            ),
+                          const SizedBox(width: 16),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Welcome ${appStore.fullName}',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                appStore.userEmail,
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
+                      const SizedBox(height: 20),
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          childAspectRatio: 3 / 2.5,
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+                        itemCount: metricData.length,
+                        itemBuilder: (context, index) {
+                          final data = metricData[index];
+                          warningLog('metricData: ${data['icon']}');
+                          return _buildCard(
+                            data['icon'],
+                            data['count'],
+                            data['label'],
+                            data['color'],
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Invoice Progress Bars
+                      const Text(
+                        "Leads Overview",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const InvoiceProgressItem(
+                        label: "New Lead",
+                        value: 0.1, // Percentage of progress
+                        color: Colors.red,
+                        count: 2,
+                      ),
+                      const InvoiceProgressItem(
+                        label: "Contacted",
+                        value: 0.4,
+                        color: Colors.green,
+                        count: 4,
+                      ),
+                      const InvoiceProgressItem(
+                        label: "Qualified",
+                        value: 0.2,
+                        color: Colors.blue,
+                        count: 2,
+                      ),
+                      const InvoiceProgressItem(
+                        label: "Negotiating",
+                        value: 0.7,
+                        color: Colors.orange,
+                        count: 23,
+                      ),
+                      const InvoiceProgressItem(
+                        label: "Closed-Won",
+                        value: 0.5,
+                        color: Colors.green,
+                        count: 23,
+                      ),
+                      const InvoiceProgressItem(
+                        label: "Closed-Lost",
+                        value: 0.6,
+                        color: Colors.red,
+                        count: 23,
+                      ),
+                      const InvoiceProgressItem(
+                        label: "Pending",
+                        value: 0.7,
+                        color: Colors.orange,
+                        count: 23,
+                      ),
+                      const InvoiceProgressItem(
+                        label: "On Hold",
+                        value: 0.3,
+                        color: Colors.grey,
+                        count: 23,
+                      ),
+
+                      const InvoiceProgressItem(
+                        label: "Reopened",
+                        value: 0.4,
+                        color: Colors.purple,
+                        count: 23,
+                      ),
+                      const InvoiceProgressItem(
+                        label: "Converted",
+                        value: 0.4,
+                        color: Colors.blue,
+                        count: 23,
+                      ),
+                      const InvoiceProgressItem(
+                        label: "Customer",
+                        value: 0.7,
+                        color: Colors.lightGreen,
+                        count: 23,
+                      ),
                     ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Metrics Grid
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      childAspectRatio: 3 / 2.5,
-                      crossAxisCount: 2, // Number of columns
-                      crossAxisSpacing: 10, // Reduced spacing for smaller cards
-                      mainAxisSpacing: 10, // Reduced spacing for smaller cards
-                    ),
-                    itemCount: metricData.length,
-                    itemBuilder: (context, index) {
-                      final data = metricData[index];
-                      return _buildCard(
-                        data['icon'],
-                        data['count'],
-                        data['label'],
-                        data['color'],
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Invoice Progress Bars
-                  const Text(
-                    "Leads Overview",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const InvoiceProgressItem(
-                    label: "New Lead",
-                    value: 0.1, // Percentage of progress
-                    color: Colors.red,
-                    count: 2,
-                  ),
-                  const InvoiceProgressItem(
-                    label: "Contacted",
-                    value: 0.4,
-                    color: Colors.green,
-                    count: 4,
-                  ),
-                  const InvoiceProgressItem(
-                    label: "Qualified",
-                    value: 0.2,
-                    color: Colors.blue,
-                    count: 2,
-                  ),
-                  const InvoiceProgressItem(
-                    label: "Negotiating",
-                    value: 0.7,
-                    color: Colors.orange,
-                    count: 23,
-                  ),
-                  const InvoiceProgressItem(
-                    label: "Closed-Won",
-                    value: 0.5,
-                    color: Colors.green,
-                    count: 23,
-                  ),
-                  const InvoiceProgressItem(
-                    label: "Closed-Lost",
-                    value: 0.6,
-                    color: Colors.red,
-                    count: 23,
-                  ),
-                  const InvoiceProgressItem(
-                    label: "Pending",
-                    value: 0.7,
-                    color: Colors.orange,
-                    count: 23,
-                  ),
-                  const InvoiceProgressItem(
-                    label: "On Hold",
-                    value: 0.3,
-                    color: Colors.grey,
-                    count: 23,
-                  ),
-
-                  const InvoiceProgressItem(
-                    label: "Reopened",
-                    value: 0.4,
-                    color: Colors.purple,
-                    count: 23,
-                  ),
-                  const InvoiceProgressItem(
-                    label: "Converted",
-                    value: 0.4,
-                    color: Colors.blue,
-                    count: 23,
-                  ),
-                  const InvoiceProgressItem(
-                    label: "Customer",
-                    value: 0.7,
-                    color: Colors.lightGreen,
-                    count: 23,
-                  ),
-                ],
-              );
-            }
-          ),
-        ),
-      ),
+                  );
+                }),
+              ),
+            ),
     );
   }
 
