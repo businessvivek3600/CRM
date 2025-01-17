@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:crm/Models/dashboard_model.dart';
 import 'package:crm/constants/api_constant.dart';
 import 'package:crm/database/function.dart';
 import 'package:dio/dio.dart';
@@ -16,10 +17,12 @@ import '../widgets/toastification/toastification.dart';
 
 class ApiService {
   static String tag = 'ApiService';
+
   ///--------------------Leads--------------------
 
   /// Fetch leads from the API
-  static Future<(bool, Map<String, dynamic>, String?)> getLeads({int page = 0}) async {
+  static Future<(bool, Map<String, dynamic>, String?)> getLeads(
+      {int page = 0}) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
           await ApiHandler.fetchData('${ApiConstant.getLeads}?page=$page',
@@ -43,10 +46,10 @@ class ApiService {
       FormData info) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-      await await ApiHandler.fetchData(ApiConstant.addLead,data: info);
+          await await ApiHandler.fetchData(ApiConstant.addLead, data: info);
       log('data : $data');
       if (status) {
-       log("message --$message");
+        log("message --$message");
       } else {
         return (false, data, message);
       }
@@ -56,29 +59,29 @@ class ApiService {
     return (false, <String, dynamic>{}, '');
   }
 
-
   ///---ADD & Edit & delete note----
   static Future<(bool, Map<String, dynamic>, String?)> addNote(
-        Map<String, dynamic> info) async {
-      try {
-        var (bool status, Map<String, dynamic> data, String? message) =
-        await await ApiHandler.fetchData(ApiConstant.addNote,data: info);
-        log('data : $data');
-        if (status) {
-          TF.success;
-        } else {
-          return (false, data, message);
-        }
-      } catch (e) {
-        logger.e('register error : $e', tag: tag);
+      Map<String, dynamic> info) async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+          await await ApiHandler.fetchData(ApiConstant.addNote, data: info);
+      log('data : $data');
+      if (status) {
+        TF.success;
+      } else {
+        return (false, data, message);
       }
-      return (false, <String, dynamic>{}, '');
+    } catch (e) {
+      logger.e('register error : $e', tag: tag);
     }
+    return (false, <String, dynamic>{}, '');
+  }
+
   static Future<(bool, Map<String, dynamic>, String?)> editNote(
       Map<String, dynamic> info) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-      await await ApiHandler.fetchData(ApiConstant.editNote,data: info);
+          await await ApiHandler.fetchData(ApiConstant.editNote, data: info);
       log('data : $data');
       if (status) {
         log("message --$message");
@@ -95,7 +98,7 @@ class ApiService {
       Map<String, dynamic> info) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-      await await ApiHandler.fetchData(ApiConstant.deleteNote,data: info);
+          await await ApiHandler.fetchData(ApiConstant.deleteNote, data: info);
       log('data : $data');
       if (status) {
         log("message --$message");
@@ -107,14 +110,13 @@ class ApiService {
     }
     return (false, <String, dynamic>{}, '');
   }
-
 
   ///------------------------Remainders-----------------------
   static Future<(bool, Map<String, dynamic>, String?)> addReminder(
       Map<String, dynamic> info) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-      await await ApiHandler.fetchData(ApiConstant.addReminder,data: info);
+          await await ApiHandler.fetchData(ApiConstant.addReminder, data: info);
       log('data : $data');
       if (status) {
         log("message --$message");
@@ -126,11 +128,13 @@ class ApiService {
     }
     return (false, <String, dynamic>{}, '');
   }
+
   static Future<(bool, Map<String, dynamic>, String?)> editReminder(
       Map<String, dynamic> info) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-      await await ApiHandler.fetchData(ApiConstant.editReminder,data: info);
+          await await ApiHandler.fetchData(ApiConstant.editReminder,
+              data: info);
       log('data : $data');
       if (status) {
         log("message --$message");
@@ -147,7 +151,8 @@ class ApiService {
       Map<String, dynamic> info) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-      await await ApiHandler.fetchData(ApiConstant.deleteReminder,data: info);
+          await await ApiHandler.fetchData(ApiConstant.deleteReminder,
+              data: info);
       log('data : $data');
       if (status) {
         log("message --$message");
@@ -160,10 +165,10 @@ class ApiService {
     return (false, <String, dynamic>{}, '');
   }
 
-
   ///------------------------Customers-----------------------
   /// Fetch customers from the API
-  static Future<(bool, Map<String, dynamic>, String?)> getCustomers({int page = 0}) async {
+  static Future<(bool, Map<String, dynamic>, String?)> getCustomers(
+      {int page = 0}) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
           await ApiHandler.fetchData('${ApiConstant.getCustomer}?page=$page',
@@ -180,6 +185,33 @@ class ApiService {
     } catch (e) {
       logger.e('getCustomers error : $e', tag: tag);
     }
+    return (false, <String, dynamic>{}, null);
+  }
+
+  ///------------------------Dashboard-----------------------
+  /// Fetch Dashboard from the API
+  static Future<(bool, Map<String, dynamic>, String?)>
+      getDashboardData() async {
+    try {
+      // Fetch data using the ApiHandler
+      var (bool status, Map<String, dynamic> data, String? message) =
+          await ApiHandler.fetchData(ApiConstant.dashboard,
+              method: ApiMethod.POST);
+
+      if (status && data.isNotEmpty) {
+        return (true, data, message);
+      } else {
+        message = message?.split('.').first;
+        // Optionally log or handle the error
+        logger.e('Dashboard API error: $message', tag: 'DashboardAPI');
+        return (false, <String, dynamic>{}, message);
+      }
+    } catch (e) {
+      // Handle exceptions gracefully
+      logger.e('getDashboardData error: $e', tag: 'DashboardAPI');
+    }
+
+    // Return default failure response in case of error
     return (false, <String, dynamic>{}, null);
   }
 }
