@@ -1,3 +1,4 @@
+import 'package:country_codes/country_codes.dart';
 import 'package:country_list_pick/country_list_pick.dart';
 import 'package:crm/Models/leads_model.dart';
 import 'package:crm/features/auth/dashboard/customer/convertedto_customer.dart';
@@ -6,6 +7,7 @@ import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/features/auth/dashboard/leads/reminders.dart';
 import 'package:crm/features/auth/dashboard/leads/update_lead.dart';
 import 'package:crm/utils/colors.dart';
+import 'package:crm/utils/default_logger.dart';
 import 'package:crm/utils/size_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -20,6 +22,26 @@ class LeadDetails extends StatefulWidget {
 }
 
 class _LeadDetailsState extends State<LeadDetails> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    _selectedCountryName = getCountryNames(widget.lead.country);
+    super.initState();
+  }
+  String _selectedCountryName = '';
+
+  String getCountryNames(String countryCode) {
+    final countryList = CountryListPick(
+      initialSelection: countryCode,
+      onChanged: (CountryCode? code) {
+        setState(() {
+          _selectedCountryName = code?.name ?? 'Unknown';
+        });
+      },
+    );
+
+    return _selectedCountryName;
+  }
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(

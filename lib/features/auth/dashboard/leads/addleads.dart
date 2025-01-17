@@ -47,6 +47,36 @@ class _MyWidgetState extends State<AddLeads> {
   List<String> availableTags = [];
 
   List<String> selectedTags = [];
+  final FocusNode nameFocusNode = FocusNode();
+  final FocusNode leadValueFocusNode = FocusNode();
+  final FocusNode positionFocusNode = FocusNode();
+  final FocusNode emailFocusNode = FocusNode();
+  final FocusNode websiteFocusNode = FocusNode();
+  final FocusNode phoneFocusNode = FocusNode();
+  final FocusNode companyFocusNode = FocusNode();
+  final FocusNode cityFocusNode = FocusNode();
+  final FocusNode zipFocusNode = FocusNode();
+  final FocusNode addressFocusNode = FocusNode();
+  final FocusNode descriptionFocusNode = FocusNode();
+
+  // Rest of your variables...
+
+  @override
+  void dispose() {
+    // Dispose of all focus nodes
+    nameFocusNode.dispose();
+    leadValueFocusNode.dispose();
+    positionFocusNode.dispose();
+    emailFocusNode.dispose();
+    websiteFocusNode.dispose();
+    phoneFocusNode.dispose();
+    companyFocusNode.dispose();
+    cityFocusNode.dispose();
+    zipFocusNode.dispose();
+    addressFocusNode.dispose();
+    descriptionFocusNode.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -206,43 +236,70 @@ class _MyWidgetState extends State<AddLeads> {
                     controller: nameController,
                     label: 'Name',
                     hint: 'Enter Your Name',
+                    focusNode: nameFocusNode,
+                    onFieldSubmitted: (_) {
+                      FocusScope.of(context).requestFocus(leadValueFocusNode);
+                    },
                   ),
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: leadValueController,
                     label: 'Lead Value',
                     hint: 'Lead Value',
-                    // suffix: Text("₹",style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 18),),
+                    focusNode: leadValueFocusNode,
+                    onFieldSubmitted: (_) {
+                      FocusScope.of(context).requestFocus(positionFocusNode);
+                    },
                   ),
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: positionController,
                     label: 'Position',
                     hint: 'Position',
+                    focusNode: positionFocusNode,
+                    onFieldSubmitted: (_) {
+                      FocusScope.of(context).requestFocus(emailFocusNode);
+                    },
                   ),
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: emailController,
                     label: 'Email',
                     hint: 'Enter Your Email',
+                    focusNode: emailFocusNode,
+                    onFieldSubmitted: (_) {
+                      FocusScope.of(context).requestFocus(websiteFocusNode);
+                    },
                   ),
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: websiteController,
                     label: 'Website',
                     hint: 'Enter Website Name',
+                    focusNode: websiteFocusNode,
+                    onFieldSubmitted: (_) {
+                      FocusScope.of(context).requestFocus(phoneFocusNode);
+                    },
                   ),
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: phoneController,
                     label: 'Phone',
-                    hint: 'Enter Website Phone Number',
+                    hint: 'Enter Phone Number',
+                    focusNode: phoneFocusNode,
+                    onFieldSubmitted: (_) {
+                      FocusScope.of(context).requestFocus(companyFocusNode);
+                    },
                   ),
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: companyController,
                     label: 'Company',
                     hint: 'Enter Company Name',
+                    focusNode: companyFocusNode,
+                    onFieldSubmitted: (_) {
+                      FocusScope.of(context).requestFocus(cityFocusNode);
+                    },
                   ),
                   const SizedBox(height: 15),
                   CountryStatePicker(
@@ -281,25 +338,38 @@ class _MyWidgetState extends State<AddLeads> {
                     controller: cityController,
                     label: 'City',
                     hint: 'Enter Your City',
+                    focusNode: cityFocusNode,
+                    onFieldSubmitted: (_) {
+                      FocusScope.of(context).requestFocus(zipFocusNode);
+                    },
                   ),
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: zipController,
                     label: 'Zip Code',
                     hint: 'Enter Zip Code',
+                    focusNode: zipFocusNode,
+                    onFieldSubmitted: (_) {
+                      FocusScope.of(context).requestFocus(addressFocusNode);
+                    },
                   ),
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: addressController,
                     label: 'Address',
                     hint: 'Enter Address',
+                    focusNode: addressFocusNode,
+                    onFieldSubmitted: (_) {
+                      FocusScope.of(context).requestFocus(descriptionFocusNode);
+                    },
                   ),
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: descriptionController,
                     maxLines: 3,
                     label: 'Description',
-                    hint: 'Tell us more about project',
+                    hint: 'Tell us more about the project',
+                    focusNode: descriptionFocusNode,
                   ),
                   const SizedBox(height: 15),
                   Row(
