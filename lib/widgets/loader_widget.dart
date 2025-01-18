@@ -141,13 +141,28 @@ class _SessionExpiredWidgetState extends State<_SessionExpiredWidget> {
   @override
   void initState() {
     super.initState();
-    AuthService().logout().then((value) {
-      pl('running loggout... ');
-      1.seconds.delay.then((value) => widget.goRouter.go(Paths.login))
-      .then((value) => appStore.setSessionExpired(false))
-          ;
-    });
+    handleSessionExpiration();
   }
+
+  /// Handle session expiration
+  Future<void> handleSessionExpiration() async {
+    try {
+      // Trigger logout for session expiration
+        await AuthService().logout(context: context, isSessionExpired: true);
+
+      pl('Session expired. Navigating to login...');
+      await Future.delayed(Duration(seconds: 1));
+
+      // Use GoRouter to navigate to the login screen
+      GoRouter.of(context).go(Paths.login);
+
+      // Reset session expiration state
+      appStore.setSessionExpired(false);
+    } catch (e) {
+      pl('Error during session expiration: $e');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
