@@ -42,6 +42,9 @@ abstract class _LeadStore with Store {
   @observable
   List<Tag> leadTags = [];
 
+  @observable
+  List<Country> country = [];
+
   @action
   Future<void> getLeads({int page = 0}) async {
     infoLog("Leads Page Count --------$page");
@@ -111,4 +114,6 @@ abstract class _LeadStore with Store {
     infoLog("API Response Data according page: ${responsedata['leads']}");
     if (status) {}
   }
+  //getDashBoard data
+
 }
