@@ -63,7 +63,11 @@ dependencies:
   country_code_picker: ^3.1.0
   country_codes: ^3.2.0+1
   flutter_fast_forms: ^18.0.0
+<<<<<<< HEAD
   country_pickers: ^3.0.1
+=======
+  back_button_interceptor: ^8.0.3
+>>>>>>> 93515d7e8008c15747f8b18b5da5cca28ff4135c
 
 
 dev_dependencies:
