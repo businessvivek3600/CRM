@@ -36,7 +36,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) => const HomeScreen(),
@@ -53,7 +53,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
               return const Center(child: CircularProgressIndicator());
             } else if (customerStore.customerFuture?.status ==
                 FutureStatus.rejected) {
-              return Center(child: Text('Error loading data'));
+              return const Center(child: Text('Error loading data'));
             } else if (customerStore.customers.isEmpty) {
               return const Center(child: Text('No customers available.'));
             }
@@ -195,7 +195,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
                       var customer = customerStore.customers[index];
                       return GestureDetector(
                         onTap: () {
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) => CustomerDetails(
@@ -291,6 +291,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
             ),
           );
         },
+        tooltip: 'Add Customer',
         child: const Padding(
           padding: EdgeInsets.all(8.0),
           child: Icon(
@@ -299,7 +300,6 @@ class _CustomerScreenState extends State<CustomerScreen> {
             size: 30,
           ),
         ),
-        tooltip: 'Add Customer',
       ),
     );
   }

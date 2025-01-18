@@ -5,6 +5,8 @@ import 'package:country_state_picker/country_state_picker.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 import '../../../../constants/app_constants.dart';
+import '../../../../services/api_services.dart';
+import '../../../../utils/default_logger.dart';
 import '../../../../utils/text_field.dart';
 
 class AddCustomer extends StatefulWidget {
@@ -15,8 +17,43 @@ class AddCustomer extends StatefulWidget {
 }
 
 class _AddCustomerState extends State<AddCustomer> {
-  String? state;
+  final TextEditingController _companyController = TextEditingController();
+  final TextEditingController _vatController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _websiteController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _zipController = TextEditingController();
+
+  final TextEditingController _billingStreetController = TextEditingController();
+  final TextEditingController _billingZipController = TextEditingController();
+  final TextEditingController _billingCityController = TextEditingController();
+  final TextEditingController _shippingStreetController = TextEditingController();
+  final TextEditingController _shippingZipController = TextEditingController();
+  final TextEditingController _shippingCityController = TextEditingController();
+
   String? country;
+  String? state;
+  String? countryBilling;
+  String? stateBilling;
+  String? countryShipping;
+  String? stateShipping;
+  bool _sameAsBilling = false;
+  void _copyBillingToShipping() {
+    if (_sameAsBilling) {
+      _shippingStreetController.text = _billingStreetController.text;
+      _shippingZipController.text = _billingZipController.text;
+      _shippingCityController.text = _billingCityController.text;
+      countryShipping = countryBilling;
+      stateShipping = stateBilling;
+    } else {
+      // Clear shipping address fields when "same as billing" is unchecked
+      _shippingStreetController.clear();
+      _shippingZipController.clear();
+      _shippingCityController.clear();
+      countryShipping = null;
+      stateShipping = null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,13 +61,7 @@ class _AddCustomerState extends State<AddCustomer> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text(
-            'Add Customer',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          title: const Text('Add Customer'),
         ),
         body: Column(
           children: [
@@ -59,32 +90,36 @@ class _AddCustomerState extends State<AddCustomer> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 10),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const CommonTextField(
+                          CommonTextField(
+                            controller: _companyController,
                             label: 'Legal Company Name',
                             hint: 'Legal Company Name',
                           ),
-                          const SizedBox(height: 15),
-                          const CommonTextField(
+                          SizedBox(height: 15),
+                          CommonTextField(
+                            controller: _vatController,
                             label: 'VAT Number',
                           ),
-                          const SizedBox(height: 15),
-                          const CommonTextField(
+                          SizedBox(height: 15),
+                          CommonTextField(
+                            controller: _phoneController,
                             label: 'Phone',
                             hint: 'Enter Phone Number',
                           ),
-                          const SizedBox(height: 15),
-                          const CommonTextField(
+                          SizedBox(height: 15),
+                          CommonTextField(
+                            controller: _websiteController,
                             label: 'Website',
                             hint: 'Enter Website URL',
                           ),
-                          const SizedBox(height: 15),
-                          const CommonTextField(
+                          SizedBox(height: 15),
+                          CommonTextField(
+                            controller: _addressController,
                             label: 'Address',
                             hint: 'Enter Address',
                           ),
-                          const SizedBox(height: 15),
+                          SizedBox(height: 15),
                           CountryStatePicker(
                             inputDecoration: InputDecoration(
                               labelStyle: TextStyle(
@@ -94,11 +129,6 @@ class _AddCustomerState extends State<AddCustomer> {
                                       .primaryColor
                                       .withOpacity(0.6)),
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                    color: Theme.of(context).primaryColor),
-                              ),
-                              focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                                 borderSide: BorderSide(
                                     color: Theme.of(context).primaryColor),
@@ -115,10 +145,10 @@ class _AddCustomerState extends State<AddCustomer> {
                             }),
                             countryHintText: "Select Country",
                             stateHintText: "Select State",
-                            noStateFoundText: "No State Found",
                           ),
-                          const SizedBox(height: 15),
-                          const CommonTextField(
+                          SizedBox(height: 15),
+                          CommonTextField(
+                            controller: _zipController,
                             label: 'Zip Code',
                             hint: 'Enter Zip Code',
                           ),
@@ -126,7 +156,7 @@ class _AddCustomerState extends State<AddCustomer> {
                       ),
                     ),
                   ),
-                  // Billing Details Tab (example placeholder)
+                  // Billing Details Tab
                   SingleChildScrollView(
                     child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -135,22 +165,20 @@ class _AddCustomerState extends State<AddCustomer> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             // const SizedBox(height: 15),
-                            const CommonTextField(
+                            CommonTextField(
+                              controller: _billingStreetController,
                               label: 'Billing Street',
                               hint: 'Billing Street',
                             ),
-                            const SizedBox(height: 15),
-                            const CommonTextField(
+                            SizedBox(height: 15),
+                            CommonTextField(
+                              controller: _billingCityController,
                               label: 'Billing City',
                               hint: 'Billing City',
                             ),
-                            // const SizedBox(height: 15),
-                            // const CommonTextField(
-                            //   label: 'Billing State',
-                            //   hint: 'Billing State'
-                            // ),
-                            const SizedBox(height: 15),
-                            const CommonTextField(
+                            SizedBox(height: 15),
+                            CommonTextField(
+                              controller: _billingZipController,
                               label: 'Billing Zip',
                               hint: 'Billing Zip',
                             ),
@@ -164,7 +192,7 @@ class _AddCustomerState extends State<AddCustomer> {
                                     color: Theme.of(context)
                                         .primaryColor
                                         .withOpacity(
-                                            0.6)), // Primary color with opacity
+                                        0.6)), // Primary color with opacity
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                   borderSide: BorderSide(
@@ -185,34 +213,48 @@ class _AddCustomerState extends State<AddCustomer> {
                               // countryLabel: const Label(title: "Country"),
                               // stateLabel: const Label(title: "State"),
                               onCountryChanged: (ct) => setState(() {
-                                country = ct;
-                                state = null;
+                                countryBilling = ct;
+                                stateBilling = null;
                               }),
                               onStateChanged: (st) => setState(() {
-                                state = st;
+                                stateBilling = st;
                               }),
                               countryHintText: "Select Billing Country",
                               stateHintText: "Billing State",
                               noStateFoundText: "No State Found",
                             ),
                             SizedBox(height: 15),
+                            // Checkbox for "Same as Billing Address"
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: _sameAsBilling,
+                                  activeColor: acceptColor,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _sameAsBilling = value!;
+                                      _copyBillingToShipping();
+                                    });
+                                  },
+                                ),
+                                const Text("Same as billing address"),
+                              ],
+                            ),
                             const SizedBox(height: 15),
-                            const CommonTextField(
+                            CommonTextField(
+                              controller: _shippingStreetController,
                               label: 'Shipping Street',
                               hint: 'Shipping Street',
                             ),
                             const SizedBox(height: 15),
-                            const CommonTextField(
+                            CommonTextField(
+                              controller: _shippingCityController,
                               label: 'Shipping City',
                               hint: 'Shipping City',
                             ),
-                            // const SizedBox(height: 15),
-                            // const CommonTextField(
-                            //   label: 'Billing State',
-                            //   hint: 'Billing State'
-                            // ),
-                            const SizedBox(height: 15),
-                            const CommonTextField(
+                            SizedBox(height: 15),
+                            CommonTextField(
+                              controller: _shippingZipController,
                               label: 'Shipping Zip',
                               hint: 'Shipping Zip',
                             ),
@@ -226,7 +268,7 @@ class _AddCustomerState extends State<AddCustomer> {
                                     color: Theme.of(context)
                                         .primaryColor
                                         .withOpacity(
-                                            0.6)), // Primary color with opacity
+                                        0.6)), // Primary color with opacity
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                   borderSide: BorderSide(
@@ -247,11 +289,11 @@ class _AddCustomerState extends State<AddCustomer> {
                               // countryLabel: const Label(title: "Country"),
                               // stateLabel: const Label(title: "State"),
                               onCountryChanged: (ct) => setState(() {
-                                country = ct;
-                                state = null;
+                                countryShipping = ct;
+                                stateShipping = null;
                               }),
                               onStateChanged: (st) => setState(() {
-                                state = st;
+                                stateShipping = st;
                               }),
                               countryHintText: "Select Shipping Country",
                               stateHintText: "Shipping State",
@@ -272,12 +314,33 @@ class _AddCustomerState extends State<AddCustomer> {
           child: ElevatedButton(
             onPressed: () {
               if (country != null && state != null) {
-                debugPrint('Country: $country, State: $state');
+                final Map<String, dynamic> formData = {
+                  "company": _companyController.text,
+                  "vat": _vatController.text,
+                  "phonenumber": _phoneController.text,
+                  "website": _websiteController.text,
+                  "address": _addressController.text,
+                  "country": country,
+                  "state": state,
+                  "zip": _zipController.text,
+                  'billing_street': _billingStreetController.text,
+                  'billing_city': _billingCityController.text,
+                  'billing_state': stateBilling,
+                  'billing_zip':_billingZipController.text,
+                  'billing_country': countryBilling,
+                  'shipping_street': _shippingStreetController.text,
+                  'shipping_city':_shippingCityController.text,
+                  'shipping_state': stateShipping,
+                  'shipping_zip': _shippingZipController.text,
+                  'shipping_country': countryShipping,
+                };
+
+                // Call the _saveCustomerData method
+                _saveCustomerData(formData);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Please select a country and state.'),
-                  ),
+                      content: Text('Please select a country and state.')),
                 );
               }
             },
@@ -286,5 +349,20 @@ class _AddCustomerState extends State<AddCustomer> {
         ),
       ),
     );
+  }
+
+  void _saveCustomerData(Map<String, dynamic> formData) async {
+    warningLog("Editable customer Data: $formData");
+
+    final (bool status, Map<String, dynamic> response, String? message) =
+        await ApiService.editCustomer(formData);
+
+    if (status) {
+      infoLog('Success: ${message}');
+      // Handle success (e.g., show a success message or navigate)
+    } else {
+      print('Error: ${status} - ${response}');
+      // Handle API error
+    }
   }
 }

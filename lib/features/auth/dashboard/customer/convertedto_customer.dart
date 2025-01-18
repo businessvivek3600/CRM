@@ -1,3 +1,4 @@
+import 'package:country_pickers/utils/utils.dart';
 import 'package:country_state_picker/components/index.dart';
 import 'package:country_state_picker/country_state_picker.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_details.dart';
@@ -5,21 +6,52 @@ import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/text_field.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../Models/leads_model.dart';
+
 class ConvertToCustomer extends StatefulWidget {
-  const ConvertToCustomer({super.key});
+  ConvertToCustomer({super.key, required this.lead});
+  final Lead lead;
 
   @override
   State<ConvertToCustomer> createState() => _ConvertedToCustomerState();
 }
 
 class _ConvertedToCustomerState extends State<ConvertToCustomer> {
+  // Variables for fields
+  String? firstName;
+  String? position;
+  String? email;
+  String? company;
+  String? phone;
+  String? address;
+  String? city;
+  String? zipCode;
   String? state;
-  String? country;
+  String? countryCode;
+  String? countryName;
+
 
   bool isPasswordHidden = true;
   bool sendSetPasswordEmail = false;
   bool doNotSendWelcomeEmail = false;
   final passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize variables with lead data
+    firstName = widget.lead.name;
+    position = widget.lead.title;
+    email = widget.lead.email;
+    company = widget.lead.company;
+    phone = widget.lead.phonenumber;
+    address = widget.lead.address;
+    city = widget.lead.city;
+    zipCode = widget.lead.zip;
+    countryCode = widget.lead.country;
+    state = widget.lead.state;
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +62,7 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
           'Convert to Customer',
           style: TextStyle(color: Colors.white),
         ),
-       automaticallyImplyLeading: true,
+        automaticallyImplyLeading: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -39,80 +71,94 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const CommonTextField(
+                CommonTextField(
                   label: 'First Name',
                   hint: 'Enter First Name',
+                  initialValue: firstName, // Set initial value
+                  onChanged: (value) => firstName = value,
                 ),
                 const SizedBox(height: 15),
-                const CommonTextField(
-                  label: 'Last Name ',
-                  hint: 'Enter Last Name',
-                ),
                 const SizedBox(height: 15),
-                const CommonTextField(
-                  label: 'Position ',
+                CommonTextField(
+                  label: 'Position',
                   hint: 'Enter Position',
+                  initialValue: position,
+                  onChanged: (value) => position = value,
                 ),
                 const SizedBox(height: 15),
-                const CommonTextField(
-                  label: 'Email ',
+                CommonTextField(
+                  label: 'Email',
                   hint: 'Enter Email',
+                  initialValue: email,
+                  onChanged: (value) => email = value,
                 ),
                 const SizedBox(height: 15),
-                const CommonTextField(
-                  label: 'Company ',
+                CommonTextField(
+                  label: 'Company',
                   hint: 'Enter Company Name',
+                  initialValue: company,
+                  onChanged: (value) => company = value,
                 ),
                 const SizedBox(height: 15),
-                const CommonTextField(
-                  label: 'Phone ',
+                CommonTextField(
+                  label: 'Phone',
                   hint: 'Enter Phone Number',
+                  initialValue: phone,
+                  onChanged: (value) => phone = value,
                 ),
                 const SizedBox(height: 15),
-                const CommonTextField(
+                CommonTextField(
                   label: 'Address',
                   hint: 'Enter Address',
+                  initialValue: address,
+                  onChanged: (value) => address = value,
                 ),
                 const SizedBox(height: 15),
-                const CommonTextField(
+                CommonTextField(
                   label: 'City',
                   hint: 'Enter City',
+                  initialValue: city,
+                  onChanged: (value) => city = value,
                 ),
                 const SizedBox(height: 15),
                 CountryStatePicker(
                   inputDecoration: InputDecoration(
                     labelStyle:
-                        TextStyle(color: Theme.of(context).primaryColor),
+                    TextStyle(color: Theme.of(context).primaryColor),
                     hintStyle: TextStyle(
                         color: Theme.of(context).primaryColor.withOpacity(0.6)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                       borderSide:
-                          BorderSide(color: Theme.of(context).primaryColor),
+                      BorderSide(color: Theme.of(context).primaryColor),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                       borderSide:
-                          BorderSide(color: Theme.of(context).primaryColor),
+                      BorderSide(color: Theme.of(context).primaryColor),
                     ),
                   ),
                   countryLabel: const Label(title: "Country"),
                   stateLabel: const Label(title: "State"),
                   onCountryChanged: (ct) => setState(() {
-                    country = ct;
+                    countryCode= ct;
+                    countryName =
+                        CountryPickerUtils.getCountryByIsoCode(ct).name;
                     state = null;
                   }),
                   onStateChanged: (st) => setState(() {
                     state = st;
                   }),
-                  countryHintText: "Select Country",
-                  stateHintText: "Select State",
+                  countryHintText: countryName ?? "Select Country",
+                  stateHintText: state ?? "Select State",
                   noStateFoundText: "No State Found",
                 ),
                 const SizedBox(height: 15),
-                const CommonTextField(
+                CommonTextField(
                   label: 'Zip Code',
                   hint: 'Enter Zip Code',
+                  initialValue: zipCode,
+                  onChanged: (value) => zipCode = value,
                 ),
                 const SizedBox(height: 15),
                 if (!sendSetPasswordEmail)
@@ -169,19 +215,64 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => LeadDetails(),
-                        //   ),
-                        // );
+                        // Back to lead action
                       },
                       child: const Text("Back to lead"),
                     ),
                     const SizedBox(width: 8.0),
                     ElevatedButton(
                       onPressed: () {
-                        // Save action
+                        // Collect updated data
+                        final updatedData = <String, dynamic>{};
+
+                        // Compare each field with the initial value and add only changed fields
+                        if (firstName != widget.lead.name) {
+                          updatedData['name'] = firstName;
+                        }
+                        if (position != widget.lead.title) {
+                          updatedData['title'] = position;
+                        }
+                        if (email != widget.lead.email) {
+                          updatedData['email'] = email;
+                        }
+                        if (company != widget.lead.company) {
+                          updatedData['company'] = company;
+                        }
+                        if (phone != widget.lead.phonenumber) {
+                          updatedData['phonenumber'] = phone;
+                        }
+                        if (address != widget.lead.address) {
+                          updatedData['address'] = address;
+                        }
+                        if (city != widget.lead.city) {
+                          updatedData['city'] = city;
+                        }
+                        if (zipCode != widget.lead.zip) {
+                          updatedData['zip'] = zipCode;
+                        }
+                        if (countryCode != widget.lead.country) {
+                          updatedData['country'] = countryCode;
+                        }
+                        if (state != widget.lead.state) {
+                          updatedData['state'] = state;
+                        }
+
+                        // Handle password if "Send SET password email" is not selected
+                        if (!sendSetPasswordEmail && passwordController.text.isNotEmpty) {
+                          updatedData['password'] = passwordController.text;
+                        }
+
+                        // Additional options
+                        updatedData['sendSetPasswordEmail'] = sendSetPasswordEmail;
+                        updatedData['doNotSendWelcomeEmail'] = doNotSendWelcomeEmail;
+
+                        // Send updated data to the API
+                        if (updatedData.isNotEmpty) {
+                          // Call your API method here and pass `updatedData`
+                          print('Updated data to send: $updatedData');
+                        } else {
+                          print('No changes detected');
+                        }
                       },
                       child: const Text("Save"),
                     ),
@@ -195,3 +286,4 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
     );
   }
 }
+
