@@ -32,8 +32,8 @@ class _EditLeadState extends State<EditLead> {
   String? _selectedEmployeeId;
   String? _selectedItem;
   String? _selectedStatusId;
-  ValueNotifier<List<CountryModel>> countries =
-  ValueNotifier<List<CountryModel>>([]);
+  ValueNotifier<List<Country>> countries =
+  ValueNotifier<List<Country>>([]);
 
   List<String> availableTags = [];
   final List<String> _dropDownTagId = [];
