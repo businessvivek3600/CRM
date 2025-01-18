@@ -1,5 +1,5 @@
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:crm/features/auth/auth/auth_screen.dart';
-
 import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/services/auth_services.dart';
@@ -22,6 +22,24 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
+  void initState() {
+    super.initState();
+    // Add back button interceptor
+    BackButtonInterceptor.add(interceptorCallback);
+  }
+
+  @override
+  void dispose() {
+    // Remove back button interceptor
+    BackButtonInterceptor.remove(interceptorCallback);
+    super.dispose();
+  }
+
+  // Updated interceptor callback with RouteInfo parameter
+  bool interceptorCallback(bool stopDefaultButtonEvent, RouteInfo info) {
+    return true; // Block back button navigation
+  }
+
   @override
   Widget build(BuildContext context) {
     infoLog(appStore.profileImage);
@@ -38,7 +56,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
         ),
         child: ListView(
           children: [
-             DrawerHeader(
+            // Drawer Header
+            DrawerHeader(
               decoration: const BoxDecoration(),
               child: Row(
                 children: [
@@ -50,15 +69,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         : null,
                     child: appStore.profileImage.isEmpty
                         ? Text(
-                      appStore.fullName.isNotEmpty
-                          ? appStore.fullName[0].toUpperCase()
-                          : '',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    )
+                            appStore.fullName.isNotEmpty
+                                ? appStore.fullName[0].toUpperCase()
+                                : '',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          )
                         : null,
                   ),
                   const SizedBox(width: 20),
@@ -67,11 +86,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(appStore.fullName,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 24,
-                            )),
+                        Text(
+                          appStore.fullName,
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 24,
+                          ),
+                        ),
                         Text(
                           appStore.userEmail,
                           style: const TextStyle(
@@ -86,44 +107,60 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ],
               ),
             ),
+            // Customer ListTile
             ListTile(
               title: const Text('Customer'),
               leading: const Icon(Icons.people),
               trailing: const Icon(Icons.keyboard_arrow_right),
               onTap: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CustomerScreen(),
-                    ));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CustomerScreen(),
+                  ),
+                );
               },
             ),
+            // Leads ListTile
             ListTile(
               title: const Text('Leads'),
-              trailing: const Icon(Icons.keyboard_arrow_right),
               leading: const Icon(Icons.leaderboard),
+              trailing: const Icon(Icons.keyboard_arrow_right),
               onTap: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LeadsScreen(),
-                    ));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LeadsScreen(),
+                  ),
+                );
               },
             ),
+            // Logout ListTile
             ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
+              leading: const Icon(
+                Icons.logout,
+                color: Colors.red,
+              ),
+              title: const Text(
+                'Logout',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               onTap: () async {
-                pl('Running logout...');
-                // Call logout method and wait for completion
-                bool success = await AuthService().logout();
-
-                if (success) {
-                  // Perform navigation after ensuring logout is complete
-                  context.goNamed(Routes.login); // Use only one navigation method
-                } else {
-                  // Handle logout failure if needed
-                  pl('Logout failed.');
+                bool logoutConfirmed = await _showLogoutDialog(context);
+                if (logoutConfirmed) {
+                  // Proceed with logout
+                  bool success = await AuthService().logout(
+                    context: context, // Passing context
+                    isSessionExpired: true, // Passing isSessionExpired
+                  );
+                  if (success) {
+                    // Redirect to login screen after successful logout
+                    Navigator.pushReplacementNamed(context, '/login');
+                  }
                 }
               },
             ),
@@ -133,5 +170,44 @@ class _CustomDrawerState extends State<CustomDrawer> {
     );
   }
 
+  // Logout Confirmation Dialog
 
+  Future<bool> _showLogoutDialog(BuildContext context) async {
+    bool result = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Are you sure?'),
+              content: const Text('Do you want to log out?'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false); // Cancel
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Simulate session expiration (remove user session data here if needed)
+                    _logout(context);
+                  },
+                  child: const Text('Logout'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false; // Default value if dialog returns null
+
+    return result; // Ensure returning a bool
+  }
+
+  void _logout(BuildContext context) {
+    // Navigate to AuthScreen and clear all previous routes
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => AuthScreen()),
+      (Route<dynamic> route) => false, // Clear all previous routes
+    );
+  }
 }
