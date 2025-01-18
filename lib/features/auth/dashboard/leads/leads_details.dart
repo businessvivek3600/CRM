@@ -1,5 +1,6 @@
 import 'package:country_codes/country_codes.dart';
 import 'package:country_list_pick/country_list_pick.dart';
+import 'package:country_pickers/utils/utils.dart';
 import 'package:crm/Models/leads_model.dart';
 import 'package:crm/features/auth/dashboard/customer/convertedto_customer.dart';
 import 'package:crm/features/auth/dashboard/leads/addnotes.dart';
@@ -295,7 +296,7 @@ class _ProfileTabState extends State<ProfileTab> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const ConvertToCustomer(),
+                      builder: (context) => ConvertToCustomer( lead: widget.lead,),
                     ),
                   );
                 },

@@ -463,45 +463,41 @@ class Tag {
   }
 }
 
-class CountryModel {
-  String? id;
-  String? sortname;
-  String? name;
-  String? phonecode;
-  List<StateModel>? states;
+class Country {
+  final String countryId;
+  final String shortName;
+  final String longName;
+  final String callingCode;
 
-  CountryModel(
-      {this.id,
-        this.sortname,
-        this.name,
-        this.phonecode,
-        this.states = const []});
+  Country({
+    required this.countryId,
+    required this.shortName,
+    required this.longName,
+    required this.callingCode,
+  });
 
-  CountryModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    sortname = json['sortname'];
-    name = json['name'];
-    phonecode = json['phonecode'];
-    states = <StateModel>[];
-    if (json['states'] != null) {
-      json['states'].forEach((v) {
-        states!.add(StateModel.fromJson(v));
-      });
-    }
+  /// Factory method to create a `Country` object from a JSON map
+  factory Country.fromJson(Map<String, dynamic> json) {
+    return Country(
+      countryId: json['country_id'] as String,
+      shortName: json['short_name'] as String,
+      longName: json['long_name'] as String,
+      callingCode: json['calling_code'] as String,
+    );
   }
 
+  /// Method to convert a `Country` object to a JSON map
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['sortname'] = sortname;
-    data['name'] = name;
-    data['phonecode'] = phonecode;
-    if (states != null) {
-      data['states'] = states!.map((v) => v.toJson()).toList();
-    }
-    return data;
+    return {
+      'country_id': countryId,
+      'short_name': shortName,
+      'long_name': longName,
+      'calling_code': callingCode,
+    };
   }
 }
+
+
 class StateModel {
   String? id;
   String? name;

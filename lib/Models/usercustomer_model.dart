@@ -158,7 +158,61 @@ class Customer {
       'shipping_country': shippingCountry,
     };
   }
+
+  // Add the copyWith method
+  Customer copyWith({
+    String? userId,
+    String? company,
+    String? vat,
+    String? phoneNumber,
+    String? country,
+    String? city,
+    String? zip,
+    String? state,
+    String? address,
+    String? website,
+    String? dateCreated,
+    String? active,
+    String? leadId,
+    String? billingStreet,
+    String? billingCity,
+    String? billingState,
+    String? billingZip,
+    String? billingCountry,
+    String? shippingStreet,
+    String? shippingCity,
+    String? shippingState,
+    String? shippingZip,
+    String? shippingCountry,
+  }) {
+    return Customer(
+      userId: userId ?? this.userId,
+      company: company ?? this.company,
+      vat: vat ?? this.vat,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      country: country ?? this.country,
+      city: city ?? this.city,
+      zip: zip ?? this.zip,
+      state: state ?? this.state,
+      address: address ?? this.address,
+      website: website ?? this.website,
+      dateCreated: dateCreated ?? this.dateCreated,
+      active: active ?? this.active,
+      leadId: leadId ?? this.leadId,
+      billingStreet: billingStreet ?? this.billingStreet,
+      billingCity: billingCity ?? this.billingCity,
+      billingState: billingState ?? this.billingState,
+      billingZip: billingZip ?? this.billingZip,
+      billingCountry: billingCountry ?? this.billingCountry,
+      shippingStreet: shippingStreet ?? this.shippingStreet,
+      shippingCity: shippingCity ?? this.shippingCity,
+      shippingState: shippingState ?? this.shippingState,
+      shippingZip: shippingZip ?? this.shippingZip,
+      shippingCountry: shippingCountry ?? this.shippingCountry,
+    );
+  }
 }
+
 class CustomerCounts {
   final String totalCustomer;
   final String activeCustomer;

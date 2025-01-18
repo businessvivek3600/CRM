@@ -1,4 +1,3 @@
-import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:crm/features/auth/auth/auth_screen.dart';
 import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
@@ -22,23 +21,6 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-  void initState() {
-    super.initState();
-    // Add back button interceptor
-    BackButtonInterceptor.add(interceptorCallback);
-  }
-
-  @override
-  void dispose() {
-    // Remove back button interceptor
-    BackButtonInterceptor.remove(interceptorCallback);
-    super.dispose();
-  }
-
-  // Updated interceptor callback with RouteInfo parameter
-  bool interceptorCallback(bool stopDefaultButtonEvent, RouteInfo info) {
-    return true; // Block back button navigation
-  }
 
   @override
   Widget build(BuildContext context) {
