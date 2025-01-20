@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:crm/constants/app_constants.dart';
 import 'package:crm/features/auth/auth/auth_screen.dart';
 import 'package:crm/store/app_store.dart';
@@ -10,14 +8,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'Models/user_data.dart';
+
 import 'constants/value_constants.dart';
 import 'database/dio/dio/dio_client.dart';
 import 'database/dio/dio/loging_interceotor.dart';
 import 'database/routes/route_settings.dart';
-import 'features/auth/dashboard/home_screen.dart';
-import 'services/auth_services.dart';
-import 'services/theme_service.dart';
 import 'utils/default_logger.dart';
 import 'widgets/loader_widget.dart';
 
@@ -36,11 +31,13 @@ Future<void> initialize() async {
   await appStore.setToken(getStringAsync(TOKEN), isInitializing: true);
 }
 
-Future<void> initializeUserDataInMain() async { // Renamed this function
+Future<void> initializeUserDataInMain() async {
+  // Renamed this function
   WidgetsFlutterBinding.ensureInitialized();
   try {
     var token = getStringAsync(TOKEN);
-    dioClient = DioClient(loggingInterceptor: LoggingInterceptor(), baseUrl: AppConst.baseUrl);
+    dioClient = DioClient(
+        loggingInterceptor: LoggingInterceptor(), baseUrl: AppConst.baseUrl);
   } catch (e) {
     logger.e('initializeUserData: -------------------------- $e');
   }
@@ -101,8 +98,6 @@ Future<void> requestLocationPermission() async {
   }
 }
 
-
-
 // Future<void> setupAppStore() async {
 //   ///check for login
 //   await appStore.setLoggedIn(getBoolAsync(IS_LOGGED_IN), isInitializing: true);
@@ -120,45 +115,45 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return Observer(
-        builder: (_) => MaterialApp.router(
-              debugShowCheckedModeBanner: false,
-              routerConfig: _goRouter,
-            theme: ThemeData(
-              primaryColor: AppConst.defaultPrimaryColor,
-              scaffoldBackgroundColor: Colors.white,
-              appBarTheme: AppBarTheme(
-                backgroundColor: secondaryPrimaryColor,
-                foregroundColor: Colors.white,
-                titleTextStyle: GoogleFonts.lato(
-                  textStyle: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              textTheme: GoogleFonts.latoTextTheme(), // Apply Lato to all text
-              buttonTheme: ButtonThemeData(
-                buttonColor: AppConst.defaultPrimaryColor,
-                textTheme: ButtonTextTheme.primary,
-              ),
-              elevatedButtonTheme: ElevatedButtonThemeData(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: secondaryPrimaryColor,
-                  foregroundColor: Colors.white,
-                ),
+      builder: (_) => MaterialApp(
+        debugShowCheckedModeBanner: false,
+        // routerConfig: _goRouter,
+        theme: ThemeData(
+          primaryColor: AppConst.defaultPrimaryColor,
+          scaffoldBackgroundColor: Colors.white,
+          appBarTheme: AppBarTheme(
+            backgroundColor: secondaryPrimaryColor,
+            foregroundColor: Colors.white,
+            titleTextStyle: GoogleFonts.lato(
+              textStyle: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
-              title: AppConst.appName,
-              builder: (context, child) {
-                return LoadingWidget(
-                  context: context,
-                  goRouter: _goRouter,
-                  child: child!,
-                );
-              },
-            )
-
+          ),
+          textTheme: GoogleFonts.latoTextTheme(), // Apply Lato to all text
+          buttonTheme: ButtonThemeData(
+            buttonColor: AppConst.defaultPrimaryColor,
+            textTheme: ButtonTextTheme.primary,
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: secondaryPrimaryColor,
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ),
+        title: AppConst.appName,
+        home: const AuthScreen(),
+        builder: (context, child) {
+          return LoadingWidget(
+            context: context,
+            goRouter: _goRouter,
+            child: child!,
+          );
+        },
+      ),
     );
   }
 }

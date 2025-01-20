@@ -1,4 +1,3 @@
-import 'package:country_pickers/utils/utils.dart';
 import 'package:country_state_picker/components/index.dart';
 import 'package:country_state_picker/country_state_picker.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_details.dart';
@@ -30,7 +29,6 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
   String? countryCode;
   String? countryName;
 
-
   bool isPasswordHidden = true;
   bool sendSetPasswordEmail = false;
   bool doNotSendWelcomeEmail = false;
@@ -50,7 +48,6 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
     zipCode = widget.lead.zip;
     countryCode = widget.lead.country;
     state = widget.lead.state;
-
   }
 
   @override
@@ -124,26 +121,28 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                 CountryStatePicker(
                   inputDecoration: InputDecoration(
                     labelStyle:
-                    TextStyle(color: Theme.of(context).primaryColor),
+                        TextStyle(color: Theme.of(context).primaryColor),
                     hintStyle: TextStyle(
                         color: Theme.of(context).primaryColor.withOpacity(0.6)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                       borderSide:
-                      BorderSide(color: Theme.of(context).primaryColor),
+                          BorderSide(color: Theme.of(context).primaryColor),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                       borderSide:
-                      BorderSide(color: Theme.of(context).primaryColor),
+                          BorderSide(color: Theme.of(context).primaryColor),
                     ),
                   ),
                   countryLabel: const Label(title: "Country"),
                   stateLabel: const Label(title: "State"),
                   onCountryChanged: (ct) => setState(() {
-                    countryCode= ct;
-                    countryName =
-                        CountryPickerUtils.getCountryByIsoCode(ct).name;
+                    countryCode = ct;
+
+                    /// TODO : Uncomment this
+                    // countryName =
+                    //     CountryPickerUtils.getCountryByIsoCode(ct).name;
                     state = null;
                   }),
                   onStateChanged: (st) => setState(() {
@@ -258,13 +257,16 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                         }
 
                         // Handle password if "Send SET password email" is not selected
-                        if (!sendSetPasswordEmail && passwordController.text.isNotEmpty) {
+                        if (!sendSetPasswordEmail &&
+                            passwordController.text.isNotEmpty) {
                           updatedData['password'] = passwordController.text;
                         }
 
                         // Additional options
-                        updatedData['sendSetPasswordEmail'] = sendSetPasswordEmail;
-                        updatedData['doNotSendWelcomeEmail'] = doNotSendWelcomeEmail;
+                        updatedData['sendSetPasswordEmail'] =
+                            sendSetPasswordEmail;
+                        updatedData['doNotSendWelcomeEmail'] =
+                            doNotSendWelcomeEmail;
 
                         // Send updated data to the API
                         if (updatedData.isNotEmpty) {
@@ -286,4 +288,3 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
     );
   }
 }
-
