@@ -3,7 +3,6 @@ import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:nb_utils/nb_utils.dart';
 
 import '../../../services/auth_services.dart';
 import '../../../store/app_store.dart';
@@ -29,6 +28,7 @@ class _AuthScreenState extends State<AuthScreen> {
     super.initState();
     _loadSavedCredentials();
   }
+
   void _login() async {
     if (!_loginFormKey.currentState!.validate()) {
       return;
@@ -43,15 +43,18 @@ class _AuthScreenState extends State<AuthScreen> {
     )
         .then((value) async {
       setState(() => _isLoading = false);
-
       if (appStore.isLoggedIn) {
         appStore.setIsLoggedIn(true);
-        await appStore.saveCredentials(_emailController.text, _passwordController.text);
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()));
+        await appStore.saveCredentials(
+            _emailController.text, _passwordController.text);
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            (_) => false);
       }
     });
   }
+
   Future<void> _loadSavedCredentials() async {
     final credentials = await appStore.loadCredentials();
     setState(() {
@@ -59,6 +62,7 @@ class _AuthScreenState extends State<AuthScreen> {
       _passwordController.text = credentials['password'] ?? '';
     });
   }
+
   @override
   Widget build(BuildContext context) {
     // Get screen height
@@ -157,11 +161,11 @@ class _AuthScreenState extends State<AuthScreen> {
 
                       const SizedBox(height: 20),
                       // Password TextField
-                   CommonTextField(
+                      CommonTextField(
                         label: "Password",
                         controller: _passwordController,
                         isPassword: true,
-                     maxLines: 1,
+                        maxLines: 1,
                       ),
                       const SizedBox(height: 20),
                       // Remember Me and Forgot Password
@@ -175,14 +179,14 @@ class _AuthScreenState extends State<AuthScreen> {
                                   value: isRememberMe,
                                   checkColor: Colors.white,
                                   onChanged: (value) {
-
-
-                                 setState(() {
-                                   isRememberMe = value!;
-                                 });
-                                    print('Remember Me State: ${appStore.rememberMe}');
+                                    setState(() {
+                                      isRememberMe = value!;
+                                    });
+                                    print(
+                                        'Remember Me State: ${appStore.rememberMe}');
                                   },
-                                  activeColor: Theme.of(context).primaryColor, // Primary color for the checkbox
+                                  activeColor: Theme.of(context)
+                                      .primaryColor, // Primary color for the checkbox
                                 ),
                               ),
                               const Text(

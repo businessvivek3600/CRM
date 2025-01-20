@@ -4,13 +4,7 @@ import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/services/auth_services.dart';
 import 'package:crm/utils/default_logger.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:nb_utils/nb_utils.dart';
 
-import '../../../../../constants/value_constants.dart';
-import '../../../../../database/routes/route_name.dart';
-import '../../../../../database/routes/route_path.dart';
-import '../../../../../database/routes/route_settings.dart';
 import '../../../../../store/app_store.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -21,7 +15,6 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-
   @override
   Widget build(BuildContext context) {
     infoLog(appStore.profileImage);
@@ -119,10 +112,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             // Logout ListTile
             ListTile(
-              leading: const Icon(
-                Icons.logout,
-                color: Colors.red,
-              ),
+              leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text(
                 'Logout',
                 style: TextStyle(
@@ -134,14 +124,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
               onTap: () async {
                 bool logoutConfirmed = await _showLogoutDialog(context);
                 if (logoutConfirmed) {
-                  // Proceed with logout
-                  bool success = await AuthService().logout(
-                    context: context, // Passing context
-                    isSessionExpired: true, // Passing isSessionExpired
-                  );
+                  bool success = await AuthService()
+                      .logout(context: context, isSessionExpired: true);
                   if (success) {
-                    // Redirect to login screen after successful logout
-                    Navigator.pushReplacementNamed(context, '/login');
+                    // goRouter.pop();
+                    // goRouter.pop();
+                    // goRouter.goNamed('login');
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AuthScreen()),
+                      (_) => false,
+                    );
                   }
                 }
               },
@@ -164,14 +157,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(false); // Cancel
+                    Navigator.of(context).pop(false);
                   },
                   child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () {
-                    // Simulate session expiration (remove user session data here if needed)
-                    _logout(context);
+                    Navigator.of(context).pop(true);
                   },
                   child: const Text('Logout'),
                 ),
@@ -188,7 +180,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
     // Navigate to AuthScreen and clear all previous routes
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => AuthScreen()),
+      MaterialPageRoute(builder: (context) => const AuthScreen()),
       (Route<dynamic> route) => false, // Clear all previous routes
     );
   }
