@@ -1,15 +1,38 @@
 // import 'package:crm/features/auth/dashboard/components/drawer_fragment/drawer_widget.dart';
+import 'dart:async';
+
 import 'package:crm/constants/app_constants.dart';
 import 'package:crm/features/auth/dashboard/components/drawer_fragment/drawer_widget.dart';
 import 'package:crm/store/app_store.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:workmanager/workmanager.dart';
 import '../../../../store/lead_store.dart';
 import '../../../services/api_services.dart';
+
+Future<void> hitApiWithLocation(
+    String userId, double latitude, double longitude) async {
+  FormData formData = new FormData.fromMap({
+    'id': userId,
+    'latitude': latitude,
+    'longitude': longitude,
+  });
+  infoLog("LOACTION DATA ______ $formData");
+  final (bool status, Map<String, dynamic> response, String? message) =
+      await ApiService.uploadLocation(formData);
+
+  if (status) {
+    infoLog('Success: ${message}');
+  } else {
+    infoLog('API Error: $response');
+  }
+  debugPrint('Sending location: $latitude, $longitude for user: $userId');
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,10 +42,42 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  Timer? _locationTimer;
   @override
   void initState() {
     super.initState();
     _initializeData();
+    getLocation();
+    _requestLocationPermission();
+    _scheduleLocationTask();
+  }
+
+  Future<void> _requestLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        debugPrint('Location permission denied');
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      debugPrint('Location permission permanently denied');
+      return;
+    }
+  }
+
+  void _scheduleLocationTask() {
+    _locationTimer = Timer.periodic(Duration(minutes: 10), (timer) {
+      getLocation();
+    });
+    Workmanager().registerPeriodicTask(
+      'fetchLocationTask',
+      'fetchLocation',
+      frequency: const Duration(minutes: 5),
+      inputData: {'id': appStore.staffId},
+    );
   }
 
   Future<void> _initializeData() async {
@@ -38,37 +93,29 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void getLocation() async {
-    LocationPermission permission;
+    LocationPermission permission = await Geolocator.checkPermission();
 
-    // Check if permission is granted
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        print('Location permissions are denied');
+      if (permission != LocationPermission.always) {
+        warningLog('Location permissions are denied.');
         return;
       }
     }
 
-    if (permission == LocationPermission.deniedForever) {
-      print('Location permissions are permanently denied');
-      return;
-    }
-
-    // When permissions are granted, get the location
     Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.low,
-    );
-    print('Latitude: ${position.latitude}, Longitude: ${position.longitude}');
+        desiredAccuracy: LocationAccuracy.high);
+    warningLog(
+        'Latitude: ${position.latitude}, Longitude: ${position.longitude}');
+
+    await hitApiWithLocation(
+        appStore.staffId, position.latitude, position.longitude);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: getLocation,
-        child: const Icon(Icons.location_history),
-      ),
       drawer: const CustomDrawer(),
       appBar: AppBar(
         backgroundColor: secondaryPrimaryColor,
@@ -106,15 +153,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             : null,
                         child: appStore.profileImage.isEmpty
                             ? Text(
-                          appStore.fullName.isNotEmpty
-                              ? appStore.fullName[0].toUpperCase()
-                              : '',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        )
+                                appStore.fullName.isNotEmpty
+                                    ? appStore.fullName[0].toUpperCase()
+                                    : '',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              )
                             : null,
                       ),
                       const SizedBox(width: 16),
@@ -144,7 +191,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       childAspectRatio: 3 / 2,
                       crossAxisCount: 2,
                       crossAxisSpacing: 10,
@@ -179,7 +227,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         case 3:
                           label = "Total Contacted";
                           icon = Icons.phone;
-                          count = leadStore.fourthBox.totalContactLeads.toString();
+                          count =
+                              leadStore.fourthBox.totalContactLeads.toString();
                           iconColor = Colors.blue;
                           break;
                         default:
@@ -220,7 +269,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemCount: leadStore.leadStatusDashboard.length,
                       itemBuilder: (context, index) {
                         final leadStatus = leadStore.leadStatusDashboard[index];
-                        final colorCode = leadStatus.color.replaceFirst('#', '');
+                        final colorCode =
+                            leadStatus.color.replaceFirst('#', '');
                         double progressValue = leadStore.firstBox.totalLeads > 0
                             ? leadStatus.total / leadStore.firstBox.totalLeads
                             : 0.0;
@@ -268,10 +318,9 @@ class _HomeScreenState extends State<HomeScreen> {
               label,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[700],
-                fontWeight: FontWeight.bold
-              ),
+                  fontSize: 14,
+                  color: Colors.grey[700],
+                  fontWeight: FontWeight.bold),
             ),
           ],
         ),
