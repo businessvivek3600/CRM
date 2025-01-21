@@ -4,7 +4,13 @@ import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/services/auth_services.dart';
 import 'package:crm/utils/default_logger.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:nb_utils/nb_utils.dart';
 
+import '../../../../../constants/value_constants.dart';
+import '../../../../../database/routes/route_name.dart';
+import '../../../../../database/routes/route_path.dart';
+import '../../../../../database/routes/route_settings.dart';
 import '../../../../../store/app_store.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -122,19 +128,18 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ),
               ),
               onTap: () async {
+                // Await the dialog result
                 bool logoutConfirmed = await _showLogoutDialog(context);
+
                 if (logoutConfirmed) {
-                  bool success = await AuthService()
-                      .logout(context: context, isSessionExpired: true);
+                  // Proceed with logout
+                  bool success = await AuthService().logout(
+                    context: context, // Passing context
+                    isSessionExpired: true, // Passing isSessionExpired
+                  );
                   if (success) {
-                    // goRouter.pop();
-                    // goRouter.pop();
-                    // goRouter.goNamed('login');
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => const AuthScreen()),
-                      (_) => false,
-                    );
+                    // Redirect to login screen after successful logout
+                    Navigator.pushReplacementNamed(context, '/login');
                   }
                 }
               },
@@ -147,7 +152,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   // Logout Confirmation Dialog
 
-  Future<bool> _showLogoutDialog(BuildContext context) async {
+ Future<bool> _showLogoutDialog(BuildContext context) async {
     bool result = await showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
@@ -157,13 +162,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(false);
+                    Navigator.of(context).pop(false); // Cancel
                   },
                   child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(true);
+                    // Simulate session expiration (remove user session data here if needed)
+                    _logout(context);
                   },
                   child: const Text('Logout'),
                 ),
@@ -180,7 +186,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
     // Navigate to AuthScreen and clear all previous routes
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const AuthScreen()),
+      MaterialPageRoute(builder: (context) => AuthScreen()),
       (Route<dynamic> route) => false, // Clear all previous routes
     );
   }
