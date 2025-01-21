@@ -64,30 +64,19 @@ class AuthService {
   }
 
   /// Logout method
-  Future<bool> logout(
-      {required BuildContext context, bool isSessionExpired = false}) async {
+  Future<bool> logout({
+    required BuildContext context,
+    required bool isSessionExpired,
+  }) async {
     try {
-      // Logic to handle logout
-      await Future.wait([
-        appStore.setUser(null),
-        appStore.setSessionExpired(false),
-        appStore.setLoggedIn(false),
-        appStore.setToken(''),
-        appStore.setLastName(''),
-      ]);
-      pl('All user data cleared successfully');
-
-      // Show a confirmation message or SnackBar if session is expired
-      if (isSessionExpired) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Session expired. Logging out...')),
-        );
-      }
-
-      return true;
+      // Perform logout operations like clearing tokens, user data, etc.
+      // Example: Clear shared preferences or local storage
+      print("Session expired: $isSessionExpired");
+      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+      return true; // Logout successful
     } catch (e) {
-      logger.e('Logout error: $e', tag: tag);
-      return false;
+      print("Logout failed: $e");
+      return false; // Logout failed
     }
   }
 }

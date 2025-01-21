@@ -21,7 +21,6 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-
   @override
   Widget build(BuildContext context) {
     infoLog(appStore.profileImage);
@@ -119,10 +118,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             // Logout ListTile
             ListTile(
-              leading: const Icon(
-                Icons.logout,
-                color: Colors.red,
-              ),
+              leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text(
                 'Logout',
                 style: TextStyle(
@@ -132,7 +128,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ),
               ),
               onTap: () async {
+                // Await the dialog result
                 bool logoutConfirmed = await _showLogoutDialog(context);
+
                 if (logoutConfirmed) {
                   // Proceed with logout
                   bool success = await AuthService().logout(
@@ -154,7 +152,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   // Logout Confirmation Dialog
 
-  Future<bool> _showLogoutDialog(BuildContext context) async {
+ Future<bool> _showLogoutDialog(BuildContext context) async {
     bool result = await showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
@@ -188,7 +186,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
     // Navigate to AuthScreen and clear all previous routes
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const AuthScreen()),
+      MaterialPageRoute(builder: (context) => AuthScreen()),
       (Route<dynamic> route) => false, // Clear all previous routes
     );
   }
