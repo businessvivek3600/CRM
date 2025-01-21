@@ -32,8 +32,8 @@ class _EditLeadState extends State<EditLead> {
   String? _selectedEmployeeId;
   String? _selectedItem;
   String? _selectedStatusId;
-  ValueNotifier<List<CountryModel>> countries =
-  ValueNotifier<List<CountryModel>>([]);
+  ValueNotifier<List<Country>> countries =
+  ValueNotifier<List<Country>>([]);
 
   List<String> availableTags = [];
   final List<String> _dropDownTagId = [];
@@ -47,6 +47,7 @@ class _EditLeadState extends State<EditLead> {
   late TextEditingController companyController;
   late TextEditingController addressController;
   late TextEditingController cityController;
+  late TextEditingController stateController;
   late TextEditingController zipController;
   late TextEditingController phoneController;
   late TextEditingController descriptionController;
@@ -60,7 +61,9 @@ class _EditLeadState extends State<EditLead> {
 
     // Initialize controllers with lead data
     nameController = TextEditingController(text: widget.lead.name ?? '');
-    leadValueController = TextEditingController(text: "₹ ${widget.lead.leadValue ?? '0.00'}");
+    leadValueController = TextEditingController(
+      text: widget.lead.leadValue != null ? widget.lead.leadValue.toString() : '0',
+    );
     positionController = TextEditingController(text: widget.lead.title);
     emailController = TextEditingController(text: widget.lead.email);
     websiteController = TextEditingController(text: widget.lead.website);
@@ -68,13 +71,14 @@ class _EditLeadState extends State<EditLead> {
     addressController = TextEditingController(text: widget.lead.address);
     cityController = TextEditingController(text: widget.lead.city);
     zipController = TextEditingController(text: widget.lead.zip);
+    stateController = TextEditingController(text: widget.lead.state);
     phoneController = TextEditingController(text: widget.lead.phonenumber);
     descriptionController = TextEditingController(text: widget.lead.description);
 
     // Initialize dropdowns
     _selectedItem = leadStore.leadSource
         .firstWhere((source) => source.id == widget.lead.source, orElse:  null)
-        .name;
+        .id;
     _statusSelectedItem = leadStore.leadStatus
         .firstWhere((status) => status.id == widget.lead.status, orElse:  null)
         .id;
@@ -87,7 +91,7 @@ class _EditLeadState extends State<EditLead> {
     _dropDownTagId.addAll(widget.lead.tags!.map((tag) => tag.id));
 
     // Initialize country and state
-    country = widget.lead.country;
+    country = widget.lead.country ?? " ";
     state = widget.lead.state;
 
     // Handle last contact
@@ -178,17 +182,19 @@ class _EditLeadState extends State<EditLead> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   DropdownButtonFormField<String>(
-                    value: _dropdownItems.contains(_selectedItem) ? _selectedItem : null,
-                    items: _dropdownItems
+                    value: _selectedItem,
+                    items:leadStore.leadSource
                         .toSet()
                         .map((item) => DropdownMenuItem<String>(
-                      value: item,
-                      child: Text(item),
+                      value: item.id,
+                      child: Text(item.name),
                     ))
                         .toList(),
                     onChanged: (value) {
                       setState(() {
                         _selectedItem = value;
+                        String sourceId = leadStore.leadSource
+                            .firstWhere((source) => source.id == value, orElse: null)?.id ?? '';
                       });
                     },
                     decoration: InputDecoration(
@@ -345,99 +351,32 @@ class _EditLeadState extends State<EditLead> {
                     hint: 'Enter Company Name',
                   ),
                   const SizedBox(height: 15),
-                  CountryStatePicker(
-
-                    inputDecoration: InputDecoration(
-                      labelStyle: TextStyle(
-                          color: Theme.of(context).primaryColor),
-                      hintStyle: TextStyle(
-                          color: Theme.of(context)
-                              .primaryColor
-                              .withOpacity(0.6)),
+                  DropdownButtonFormField<String>(
+                    value: country,
+                    items: leadStore.country
+                        .map((item) => DropdownMenuItem<String>(
+                      value: item.countryId,
+                      child: Text(item.shortName),
+                    ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        country = value;
+                        state = null;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Select Country',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide(
-                            color: Theme.of(context).primaryColor),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide(
-                            color: Theme.of(context).primaryColor),
                       ),
                     ),
-                    countryLabel: const Label(title: "Country"),
-                    stateLabel: const Label(title: "State"),
-                    onCountryChanged: (ct) => setState(() {
-                      country = ct;
-                      state = null;
-                    }),
-                    onStateChanged: (st) => setState(() {
-                      state = st;
-                    }),
-                    countryHintText: "Select Country",
-                    stateHintText: "Select State",
-                    noStateFoundText: "No State Found",
+                  ),const SizedBox(height: 15),
+                  CommonTextField(
+                    controller: stateController,
+                    label: 'State',
+                    hint: 'Enter State',
                   ),
-                  // ValueListenableBuilder(
-                  //     valueListenable: countries,
-                  //     builder: (BuildContext context, List<CountryModel> countryList,
-                  //         Widget? child) {
-                  //       CountryModel? country = countryList.firstWhereOrNull(
-                  //               (e) => e.id == (formData[activeStep]['country'] ?? ''));
-                  //
-                  //       pl('activestep{$activeStep} country ${country?.id} states: ${country?.states.validate().length} ${formData[activeStep]['country']}');
-                  //
-                  //       return Row(
-                  //         crossAxisAlignment: CrossAxisAlignment.start,
-                  //         children: [
-                  //           /// country dropdown
-                  //           Expanded(
-                  //             child: FastDropdown<CountryModel>(
-                  //               name: 'country',
-                  //               labelText: 'Country*',
-                  //               initialValue: country,
-                  //               items: countryList,
-                  //               selectedItemBuilder: (context) => countryList.map((e) {
-                  //                 String text = e.name.validate();
-                  //                 if (text.length > 15) text = text.substring(0, 15);
-                  //                 return bodyMedText(
-                  //                   text,
-                  //                   context,
-                  //                   autoSize: true,
-                  //                   minFontSize: 10,
-                  //                   maxLines: 1,
-                  //                   overflow: TextOverflow.ellipsis,
-                  //                 );
-                  //               }).toList(),
-                  //               itemsBuilder: (items, field) => items
-                  //                   .map(
-                  //                     (e) => DropdownMenuItem(
-                  //                   value: e,
-                  //                   child: bodyMedText(
-                  //                     e.name.validate(),
-                  //                     context,
-                  //                     autoSize: true,
-                  //                     minFontSize: 2,
-                  //                     maxLines: 2,
-                  //                     overflow: TextOverflow.ellipsis,
-                  //                     color: black,
-                  //                   ),
-                  //                 ),
-                  //               )
-                  //                   .toList(),
-                  //               onChanged: (value) async {
-                  //                 formData[activeStep]['country'] = countryList
-                  //                     .firstWhereOrNull((e) => e.id == value?.id)
-                  //                     ?.id;
-                  //
-                  //               },
-                  //             ),
-                  //           ),
-                  //
-                  //           10.width,
-                  //         ],
-                  //       );
-                  //     }),
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: cityController,
@@ -481,30 +420,68 @@ class _EditLeadState extends State<EditLead> {
         padding: const EdgeInsets.all(10),
         child: ElevatedButton(
           onPressed:() async {
-            infoLog("________Tags $_dropDownTagId");
+            infoLog("________Tags1 $_dropDownTagId");
+            infoLog("________Source2$_selectedItem");
+            infoLog("________Status4 $_selectedStatusId");
+            infoLog("________Employee5 $_selectedEmployeeId");
+            bool isFieldUpdated(String currentValue, String? initialValue) {
+              return currentValue != initialValue;
+            }
             // Create form data
             FormData formData = FormData.fromMap({
               "id":widget.lead.id,
-              'name': nameController.text.trim(),
-              'lead_value': leadValueController.text.toInt,
-              'title': positionController.text.trim(),
-              'email': emailController.text.trim(),
-              'website': websiteController.text.trim(),
-              'phonenumber': phoneController.text.trim(),
-              'company': companyController.text.trim(),
-              'address': addressController.text.trim(),
-              'city': cityController.text.trim(),
-              'zip': zipController.text.trim(),
-              'state': state,
-              'country': country,
-              'source': _selectedItem,
-              'status': _selectedStatusId,
-              'assigned': _selectedEmployeeId,
-              'tags': jsonEncode(_dropDownTagId), // Assuming IDs for tags
-              'description': descriptionController.text.trim(),
-              'lastcontact': lastContactController.text.trim(),
+              'name':  isFieldUpdated(nameController.text, widget.lead.name ?? '')
+            ? nameController.text
+                : widget.lead.name,
+              'lead_value': isFieldUpdated(leadValueController.text, (widget.lead.leadValue ?? 0.00) as String?)
+                  ? leadValueController.text
+                  : widget.lead.leadValue,
+              'title':  isFieldUpdated(positionController.text, widget.lead.title!)
+                  ? positionController.text
+                  : widget.lead.title,
+              'email':isFieldUpdated(emailController.text, widget.lead.email!)
+                  ? emailController.text
+                  : widget.lead.email,
+              'website': isFieldUpdated(websiteController.text, widget.lead.website!)
+                  ? websiteController.text
+                  : widget.lead.website,
+              'phonenumber': isFieldUpdated(phoneController.text, widget.lead.phonenumber)
+                  ? phoneController.text
+                  : widget.lead.phonenumber,
+              'company':isFieldUpdated(companyController.text, widget.lead.company)
+                  ? companyController.text
+                  : widget.lead.company,
+              'address':  isFieldUpdated(addressController.text, widget.lead.address)
+                  ? addressController.text
+                  : widget.lead.address,
+              'city': isFieldUpdated(cityController.text, widget.lead.city)
+                  ? cityController.text
+                  : widget.lead.city,
+              'zip':isFieldUpdated(zipController.text, widget.lead.zip)
+                  ? zipController.text
+                  : widget.lead.zip,
+              'state': isFieldUpdated(stateController.text, widget.lead.state)
+                  ? stateController.text
+                  : widget.lead.state,
+              'country': isFieldUpdated(country ?? " ", widget.lead.country ?? " ")
+                  ? country
+                  : widget.lead.country,
+              'source': _selectedItem ?? widget.lead.source,
+              'status':  _selectedStatusId ?? widget.lead.status,
+              'assigned': _selectedEmployeeId ?? widget.lead.assigned,
+              'tags': selectedTags.isNotEmpty ? jsonEncode(_dropDownTagId) : widget.lead.tags!.map((tag) => tag.id).toList(),
+              'description': isFieldUpdated(descriptionController.text, widget.lead.description)
+                  ? descriptionController.text
+                  : widget.lead.description,
+              'lastcontact': isFieldUpdated(lastContactController.text, widget.lead.lastcontact ?? '')
+                  ? lastContactController.text
+                  : widget.lead.lastcontact,
             });
-
+warningLog("Entered Form data ---$formData");
+            infoLog("________Tags6 $_dropDownTagId");
+            infoLog("________Source7$_selectedItem");
+            infoLog("________Status8 $_selectedStatusId");
+            infoLog("________Employee9 $_selectedEmployeeId");
             try {
               // Print data to console for debugging
               errorLog("--------${formData.fields}");
@@ -543,6 +520,9 @@ class _EditLeadState extends State<EditLead> {
     );
   }
 }
+
+
+
 Widget bodyMedText(
     String text,
     BuildContext context, {

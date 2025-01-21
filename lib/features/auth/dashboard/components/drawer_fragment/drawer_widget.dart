@@ -4,6 +4,13 @@ import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/services/auth_services.dart';
 import 'package:crm/utils/default_logger.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:nb_utils/nb_utils.dart';
+
+import '../../../../../constants/value_constants.dart';
+import '../../../../../database/routes/route_name.dart';
+import '../../../../../database/routes/route_path.dart';
+import '../../../../../database/routes/route_settings.dart';
 import '../../../../../store/app_store.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -36,7 +43,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               child: Row(
                 children: [
                   CircleAvatar(
-                    radius: 45,
+                    radius: 30,
                     backgroundColor: Colors.grey[200],
                     backgroundImage: appStore.profileImage.isNotEmpty
                         ? NetworkImage(appStore.profileImage)
@@ -54,7 +61,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           )
                         : null,
                   ),
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -71,7 +78,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           appStore.userEmail,
                           style: const TextStyle(
                             color: Colors.lightBlueAccent,
-                            fontSize: 16,
+                            fontSize: 14,
                             decoration: TextDecoration.underline,
                           ),
                         ),
@@ -111,10 +118,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             // Logout ListTile
             ListTile(
-              leading: const Icon(
-                Icons.logout,
-                color: Colors.red,
-              ),
+              leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text(
                 'Logout',
                 style: TextStyle(
@@ -130,19 +134,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 if (logoutConfirmed) {
                   // Proceed with logout
                   bool success = await AuthService().logout(
-                    context: context,
-                    isSessionExpired: true,
+                    context: context, // Passing context
+                    isSessionExpired: true, // Passing isSessionExpired
                   );
-
                   if (success) {
-                    // Navigate to login screen after successful logout
+                    // Redirect to login screen after successful logout
                     Navigator.pushReplacementNamed(context, '/login');
-                  } else {
-                    // Notify the user about logout failure
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Logout failed. Please try again.')),
-                    );
                   }
                 }
               },
@@ -165,13 +162,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(false); // User cancels
+                    Navigator.of(context).pop(false); // Cancel
                   },
                   child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(true); // User confirms logout
+                    // Simulate session expiration (remove user session data here if needed)
+                    _logout(context);
                   },
                   child: const Text('Logout'),
                 ),
@@ -179,6 +177,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
             );
           },
         ) ??
-        false; // Default to false if dialog is dismissed
+        false; // Default value if dialog returns null
+
+    return result; // Ensure returning a bool
+  }
+
+  void _logout(BuildContext context) {
+    // Navigate to AuthScreen and clear all previous routes
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => AuthScreen()),
+      (Route<dynamic> route) => false, // Clear all previous routes
+    );
   }
 }

@@ -36,6 +36,7 @@ class _MyWidgetState extends State<AddLeads> {
   TextEditingController companyController = TextEditingController();
   TextEditingController addressController = TextEditingController();
   TextEditingController cityController = TextEditingController();
+  TextEditingController stateController = TextEditingController();
   TextEditingController zipController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -302,36 +303,31 @@ class _MyWidgetState extends State<AddLeads> {
                     },
                   ),
                   const SizedBox(height: 15),
-                  CountryStatePicker(
-                    inputDecoration: InputDecoration(
-                      labelStyle:
-                          TextStyle(color: Theme.of(context).primaryColor),
-                      hintStyle: TextStyle(
-                          color:
-                              Theme.of(context).primaryColor.withOpacity(0.6)),
+                  DropdownButtonFormField<String>(
+                    value: country,
+                    items: leadStore.country
+                        .map((item) => DropdownMenuItem<String>(
+                      value: item.countryId,
+                      child: Text(item.shortName),
+                    ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        country = value;
+                        state = null;  // Reset state when a new country is selected
+                      });
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Select Country',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
-                        borderSide:
-                            BorderSide(color: Theme.of(context).primaryColor),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide:
-                            BorderSide(color: Theme.of(context).primaryColor),
                       ),
                     ),
-                    countryLabel: const Label(title: "Country"),
-                    stateLabel: const Label(title: "State"),
-                    onCountryChanged: (ct) => setState(() {
-                      country = ct;
-                      state = null;
-                    }),
-                    onStateChanged: (st) => setState(() {
-                      state = st;
-                    }),
-                    countryHintText: "Select Country",
-                    stateHintText: "Select State",
-                    noStateFoundText: "No State Found",
+                  ),const SizedBox(height: 15),
+                  CommonTextField(
+                    controller: stateController,
+                    label: 'State',
+                    hint: 'Enter State',
                   ),
                   const SizedBox(height: 15),
                   CommonTextField(
@@ -426,7 +422,7 @@ class _MyWidgetState extends State<AddLeads> {
                         'address': addressController.text.trim(),
                         'city': cityController.text.trim(),
                         'zip': zipController.text.trim(),
-                        'state': state,
+                        'state': stateController.text.trim(),
                         'country': country,
                         'is_public': isPublic ? 1 : 0,
                         'contacted_today': isContactNow ? 1 : 0,
@@ -438,7 +434,6 @@ class _MyWidgetState extends State<AddLeads> {
                       });
 
                       try {
-                        // Print data to console for debugging
                         errorLog("--------${formData.fields}");
 
                         // Make API call (replace `apiClient.post` with your actual API call method)

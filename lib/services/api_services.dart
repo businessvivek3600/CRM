@@ -58,7 +58,23 @@ class ApiService {
     }
     return (false, <String, dynamic>{}, '');
   }
-
+  ///__________Convert-lead-to-customer----------
+  static Future<(bool, Map<String, dynamic>, String?)> convertCustomer(
+      FormData info) async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+      await await ApiHandler.fetchData(ApiConstant.convertToCustomer, data: info);
+      log('data : $data');
+      if (status) {
+        log("message --$message");
+      } else {
+        return (false, data, message);
+      }
+    } catch (e) {
+      logger.e('register error : $e', tag: tag);
+    }
+    return (false, <String, dynamic>{}, '');
+  }
   ///---ADD & Edit & delete note----
   static Future<(bool, Map<String, dynamic>, String?)> addNote(
       Map<String, dynamic> info) async {
@@ -214,4 +230,24 @@ class ApiService {
     // Return default failure response in case of error
     return (false, <String, dynamic>{}, null);
   }
+
+  ///----------------------Customer----------
+  static Future<(bool, Map<String, dynamic>, String?)> editCustomer(
+      Map<String, dynamic> info) async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+      await await ApiHandler.fetchData(ApiConstant.editCustomer,
+          data: info);
+      log('data : $data');
+      if (status) {
+        log("message --$message");
+      } else {
+        return (false, data, message);
+      }
+    } catch (e) {
+      logger.e('register error : $e', tag: tag);
+    }
+    return (false, <String, dynamic>{}, '');
+  }
+
 }

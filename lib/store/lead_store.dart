@@ -1,5 +1,4 @@
-import 'dart:math';
-
+import 'package:crm/Models/dashboard_model.dart';
 import 'package:crm/Models/leads_model.dart';
 import 'package:crm/services/api_services.dart';
 import 'package:crm/utils/default_logger.dart';
@@ -7,7 +6,6 @@ import 'package:crm/utils/extensions.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
-
 part 'lead_store.g.dart';
 
 final leadStore = LeadStore();
@@ -23,6 +21,9 @@ abstract class _LeadStore with Store {
 
   @observable
   List<LeadStatus> leadStatus = [];
+
+  @observable
+  List<LeadStatus> leadStatusDashboard = [];
 
   @observable
   List<LeadSource> leadSource = [];
@@ -41,6 +42,24 @@ abstract class _LeadStore with Store {
 
   @observable
   List<Tag> leadTags = [];
+
+  @observable
+  List<Country> country = [];
+
+  @observable
+  ObservableList<Map<String, dynamic>> metricData = ObservableList();
+
+  @observable
+  FirstBox firstBox = FirstBox(totalLeads: 0);
+
+  @observable
+  SecondBox secondBox = SecondBox(totalCLeads: 0, totalConverted: 0);
+
+  @observable
+  ThirdBox thirdBox = ThirdBox(totalNewLeads: 0);
+
+  @observable
+  FourthBox fourthBox = FourthBox(totalContactLeads: 0);
 
   @action
   Future<void> getLeads({int page = 0}) async {
@@ -110,5 +129,41 @@ abstract class _LeadStore with Store {
     var (status, responsedata, message) = await ApiService.addLeads(data);
     infoLog("API Response Data according page: ${responsedata['leads']}");
     if (status) {}
+  }
+
+  //getDashBoard data
+  Future<void> getDashboard() async {
+    loadingLeads.value = true; // Update as observable
+    var (status, data, message) = await ApiService.getDashboardData();
+    infoLog(
+        "API Dashboard Data according page: ${data['first_box']?['total_leads']}");
+    infoLog(
+        "API Dashboard Data according page: ${data['second_box']?['total_c_leads']}");
+    infoLog(
+        "API Dashboard Data according page: ${data['third_box']?['total_new_leads']}");    infoLog(
+        "API Dashboard Data according page: ${data['fourth_box']?['total_contact_leads']}");
+    if (status) {
+      loadingLeads.value = false;
+      // Map data to FirstBox
+      firstBox = FirstBox.fromJson(data['first_box'] ?? {});
+
+      // Map data to SecondBox
+      secondBox = SecondBox.fromJson(data['second_box'] ?? {});
+
+      // Map data to ThirdBox
+      thirdBox = ThirdBox.fromJson(data['third_box'] ?? {});
+
+      // Map data to FourthBox
+      fourthBox = FourthBox.fromJson(data['fourth_box'] ?? {});
+      if (data['country'] != null) {
+        country =
+            (data['country'] as List).map((e) => Country.fromJson(e)).toList();
+      }
+        leadStatusDashboard = (data["leadStatus"] as List)
+            .map((e) => LeadStatus.fromJson(e))
+            .toList();
+      infoLog("Updated leadStatusDashboard: $leadStatusDashboard");
+      loadingLeads.value = false;
+    }
   }
 }

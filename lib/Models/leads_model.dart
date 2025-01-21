@@ -56,6 +56,7 @@ class LeadStatus {
   String statusOrder;
   String color;
   String isDefault;
+  int total;
 
   LeadStatus({
     required this.id,
@@ -63,6 +64,7 @@ class LeadStatus {
     required this.statusOrder,
     required this.color,
     required this.isDefault,
+    this.total = 0,
   });
 
   factory LeadStatus.fromJson(Map<String, dynamic> json) {
@@ -72,6 +74,7 @@ class LeadStatus {
       statusOrder: json['statusorder'],
       color: json['color'],
       isDefault: json['isdefault'],
+      total: json['total'] ?? 0,
     );
   }
 
@@ -82,9 +85,11 @@ class LeadStatus {
       'statusorder': statusOrder,
       'color': color,
       'isdefault': isDefault,
+      'total': total,
     };
   }
 }
+
 class LeadSource {
   String id;
   String name;
@@ -196,7 +201,7 @@ class Lead {
       title: json['title'],
       company: json['company'],
       description: json['description'],
-      country: json['country'] ?? '',
+      country: json['country'] ?? '0',
       zip: json['zip'],
       city: json['city'],
       state: json['state'],
@@ -463,45 +468,42 @@ class Tag {
   }
 }
 
-class CountryModel {
-  String? id;
-  String? sortname;
-  String? name;
-  String? phonecode;
-  List<StateModel>? states;
+class Country {
+  final String countryId;
+  final String shortName;
+  final String longName;
+  final String callingCode;
 
-  CountryModel(
-      {this.id,
-        this.sortname,
-        this.name,
-        this.phonecode,
-        this.states = const []});
+  Country({
+    required this.countryId,
+    required this.shortName,
+    required this.longName,
+    required this.callingCode,
+  });
 
-  CountryModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    sortname = json['sortname'];
-    name = json['name'];
-    phonecode = json['phonecode'];
-    states = <StateModel>[];
-    if (json['states'] != null) {
-      json['states'].forEach((v) {
-        states!.add(StateModel.fromJson(v));
-      });
-    }
+  /// Factory method to create a `Country` object from a JSON map
+  factory Country.fromJson(Map<String, dynamic> json) {
+    return Country(
+      countryId: json['country_id'] as String? ?? '',
+      shortName: json['short_name'] as String? ?? '',
+      longName: json['long_name'] as String? ?? '',
+      callingCode: json['calling_code'] as String? ?? '',
+    );
   }
 
+
+  /// Method to convert a `Country` object to a JSON map
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['sortname'] = sortname;
-    data['name'] = name;
-    data['phonecode'] = phonecode;
-    if (states != null) {
-      data['states'] = states!.map((v) => v.toJson()).toList();
-    }
-    return data;
+    return {
+      'country_id': countryId,
+      'short_name': shortName,
+      'long_name': longName,
+      'calling_code': callingCode,
+    };
   }
 }
+
+
 class StateModel {
   String? id;
   String? name;
