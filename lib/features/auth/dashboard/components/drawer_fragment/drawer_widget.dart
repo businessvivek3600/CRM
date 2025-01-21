@@ -129,7 +129,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
               onTap: () async {
                 // Await the dialog result
-                bool logoutConfirmed = await showLogoutDialog(context);
+                bool logoutConfirmed = await _showLogoutDialog(context);
 
                 if (logoutConfirmed) {
                   // Proceed with logout
@@ -152,14 +152,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   // Logout Confirmation Dialog
 
-  Future<bool> showLogoutDialog(BuildContext context) async {
-    return await showDialog<bool>(
+ Future<bool> _showLogoutDialog(BuildContext context) async {
+    bool result = await showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Confirm Logout'),
-              content: const Text('Are you sure you want to log out?'),
-              actions: [
+              title: const Text('Are you sure?'),
+              content: const Text('Do you want to log out?'),
+              actions: <Widget>[
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(false); // Cancel
