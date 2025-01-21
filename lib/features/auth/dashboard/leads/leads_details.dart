@@ -274,9 +274,8 @@ class _ProfileTabState extends State<ProfileTab> {
         break;
       }
     }
-    List<Tag>? displayedTags = showAll
-        ? widget.lead.tags
-        : widget.lead.tags!.take(3).toList();
+    List<Tag>? displayedTags =
+        showAll ? widget.lead.tags : widget.lead.tags!.take(3).toList();
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -475,28 +474,30 @@ class _ProfileTabState extends State<ProfileTab> {
                         const SizedBox(width: 30),
                         Expanded(
                           child: Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.end,
-                            alignment: WrapAlignment.end,
-                            spacing: 2,
-                            children:[  ...displayedTags!.map((tag) => Text("${tag.name}, ")).toList(),
-                // Show "..." or "Show Less" button
-                              if (widget.lead.tags!.length > 3)
-              GestureDetector(
-              onTap: () {
-    setState(() {
-    showAll = !showAll; // Toggle visibility
-    });
-    },
-      child: Text(
-        showAll ? 'Show Less' : '...',
-        style: const TextStyle(
-          color: Colors.blue,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    ),
-                      ]    ),
-
+                              crossAxisAlignment: WrapCrossAlignment.end,
+                              alignment: WrapAlignment.end,
+                              spacing: 2,
+                              children: [
+                                ...displayedTags!
+                                    .map((tag) => Text("${tag.name}, "))
+                                    .toList(),
+                                // Show "..." or "Show Less" button
+                                if (widget.lead.tags!.length > 3)
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        showAll = !showAll; // Toggle visibility
+                                      });
+                                    },
+                                    child: Text(
+                                      showAll ? 'Show Less' : '...',
+                                      style: const TextStyle(
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                              ]),
                         ),
                       ],
                     ),
