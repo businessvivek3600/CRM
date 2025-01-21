@@ -14,4 +14,5 @@ class ApiConstant {
   static const addReminder = 'add-reminder';
   static const dashboard = 'dashboard';
   static const editCustomer = 'add-client';
+  static const convertToCustomer = 'convert-to-customer';
 }
