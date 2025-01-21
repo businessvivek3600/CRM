@@ -22,12 +22,20 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    leadStore.getDashboard();
-    appStore.loadUserData();
+    _initializeData();
   }
 
+  Future<void> _initializeData() async {
+    // Display a loading state while fetching data
+    appStore.setLoading(true);
 
+    // Fetch dashboard data and user data
+    await leadStore.getDashboard();
+    await appStore.loadUserData();
 
+    // Hide loading state
+    appStore.setLoading(false);
+  }
 
   void getLocation() async {
     LocationPermission permission;
@@ -37,14 +45,12 @@ class _HomeScreenState extends State<HomeScreen> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, handle appropriately
         print('Location permissions are denied');
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately
       print('Location permissions are permanently denied');
       return;
     }
@@ -63,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: getLocation,
         child: const Icon(Icons.location_history),
       ),
-      drawer: const CustomDrawer(), // Ensure CustomDrawer is defined properly
+      drawer: const CustomDrawer(),
       appBar: AppBar(
         backgroundColor: secondaryPrimaryColor,
         elevation: 0,
@@ -73,157 +79,166 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(fontSize: 23, color: white),
         ),
       ),
-      body:  SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Observer(builder: (context) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: Observer(
+        builder: (context) {
+          if (appStore.isLoading) {
+            // Show a loading indicator while data is being fetched
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          // Show content after data has loaded
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // User Profile Section
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 45,
-                            backgroundColor: Colors.grey[200],
-                            backgroundImage: appStore.profileImage.isNotEmpty
-                                ? NetworkImage(appStore.profileImage)
-                                : null,
-                            child: appStore.profileImage.isEmpty
-                                ? Text(
-                                    appStore.fullName.isNotEmpty
-                                        ? appStore.fullName[0].toUpperCase()
-                                        : '',
-                                    style: const TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  )
-                                : null,
+                      CircleAvatar(
+                        radius: 45,
+                        backgroundColor: Colors.grey[200],
+                        backgroundImage: appStore.profileImage.isNotEmpty
+                            ? NetworkImage(appStore.profileImage)
+                            : null,
+                        child: appStore.profileImage.isEmpty
+                            ? Text(
+                          appStore.fullName.isNotEmpty
+                              ? appStore.fullName[0].toUpperCase()
+                              : '',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
                           ),
-                          const SizedBox(width: 16),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Welcome ${appStore.fullName}',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                appStore.userEmail,
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
+                        )
+                            : null,
+                      ),
+                      const SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Welcome ${appStore.fullName}',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            appStore.userEmail,
+                            style: const TextStyle(
+                              color: Colors.grey,
+                            ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                          GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              childAspectRatio: 3 / 2,
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                            ),
-                            itemCount: 4,
-                            itemBuilder: (context, index) {
+                    ],
+                  ),
+                  const SizedBox(height: 20),
 
-                              String label;
-                              IconData icon;
-                              String count;
-                              Color iconColor;
+                  // Dashboard Stats Section
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      childAspectRatio: 3 / 2,
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    itemCount: 4,
+                    itemBuilder: (context, index) {
+                      String label;
+                      IconData icon;
+                      String count;
+                      Color iconColor;
 
-                              switch (index) {
-                                case 0:
-                                  label = "Total Leads";
-                                  icon = Icons.star;
-                                  count = leadStore.firstBox.totalLeads.toString();
-                                  iconColor = Colors.orange;
-                                  break;
-                                case 1:
-                                  label = "Converted Leads";
-                                  icon = Icons.group_add_outlined;
-                                  count = leadStore.secondBox.totalConverted.toString();
-                                  iconColor = Colors.green;
-                                  break;
-                                case 2:
-                                  label = "New Leads";
-                                  icon = Icons.notifications;
-                                  count = leadStore.thirdBox.totalNewLeads.toString();
-                                  iconColor = Colors.red;
-                                  break;
-                                case 3:
-                                  label = "Total Contacted";
-                                  icon = Icons.phone;
-                                  count = leadStore.fourthBox.totalContactLeads.toString();
-                                  iconColor = Colors.blue;
-                                  break;
-                                default:
-                                  label = "";
-                                  icon = Icons.help;
-                                  count = "0";
-                                  iconColor = Colors.grey;
-                              }
+                      switch (index) {
+                        case 0:
+                          label = "Total Leads";
+                          icon = Icons.star;
+                          count = leadStore.firstBox.totalLeads.toString();
+                          iconColor = Colors.orange;
+                          break;
+                        case 1:
+                          label = "Converted Leads";
+                          icon = Icons.group_add_outlined;
+                          count = leadStore.secondBox.totalConverted.toString();
+                          iconColor = Colors.green;
+                          break;
+                        case 2:
+                          label = "New Leads";
+                          icon = Icons.notifications;
+                          count = leadStore.thirdBox.totalNewLeads.toString();
+                          iconColor = Colors.red;
+                          break;
+                        case 3:
+                          label = "Total Contacted";
+                          icon = Icons.phone;
+                          count = leadStore.fourthBox.totalContactLeads.toString();
+                          iconColor = Colors.blue;
+                          break;
+                        default:
+                          label = "";
+                          icon = Icons.help;
+                          count = "0";
+                          iconColor = Colors.grey;
+                      }
 
-                              return _buildCard(icon, count, label, iconColor);
-                            },
-                          ),
+                      return _buildCard(icon, count, label, iconColor);
+                    },
+                  ),
+                  const SizedBox(height: 20),
 
-
-                      const SizedBox(height: 20),
-
-                      // Invoice Progress Bars
-                      Row(
-                        children: [
-                          Container(
+                  // Leads Overview Section
+                  Row(
+                    children: [
+                      Container(
                         width: 4,
                         height: 24,
                         color: Colors.blue,
                       ),
                       const SizedBox(width: 8),
-                          const Text(
-                            "Leads Overview",
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      const Text(
+                        "Leads Overview",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      const SizedBox(height: 16),
-                       SizedBox(
-                         height: 300,
-                         child: ListView.builder(
-                           shrinkWrap: true,
-                              itemCount: leadStore.leadStatusDashboard.length,
-                              itemBuilder: (context, index) {
-                                final leadStatus = leadStore.leadStatusDashboard[index];
-                                infoLog("____DATA${ leadStatus.name}");
-                                           infoLog("____DATA${ leadStatus.total}");
-                                return InvoiceProgressItem(
-                                  label: leadStatus.name,
-                                  value: leadStatus.total.toDouble(),
-                                  color: Color(int.parse('0xFF${leadStatus.color}')),
-                                  count: leadStore.firstBox.totalLeads,
-                                );
-                              },
-                            ),
-                       ),
-
-
                     ],
-                  );
-                }),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 300,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: leadStore.leadStatusDashboard.length,
+                      itemBuilder: (context, index) {
+                        final leadStatus = leadStore.leadStatusDashboard[index];
+                        final colorCode = leadStatus.color.replaceFirst('#', '');
+                        double progressValue = leadStore.firstBox.totalLeads > 0
+                            ? leadStatus.total / leadStore.firstBox.totalLeads
+                            : 0.0;
+                        return InvoiceProgressItem(
+                          label: leadStatus.name,
+                          value: progressValue,
+                          color: Color(int.parse('0xFF$colorCode')),
+                          count: leadStatus.total,
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
+          );
+        },
+      ),
     );
   }
 
@@ -267,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class InvoiceProgressItem extends StatelessWidget {
   final String label;
-  final double value; // Progress value (0.0 to 1.0)
+  final double value;
   final Color color;
   final int count;
 
