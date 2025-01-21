@@ -1,17 +1,9 @@
-import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:crm/features/auth/auth/auth_screen.dart';
 import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/services/auth_services.dart';
 import 'package:crm/utils/default_logger.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:nb_utils/nb_utils.dart';
-
-import '../../../../../constants/value_constants.dart';
-import '../../../../../database/routes/route_name.dart';
-import '../../../../../database/routes/route_path.dart';
-import '../../../../../database/routes/route_settings.dart';
 import '../../../../../store/app_store.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -22,24 +14,6 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-  void initState() {
-    super.initState();
-    // Add back button interceptor
-    BackButtonInterceptor.add(interceptorCallback);
-  }
-
-  @override
-  void dispose() {
-    // Remove back button interceptor
-    BackButtonInterceptor.remove(interceptorCallback);
-    super.dispose();
-  }
-
-  // Updated interceptor callback with RouteInfo parameter
-  bool interceptorCallback(bool stopDefaultButtonEvent, RouteInfo info) {
-    return true; // Block back button navigation
-  }
-
   @override
   Widget build(BuildContext context) {
     infoLog(appStore.profileImage);
@@ -150,16 +124,25 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ),
               ),
               onTap: () async {
-                bool logoutConfirmed = await _showLogoutDialog(context);
+                // Await the dialog result
+                bool logoutConfirmed = await showLogoutDialog(context);
+
                 if (logoutConfirmed) {
                   // Proceed with logout
                   bool success = await AuthService().logout(
-                    context: context, // Passing context
-                    isSessionExpired: true, // Passing isSessionExpired
+                    context: context,
+                    isSessionExpired: true,
                   );
+
                   if (success) {
-                    // Redirect to login screen after successful logout
+                    // Navigate to login screen after successful logout
                     Navigator.pushReplacementNamed(context, '/login');
+                  } else {
+                    // Notify the user about logout failure
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Logout failed. Please try again.')),
+                    );
                   }
                 }
               },
@@ -172,24 +155,23 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   // Logout Confirmation Dialog
 
-  Future<bool> _showLogoutDialog(BuildContext context) async {
-    bool result = await showDialog<bool>(
+  Future<bool> showLogoutDialog(BuildContext context) async {
+    return await showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Are you sure?'),
-              content: const Text('Do you want to log out?'),
-              actions: <Widget>[
+              title: const Text('Confirm Logout'),
+              content: const Text('Are you sure you want to log out?'),
+              actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(false); // Cancel
+                    Navigator.of(context).pop(false); // User cancels
                   },
                   child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () {
-                    // Simulate session expiration (remove user session data here if needed)
-                    _logout(context);
+                    Navigator.of(context).pop(true); // User confirms logout
                   },
                   child: const Text('Logout'),
                 ),
@@ -197,17 +179,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
             );
           },
         ) ??
-        false; // Default value if dialog returns null
-
-    return result; // Ensure returning a bool
-  }
-
-  void _logout(BuildContext context) {
-    // Navigate to AuthScreen and clear all previous routes
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => AuthScreen()),
-      (Route<dynamic> route) => false, // Clear all previous routes
-    );
+        false; // Default to false if dialog is dismissed
   }
 }
