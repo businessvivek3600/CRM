@@ -15,4 +15,5 @@ class ApiConstant {
   static const dashboard = 'dashboard';
   static const editCustomer = 'add-client';
   static const convertToCustomer = 'convert-to-customer';
+  static const userLocation = 'location';
 }
