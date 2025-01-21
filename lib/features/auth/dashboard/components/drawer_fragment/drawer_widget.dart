@@ -44,7 +44,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               child: Row(
                 children: [
                   CircleAvatar(
-                    radius: 45,
+                    radius: 30,
                     backgroundColor: Colors.grey[200],
                     backgroundImage: appStore.profileImage.isNotEmpty
                         ? NetworkImage(appStore.profileImage)
@@ -62,7 +62,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           )
                         : null,
                   ),
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -79,7 +79,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           appStore.userEmail,
                           style: const TextStyle(
                             color: Colors.lightBlueAccent,
-                            fontSize: 16,
+                            fontSize: 14,
                             decoration: TextDecoration.underline,
                           ),
                         ),
@@ -188,7 +188,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
     // Navigate to AuthScreen and clear all previous routes
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => AuthScreen()),
+      MaterialPageRoute(builder: (context) => const AuthScreen()),
       (Route<dynamic> route) => false, // Clear all previous routes
     );
   }

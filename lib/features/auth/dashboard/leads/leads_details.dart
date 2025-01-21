@@ -1,6 +1,6 @@
 import 'package:country_codes/country_codes.dart';
 import 'package:country_list_pick/country_list_pick.dart';
-import 'package:country_pickers/utils/utils.dart';
+
 import 'package:crm/Models/leads_model.dart';
 import 'package:crm/features/auth/dashboard/customer/convertedto_customer.dart';
 import 'package:crm/features/auth/dashboard/leads/addnotes.dart';
@@ -269,9 +269,16 @@ class _ProfileTabState extends State<ProfileTab> {
     final status = leadStore.getStatusById(widget.lead.status);
     final source = leadStore.getSourceById(widget.lead.source);
     final assigned = leadStore.getAssignedById(widget.lead.assigned);
-    List<Tag> displayedTags = showAll
-        ? leadStore.leadTags
-        : leadStore.leadTags.take(3).toList();
+    String countryName = 'N/A';
+    for (var c in leadStore.country) {
+      if (c.countryId == widget.lead.country) {
+        countryName = c.shortName ?? 'N/A'; // Set country name if found
+        break;
+      }
+    }
+    List<Tag>? displayedTags = showAll
+        ? widget.lead.tags
+        : widget.lead.tags!.take(3).toList();
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -413,7 +420,7 @@ class _ProfileTabState extends State<ProfileTab> {
                   const Divider(),
                   DetailRow(label: 'State', value: widget.lead.state ?? 'N/A'),
                   const Divider(),
-                  DetailRow(label: 'Country', value: widget.lead.country ?? 'N/A'),
+                  DetailRow(label: 'Country', value: countryName ?? 'N/A'),
                   const Divider(),
                   DetailRow(label: 'Zip Code', value: widget.lead.zip ?? 'N/A'),
                 ],
@@ -463,9 +470,9 @@ class _ProfileTabState extends State<ProfileTab> {
                             crossAxisAlignment: WrapCrossAlignment.end,
                             alignment: WrapAlignment.end,
                             spacing: 2,
-                            children:[  ...displayedTags.map((tag) => Text("${tag.name}, ")).toList(),
+                            children:[  ...displayedTags!.map((tag) => Text("${tag.name}, ")).toList(),
                 // Show "..." or "Show Less" button
-                if (leadStore.leadTags.length > 3)
+                              if (widget.lead.tags!.length > 3)
               GestureDetector(
               onTap: () {
     setState(() {

@@ -56,6 +56,7 @@ class LeadStatus {
   String statusOrder;
   String color;
   String isDefault;
+  int total;
 
   LeadStatus({
     required this.id,
@@ -63,6 +64,7 @@ class LeadStatus {
     required this.statusOrder,
     required this.color,
     required this.isDefault,
+    this.total = 0,
   });
 
   factory LeadStatus.fromJson(Map<String, dynamic> json) {
@@ -72,6 +74,7 @@ class LeadStatus {
       statusOrder: json['statusorder'],
       color: json['color'],
       isDefault: json['isdefault'],
+      total: json['total'] ?? 0,
     );
   }
 
@@ -82,9 +85,11 @@ class LeadStatus {
       'statusorder': statusOrder,
       'color': color,
       'isdefault': isDefault,
+      'total': total,
     };
   }
 }
+
 class LeadSource {
   String id;
   String name;
@@ -196,7 +201,7 @@ class Lead {
       title: json['title'],
       company: json['company'],
       description: json['description'],
-      country: json['country'] ?? '',
+      country: json['country'] ?? '0',
       zip: json['zip'],
       city: json['city'],
       state: json['state'],
@@ -479,12 +484,13 @@ class Country {
   /// Factory method to create a `Country` object from a JSON map
   factory Country.fromJson(Map<String, dynamic> json) {
     return Country(
-      countryId: json['country_id'] as String,
-      shortName: json['short_name'] as String,
-      longName: json['long_name'] as String,
-      callingCode: json['calling_code'] as String,
+      countryId: json['country_id'] as String? ?? '',
+      shortName: json['short_name'] as String? ?? '',
+      longName: json['long_name'] as String? ?? '',
+      callingCode: json['calling_code'] as String? ?? '',
     );
   }
+
 
   /// Method to convert a `Country` object to a JSON map
   Map<String, dynamic> toJson() {
