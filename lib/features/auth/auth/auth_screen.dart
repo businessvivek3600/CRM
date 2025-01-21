@@ -47,10 +47,8 @@ class _AuthScreenState extends State<AuthScreen> {
         appStore.setIsLoggedIn(true);
         await appStore.saveCredentials(
             _emailController.text, _passwordController.text);
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
-            (_) => false);
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()));
       }
     });
   }
