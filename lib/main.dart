@@ -8,19 +8,33 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:workmanager/workmanager.dart';
 
 import 'constants/value_constants.dart';
 import 'database/dio/dio/dio_client.dart';
 import 'database/dio/dio/loging_interceotor.dart';
 import 'database/routes/route_settings.dart';
+import 'features/auth/dashboard/home_screen.dart';
 import 'utils/default_logger.dart';
 import 'widgets/loader_widget.dart';
-
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    final userId = inputData?['id'];
+    final latitude = position.latitude;
+    final longitude = position.longitude;
+    logger.d("Location fetched: $latitude, $longitude for user: $userId");
+    await hitApiWithLocation(userId, latitude, longitude);
+    return Future.value(true);
+  });
+}
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Workmanager().initialize(callbackDispatcher);
   await initialize();
   await setupAppStore();
-  await initializeUserDataInMain(); // Renamed function here
+  await initializeUserDataInMain();
   requestLocationPermission();
   await initNbUtils().then((value) async => await initialize());
   runApp(const MyApp());

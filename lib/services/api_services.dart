@@ -250,4 +250,22 @@ class ApiService {
     return (false, <String, dynamic>{}, '');
   }
 
+  ///__________Pass user Current Location to api----------
+  static Future<(bool, Map<String, dynamic>, String?)> uploadLocation(
+      FormData info) async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+      await await ApiHandler.fetchData(ApiConstant.userLocation, data: info);
+      log('data : $data');
+      if (status) {
+        log("message --$message");
+      } else {
+        return (false, data, message);
+      }
+    } catch (e) {
+      logger.e('register error : $e', tag: tag);
+    }
+    return (false, <String, dynamic>{}, '');
+  }
+
 }
