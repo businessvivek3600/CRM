@@ -30,6 +30,7 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
   String? city;
   String? zipCode;
   String? state;
+
   String? country;
   late TextEditingController nameController;
   late TextEditingController leadValueController;
@@ -267,7 +268,8 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                         }
 
                         // Handle password if "Send SET password email" is not selected
-                        if (!sendSetPasswordEmail && passwordController.text.isNotEmpty) {
+                        if (!sendSetPasswordEmail &&
+                            passwordController.text.isNotEmpty) {
                           updatedData['password'] = passwordController.text;
                         }
 
@@ -275,7 +277,6 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                         updatedData['sendSetPasswordEmail'] = sendSetPasswordEmail;
                         updatedData['doNotSendWelcomeEmail'] = doNotSendWelcomeEmail;
                         updatedData['leadid'] = widget.lead.id;
-
                         // Check if any data has changed
                         final formData = FormData.fromMap(updatedData);
                         if (updatedData.isNotEmpty) {
