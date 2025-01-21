@@ -29,6 +29,7 @@ class _LeadDetailsState extends State<LeadDetails> {
     _selectedCountryName = getCountryNames(widget.lead.country);
     super.initState();
   }
+
   String _selectedCountryName = '';
 
   String getCountryNames(String countryCode) {
@@ -43,6 +44,7 @@ class _LeadDetailsState extends State<LeadDetails> {
 
     return _selectedCountryName;
   }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -91,8 +93,7 @@ class _LeadDetailsState extends State<LeadDetails> {
                 color: Colors.white,
               ),
               onPressed: () {
-                _showDeleteDialog(
-                    context);
+                _showDeleteDialog(context);
               },
             ),
           ],
@@ -106,10 +107,8 @@ class _LeadDetailsState extends State<LeadDetails> {
                 indicatorSize: TabBarIndicatorSize.tab,
 
                 labelColor: textPrimaryColor,
-                unselectedLabelColor:
-                    textPrimaryColor.withOpacity(0.6),
-                indicatorColor:
-                   acceptColor, // Tab indicator color
+                unselectedLabelColor: textPrimaryColor.withOpacity(0.6),
+                indicatorColor: acceptColor, // Tab indicator color
                 tabs: const [
                   Tab(text: 'Profile'),
                   Tab(text: 'Notes'),
@@ -118,16 +117,16 @@ class _LeadDetailsState extends State<LeadDetails> {
               ),
             ),
             Expanded(
-          child: TabBarView(
+              child: TabBarView(
                 children: [
                   ProfileTab(lead: widget.lead), // Includes cards
                   AddNotesTab(
                     noteData: widget.lead.notesData ?? [],
-                    lead:   widget.lead,
+                    lead: widget.lead,
                   ),
                   RemindersTab(
                     remainder: widget.lead.reminders ?? [],
-                    lead:   widget.lead,
+                    lead: widget.lead,
                   )
                 ],
               ),
@@ -265,7 +264,6 @@ class _ProfileTabState extends State<ProfileTab> {
   bool showAll = false;
   @override
   Widget build(BuildContext context) {
-
     final status = leadStore.getStatusById(widget.lead.status);
     final source = leadStore.getSourceById(widget.lead.source);
     final assigned = leadStore.getAssignedById(widget.lead.assigned);
@@ -276,9 +274,8 @@ class _ProfileTabState extends State<ProfileTab> {
         break;
       }
     }
-    List<Tag>? displayedTags = showAll
-        ? widget.lead.tags
-        : widget.lead.tags!.take(3).toList();
+    List<Tag>? displayedTags =
+        showAll ? widget.lead.tags : widget.lead.tags!.take(3).toList();
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -303,7 +300,9 @@ class _ProfileTabState extends State<ProfileTab> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ConvertToCustomer( lead: widget.lead,),
+                      builder: (context) => ConvertToCustomer(
+                        lead: widget.lead,
+                      ),
                     ),
                   );
                 },
@@ -377,7 +376,7 @@ class _ProfileTabState extends State<ProfileTab> {
                       ),
                     ],
                   ),
-                 height10(),
+                  height10(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -406,15 +405,20 @@ class _ProfileTabState extends State<ProfileTab> {
                   const Divider(),
                   const SizedBox(height: 16),
                   // Details Card
-                  DetailRow(label: 'Position', value: widget.lead.title ?? 'N/A'),
+                  DetailRow(
+                      label: 'Position', value: widget.lead.title ?? 'N/A'),
                   const Divider(),
-                  DetailRow(label: 'Company', value: widget.lead.company ?? 'N/A'),
+                  DetailRow(
+                      label: 'Company', value: widget.lead.company ?? 'N/A'),
                   const Divider(),
-                  DetailRow(label: 'Phone', value: widget.lead.phonenumber ?? 'N/A'),
+                  DetailRow(
+                      label: 'Phone', value: widget.lead.phonenumber ?? 'N/A'),
                   const Divider(),
-                  DetailRow(label: 'Website', value: widget.lead.website ?? 'N/A'),
+                  DetailRow(
+                      label: 'Website', value: widget.lead.website ?? 'N/A'),
                   const Divider(),
-                  DetailRow(label: 'Address', value: widget.lead.address ?? 'N/A'),
+                  DetailRow(
+                      label: 'Address', value: widget.lead.address ?? 'N/A'),
                   const Divider(),
                   DetailRow(label: 'City', value: widget.lead.city ?? 'N/A'),
                   const Divider(),
@@ -450,7 +454,10 @@ class _ProfileTabState extends State<ProfileTab> {
                   height20(),
                   DetailRow(label: 'Source', value: source?.name ?? 'N/A'),
                   const Divider(),
-                  DetailRow(label: 'Assigned', value: "${assigned?.firstName} ${assigned?.lastName}" ?? 'N/A'),
+                  DetailRow(
+                      label: 'Assigned',
+                      value: "${assigned?.firstName} ${assigned?.lastName}" ??
+                          'N/A'),
                   const Divider(),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -467,35 +474,44 @@ class _ProfileTabState extends State<ProfileTab> {
                         const SizedBox(width: 30),
                         Expanded(
                           child: Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.end,
-                            alignment: WrapAlignment.end,
-                            spacing: 2,
-                            children:[  ...displayedTags!.map((tag) => Text("${tag.name}, ")).toList(),
-                // Show "..." or "Show Less" button
-                              if (widget.lead.tags!.length > 3)
-              GestureDetector(
-              onTap: () {
-    setState(() {
-    showAll = !showAll; // Toggle visibility
-    });
-    },
-      child: Text(
-        showAll ? 'Show Less' : '...',
-        style: const TextStyle(
-          color: Colors.blue,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    ),
-                      ]    ),
+                              crossAxisAlignment: WrapCrossAlignment.end,
+                              alignment: WrapAlignment.end,
+                              spacing: 2,
+                              children: [
+                                ...displayedTags!
+                                    .map((tag) => Text("${tag.name}, "))
+                                    .toList(),
+                                // Show "..." or "Show Less" button
+                                if (widget.lead.tags!.length > 3)
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        showAll = !showAll; // Toggle visibility
+                                      });
+                                    },
+                                    child: Text(
+                                      showAll ? 'Show Less' : '...',
+                                      style: const TextStyle(
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                              ]),
                         ),
                       ],
                     ),
                   ),
                   const Divider(),
-                  DetailRow(label: 'Last Contact', value: formatDate(widget.lead.lastcontact.toString()) ?? 'N/A'),
+                  DetailRow(
+                      label: 'Last Contact',
+                      value: formatDate(widget.lead.lastcontact.toString()) ??
+                          'N/A'),
                   const Divider(),
-                  DetailRow(label: 'Public', value: widget.lead.isPublic == "1" ? "Yes" : "No" ?? 'N/A'),
+                  DetailRow(
+                      label: 'Public',
+                      value:
+                          widget.lead.isPublic == "1" ? "Yes" : "No" ?? 'N/A'),
                 ],
               ),
             ),
