@@ -17,6 +17,7 @@ import 'database/routes/route_settings.dart';
 import 'features/auth/dashboard/home_screen.dart';
 import 'utils/default_logger.dart';
 import 'widgets/loader_widget.dart';
+
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     final position = await Geolocator.getCurrentPosition(
@@ -29,6 +30,7 @@ void callbackDispatcher() {
     return Future.value(true);
   });
 }
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Workmanager().initialize(callbackDispatcher);
@@ -159,7 +161,7 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         title: AppConst.appName,
-        home: const AuthScreen(),
+        home: appStore.isLoggedIn ? const HomeScreen() : const AuthScreen(),
         builder: (context, child) {
           return LoadingWidget(
             context: context,

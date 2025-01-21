@@ -1,5 +1,6 @@
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
+import 'package:crm/utils/extensions.dart';
 import 'package:crm/utils/text_field.dart';
 import 'package:dio/src/form_data.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,7 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
 
   String? country;
   late TextEditingController nameController;
+  late TextEditingController lastNameController;
 
   late TextEditingController positionController;
   late TextEditingController emailController;
@@ -50,7 +52,15 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
   void initState() {
     super.initState();
     //Initialize variables with lead data
-    nameController = TextEditingController(text: widget.lead.name ?? "");
+    String laslName = '';
+    String firstName = '';
+    if (widget.lead.name.split(' ').length > 1) {
+      laslName = widget.lead.name.split(' ').last;
+      firstName =
+          widget.lead.name.substring(0, widget.lead.name.lastIndexOf(' '));
+    }
+    nameController = TextEditingController(text: firstName);
+    lastNameController = TextEditingController(text: laslName);
     positionController = TextEditingController(text: widget.lead.title ?? "");
     emailController = TextEditingController(text: widget.lead.email ?? "");
     companyController = TextEditingController(text: widget.lead.company ?? "");
@@ -92,7 +102,7 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                   ),
                   const SizedBox(height: 15),
                   CommonTextField(
-                    // controller: nameController,
+                    controller: lastNameController,
                     label: 'Last Name',
                     hint: 'Enter Last Name',
                     initialValue: firstName, // Set initial value
@@ -151,7 +161,9 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                     width: double
                         .infinity, // Allows dropdown to take full available width
                     child: DropdownButtonFormField<String>(
-                      value: country,
+                      value: leadStore.country
+                          .firstWhereOrNull((v) => v.countryId == country)
+                          ?.countryId,
                       isExpanded: true, // Prevent overflow
                       items: leadStore.country
                           .map((item) => DropdownMenuItem<String>(
@@ -162,8 +174,7 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                       onChanged: (value) {
                         setState(() {
                           country = value;
-                          state =
-                              null; // Reset state when a new country is selected
+                          state = null;
                         });
                       },
                       decoration: InputDecoration(
@@ -292,6 +303,10 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                               passwordController.text.isNotEmpty) {
                             updatedData['password'] = passwordController.text;
                           }
+
+                          // notes
+                          /// TODO : if user has notes 1, else 0
+                          updatedData['transfer_notes'] = 1;
 
                           // Additional options
                           updatedData['sendSetPasswordEmail'] =

@@ -4,13 +4,8 @@ import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/services/auth_services.dart';
 import 'package:crm/utils/default_logger.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:nb_utils/nb_utils.dart';
 
-import '../../../../../constants/value_constants.dart';
-import '../../../../../database/routes/route_name.dart';
-import '../../../../../database/routes/route_path.dart';
-import '../../../../../database/routes/route_settings.dart';
 import '../../../../../store/app_store.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -133,13 +128,21 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
                 if (logoutConfirmed) {
                   // Proceed with logout
+                  Fluttertoast.showToast(msg: 'Logging out...');
                   bool success = await AuthService().logout(
                     context: context, // Passing context
                     isSessionExpired: true, // Passing isSessionExpired
                   );
+
                   if (success) {
-                    // Redirect to login screen after successful logout
-                    Navigator.pushReplacementNamed(context, '/login');
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => AuthScreen()),
+                      (_) => false,
+                    );
+                  } else {
+                    Fluttertoast.cancel();
+                    Fluttertoast.showToast(msg: 'Something went wrong!');
                   }
                 }
               },
@@ -152,7 +155,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   // Logout Confirmation Dialog
 
- Future<bool> _showLogoutDialog(BuildContext context) async {
+  Future<bool> _showLogoutDialog(BuildContext context) async {
     bool result = await showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
@@ -169,7 +172,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 TextButton(
                   onPressed: () {
                     // Simulate session expiration (remove user session data here if needed)
-                    _logout(context);
+                    // _logout(context);
+                    Navigator.of(context).pop(true);
                   },
                   child: const Text('Logout'),
                 ),

@@ -2,9 +2,7 @@ import 'dart:developer';
 
 import 'package:crm/constants/api_constant.dart';
 import 'package:crm/database/function.dart';
-import 'package:crm/database/routes/route_path.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../Models/user_data.dart';
 import '../database/dio/dio/dio_client.dart';
@@ -69,10 +67,10 @@ class AuthService {
     required bool isSessionExpired,
   }) async {
     try {
-      // Perform logout operations like clearing tokens, user data, etc.
-      // Example: Clear shared preferences or local storage
-      print("Session expired: $isSessionExpired");
-      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+      await appStore.setUser(null);
+      await appStore.setToken('');
+      await appStore.setLoggedIn(false);
+      await Future.delayed(const Duration(seconds: 3)); // Simulate API call
       return true; // Logout successful
     } catch (e) {
       print("Logout failed: $e");
