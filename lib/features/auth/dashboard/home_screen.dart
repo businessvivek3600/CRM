@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:nb_utils/nb_utils.dart';
-
+import '../../../../store/lead_store.dart';
 import '../../../services/api_services.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,68 +22,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    leadStore.getDashboard();
     appStore.loadUserData();
-    infoLog("User Token: ${appStore.token}");
-    infoLog("User Email: ${appStore.userEmail}");
-    fetchDashboardData(); // Fetch data when the screen is initialized
   }
 
-  final List<Map<String, dynamic>> metricData = [];
-  bool isLoading = true;
 
-  void fetchDashboardData() async {
-    try {
-      var (bool status, Map<String, dynamic> data, String? message) =
-          await ApiService.getDashboardData();
-      print('API Response: $data');
 
-      if (status && data.isNotEmpty) {
-        setState(() {
-          metricData.addAll([
-            {
-              'icon': Icons.attach_money,
-              'count':
-                  '${data['invoices']?['pending'] ?? 0} of ${data['invoices']?['total'] ?? 0}',
-              'label': 'Invoices Awaiting Payment',
-              'color': Colors.black,
-            },
-            {
-              'icon': Icons.refresh,
-              'count':
-                  '${data['leads']?['converted'] ?? 0} of ${data['leads']?['total'] ?? 0}',
-              'label': 'Converted Leads',
-              'color': Colors.black,
-            },
-            {
-              'icon': Icons.file_copy,
-              'count':
-                  '${data['tasks']?['incomplete'] ?? 0} of ${data['tasks']?['total'] ?? 0}',
-              'label': 'Not Completed Tasks',
-              'color': Colors.black,
-            },
-            {
-              'icon': Icons.add_box,
-              'count':
-                  '${data['projects']?['inProgress'] ?? 0} of ${data['projects']?['total'] ?? 0}',
-              'label': 'Projects In Progress',
-              'color': Colors.black,
-            },
-          ]);
-          isLoading = false;
-        });
-      } else {
-        logger.e("Dashboard API Error: ${message ?? 'Unknown error'}");
-        setState(() {
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      logger.e('Error fetching dashboard data: $e');
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
 
   void getLocation() async {
     LocationPermission permission;
@@ -117,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: getLocation,
-        child: Icon(Icons.location_history),
+        child: const Icon(Icons.location_history),
       ),
       drawer: const CustomDrawer(), // Ensure CustomDrawer is defined properly
       appBar: AppBar(
@@ -129,9 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(fontSize: 23, color: white),
         ),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
+      body:  SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Observer(builder: (context) {
@@ -181,107 +123,102 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          childAspectRatio: 3 / 2.5,
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                        ),
-                        itemCount: metricData.length,
-                        itemBuilder: (context, index) {
-                          final data = metricData[index];
-                          warningLog('metricData: ${data['icon']}');
-                          return _buildCard(
-                            data['icon'],
-                            data['count'],
-                            data['label'],
-                            data['color'],
-                          );
-                        },
-                      ),
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              childAspectRatio: 3 / 2,
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
+                            itemCount: 4,
+                            itemBuilder: (context, index) {
+
+                              String label;
+                              IconData icon;
+                              String count;
+                              Color iconColor;
+
+                              switch (index) {
+                                case 0:
+                                  label = "Total Leads";
+                                  icon = Icons.star;
+                                  count = leadStore.firstBox.totalLeads.toString();
+                                  iconColor = Colors.orange;
+                                  break;
+                                case 1:
+                                  label = "Converted Leads";
+                                  icon = Icons.group_add_outlined;
+                                  count = leadStore.secondBox.totalConverted.toString();
+                                  iconColor = Colors.green;
+                                  break;
+                                case 2:
+                                  label = "New Leads";
+                                  icon = Icons.notifications;
+                                  count = leadStore.thirdBox.totalNewLeads.toString();
+                                  iconColor = Colors.red;
+                                  break;
+                                case 3:
+                                  label = "Total Contacted";
+                                  icon = Icons.phone;
+                                  count = leadStore.fourthBox.totalContactLeads.toString();
+                                  iconColor = Colors.blue;
+                                  break;
+                                default:
+                                  label = "";
+                                  icon = Icons.help;
+                                  count = "0";
+                                  iconColor = Colors.grey;
+                              }
+
+                              return _buildCard(icon, count, label, iconColor);
+                            },
+                          ),
+
 
                       const SizedBox(height: 20),
 
                       // Invoice Progress Bars
-                      const Text(
-                        "Leads Overview",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Row(
+                        children: [
+                          Container(
+                        width: 4,
+                        height: 24,
+                        color: Colors.blue,
+                      ),
+                      const SizedBox(width: 8),
+                          const Text(
+                            "Leads Overview",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 16),
-                      const InvoiceProgressItem(
-                        label: "New Lead",
-                        value: 0.1, // Percentage of progress
-                        color: Colors.red,
-                        count: 2,
-                      ),
-                      const InvoiceProgressItem(
-                        label: "Contacted",
-                        value: 0.4,
-                        color: Colors.green,
-                        count: 4,
-                      ),
-                      const InvoiceProgressItem(
-                        label: "Qualified",
-                        value: 0.2,
-                        color: Colors.blue,
-                        count: 2,
-                      ),
-                      const InvoiceProgressItem(
-                        label: "Negotiating",
-                        value: 0.7,
-                        color: Colors.orange,
-                        count: 23,
-                      ),
-                      const InvoiceProgressItem(
-                        label: "Closed-Won",
-                        value: 0.5,
-                        color: Colors.green,
-                        count: 23,
-                      ),
-                      const InvoiceProgressItem(
-                        label: "Closed-Lost",
-                        value: 0.6,
-                        color: Colors.red,
-                        count: 23,
-                      ),
-                      const InvoiceProgressItem(
-                        label: "Pending",
-                        value: 0.7,
-                        color: Colors.orange,
-                        count: 23,
-                      ),
-                      const InvoiceProgressItem(
-                        label: "On Hold",
-                        value: 0.3,
-                        color: Colors.grey,
-                        count: 23,
-                      ),
+                       SizedBox(
+                         height: 300,
+                         child: ListView.builder(
+                           shrinkWrap: true,
+                              itemCount: leadStore.leadStatusDashboard.length,
+                              itemBuilder: (context, index) {
+                                final leadStatus = leadStore.leadStatusDashboard[index];
+                                infoLog("____DATA${ leadStatus.name}");
+                                           infoLog("____DATA${ leadStatus.total}");
+                                return InvoiceProgressItem(
+                                  label: leadStatus.name,
+                                  value: leadStatus.total.toDouble(),
+                                  color: Color(int.parse('0xFF${leadStatus.color}')),
+                                  count: leadStore.firstBox.totalLeads,
+                                );
+                              },
+                            ),
+                       ),
 
-                      const InvoiceProgressItem(
-                        label: "Reopened",
-                        value: 0.4,
-                        color: Colors.purple,
-                        count: 23,
-                      ),
-                      const InvoiceProgressItem(
-                        label: "Converted",
-                        value: 0.4,
-                        color: Colors.blue,
-                        count: 23,
-                      ),
-                      const InvoiceProgressItem(
-                        label: "Customer",
-                        value: 0.7,
-                        color: Colors.lightGreen,
-                        count: 23,
-                      ),
+
                     ],
                   );
                 }),
@@ -300,14 +237,14 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 13),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(icon, size: 28, color: iconColor), // Smaller icon size
             const SizedBox(height: 6),
             Text(
               count,
               style: const TextStyle(
-                fontSize: 12, // Smaller font size
+                fontSize: 16, // Smaller font size
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -316,8 +253,9 @@ class _HomeScreenState extends State<HomeScreen> {
               label,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 10, // Smaller font size for label
+                fontSize: 14,
                 color: Colors.grey[700],
+                fontWeight: FontWeight.bold
               ),
             ),
           ],

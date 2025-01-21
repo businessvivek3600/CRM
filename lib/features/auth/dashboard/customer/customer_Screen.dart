@@ -105,15 +105,15 @@ class _CustomerScreenState extends State<CustomerScreen> {
                               Color color;
 
                               if (index == 0) {
-                                title = 'Total Customers';
+                                title = 'Total\nCustomers';
                                 value = '${customerStore.totalCustomer}';
                                 color = Colors.blue;
                               } else if (index == 1) {
-                                title = 'Active Customers';
+                                title = 'Active\nCustomers';
                                 value = '${customerStore.activeCustomer}';
                                 color = Colors.green;
                               } else {
-                                title = 'Inactive Customers';
+                                title = 'Inactive\nCustomers';
                                 value =
                                     '${customerStore.totalCustomer - customerStore.activeCustomer}';
                                 color = Colors.red;
@@ -131,6 +131,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
                                     children: [
                                       Text(
                                         title,
+                                        textAlign: TextAlign.center,
                                         style: const TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w700,
@@ -154,40 +155,51 @@ class _CustomerScreenState extends State<CustomerScreen> {
                         : const SizedBox(),
                   ],
                 ),
-                height10(),
+                height20(),
 
-                Row(
+              Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Customers',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+
                     Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            Icons.filter_list,
-                            color: Theme.of(context).colorScheme.primary,
-                            size: 25,
+                        children: [
+                          Container(
+                            width: 4,
+                            height: 24,
+                            color: Colors.blue,
                           ),
-                        ),
-                        const Text(
-                          'Filter',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(width: 8),
+                          const    Text(
+                            'Customers',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    // Row(
+                    //   children: [
+                    //     IconButton(
+                    //       onPressed: () {},
+                    //       icon: Icon(
+                    //         Icons.filter_list,
+                    //         color: Theme.of(context).colorScheme.primary,
+                    //         size: 25,
+                    //       ),
+                    //     ),
+                    //     const Text(
+                    //       'Filter',
+                    //       style: TextStyle(
+                    //         fontSize: 18,
+                    //         fontWeight: FontWeight.bold,
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                   ],
                 ),
-
+height10(),
                 // Customer List
                 Expanded(
                   child: ListView.separated(

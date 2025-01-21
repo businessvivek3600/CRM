@@ -171,38 +171,23 @@ class _LeadsScreenState extends State<LeadsScreen> {
 
               // Leads Section
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  Container(
+                    width: 4,
+                    height: 24,
+                    color: Colors.blue,
+                  ),
+                  const SizedBox(width: 8),
                   const Text(
                     'Leads',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          Icons.filter_list,
-                          color: Theme.of(context).colorScheme.primary,
-                          size: 25,
-                        ),
-                      ),
-                      Text(
-                        'Filter',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  )
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
               Observer(builder: (_) {
                 List<Lead> leads = leadStore.leads;
 
