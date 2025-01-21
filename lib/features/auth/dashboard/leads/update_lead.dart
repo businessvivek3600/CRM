@@ -1,24 +1,17 @@
 import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:country_state_picker/components/index.dart';
-import 'package:country_state_picker/country_state_picker.dart';
 import 'package:crm/store/lead_store.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
-import 'package:crm/utils/extensions.dart';
 import 'package:crm/utils/text_field.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:nb_utils/nb_utils.dart';
-import 'package:flutter_fast_forms/flutter_fast_forms.dart';
 import '../../../../Models/leads_model.dart';
 import '../../../../services/api_services.dart';
 import '../../../../store/app_store.dart';
 import '../../../../utils/size_utils.dart';
-import '../../../../utils/text.dart';
-
 
 class EditLead extends StatefulWidget {
   const EditLead({super.key, required this.lead});
@@ -28,12 +21,11 @@ class EditLead extends StatefulWidget {
 }
 
 class _EditLeadState extends State<EditLead> {
-  late  List<String> _dropdownItems = [];
+  late List<String> _dropdownItems = [];
   String? _selectedEmployeeId;
   String? _selectedItem;
   String? _selectedStatusId;
-  ValueNotifier<List<Country>> countries =
-  ValueNotifier<List<Country>>([]);
+  ValueNotifier<List<Country>> countries = ValueNotifier<List<Country>>([]);
 
   List<String> availableTags = [];
   final List<String> _dropDownTagId = [];
@@ -62,7 +54,9 @@ class _EditLeadState extends State<EditLead> {
     // Initialize controllers with lead data
     nameController = TextEditingController(text: widget.lead.name ?? '');
     leadValueController = TextEditingController(
-      text: widget.lead.leadValue != null ? widget.lead.leadValue.toString() : '0',
+      text: widget.lead.leadValue != null
+          ? widget.lead.leadValue.toString()
+          : '0',
     );
     positionController = TextEditingController(text: widget.lead.title);
     emailController = TextEditingController(text: widget.lead.email);
@@ -73,17 +67,19 @@ class _EditLeadState extends State<EditLead> {
     zipController = TextEditingController(text: widget.lead.zip);
     stateController = TextEditingController(text: widget.lead.state);
     phoneController = TextEditingController(text: widget.lead.phonenumber);
-    descriptionController = TextEditingController(text: widget.lead.description);
+    descriptionController =
+        TextEditingController(text: widget.lead.description);
 
     // Initialize dropdowns
     _selectedItem = leadStore.leadSource
-        .firstWhere((source) => source.id == widget.lead.source, orElse:  null)
+        .firstWhere((source) => source.id == widget.lead.source, orElse: null)
         .id;
     _statusSelectedItem = leadStore.leadStatus
-        .firstWhere((status) => status.id == widget.lead.status, orElse:  null)
+        .firstWhere((status) => status.id == widget.lead.status, orElse: null)
         .id;
     _selectedEmployeeId = leadStore.staff
-        .firstWhere((staff) => staff.staffId == widget.lead.assigned, orElse:  null)
+        .firstWhere((staff) => staff.staffId == widget.lead.assigned,
+            orElse: null)
         .staffId;
 
     // Initialize tags
@@ -102,16 +98,19 @@ class _EditLeadState extends State<EditLead> {
           text: DateFormat('yyyy-MM-dd h:mm a').format(lastContactDate),
         );
       } catch (e) {
-        lastContactController = TextEditingController(text: widget.lead.lastcontact);
+        lastContactController =
+            TextEditingController(text: widget.lead.lastcontact);
       }
     } else {
       lastContactController = TextEditingController();
     }
 
     setState(() {
-      _dropdownItems = leadStore.leadSource.map((source) => source.name).toList();
+      _dropdownItems =
+          leadStore.leadSource.map((source) => source.name).toList();
     });
   }
+
   List<Map<String, dynamic>> formData = [
     {},
     {},
@@ -146,7 +145,8 @@ class _EditLeadState extends State<EditLead> {
           );
 
           // Format the date and time as desired
-          final formattedDateTime = DateFormat('yyyy-MM-dd h:mm a').format(fullDateTime);
+          final formattedDateTime =
+              DateFormat('yyyy-MM-dd h:mm a').format(fullDateTime);
           lastContactController.text = formattedDateTime;
         });
       }
@@ -183,18 +183,21 @@ class _EditLeadState extends State<EditLead> {
                 children: [
                   DropdownButtonFormField<String>(
                     value: _selectedItem,
-                    items:leadStore.leadSource
+                    items: leadStore.leadSource
                         .toSet()
                         .map((item) => DropdownMenuItem<String>(
-                      value: item.id,
-                      child: Text(item.name),
-                    ))
+                              value: item.id,
+                              child: Text(item.name),
+                            ))
                         .toList(),
                     onChanged: (value) {
                       setState(() {
                         _selectedItem = value;
                         String sourceId = leadStore.leadSource
-                            .firstWhere((source) => source.id == value, orElse: null)?.id ?? '';
+                                .firstWhere((source) => source.id == value,
+                                    orElse: null)
+                                ?.id ??
+                            '';
                       });
                     },
                     decoration: InputDecoration(
@@ -204,17 +207,14 @@ class _EditLeadState extends State<EditLead> {
                       ),
                     ),
                   ),
-
-
                   const SizedBox(height: 15),
                   DropdownButtonFormField<String>(
-
                     value: _statusSelectedItem,
                     items: leadStore.leadStatus
                         .map((item) => DropdownMenuItem<String>(
-                      value: item.id,
-                      child: Text(item.name),
-                    ))
+                              value: item.id,
+                              child: Text(item.name),
+                            ))
                         .toList(),
                     onChanged: (value) {
                       setState(() {
@@ -233,9 +233,9 @@ class _EditLeadState extends State<EditLead> {
                     value: _selectedEmployeeId,
                     items: leadStore.staff
                         .map((item) => DropdownMenuItem<String>(
-                      value: item.staffId,
-                      child: Text("${item.firstName} ${item.lastName}"),
-                    ))
+                              value: item.staffId,
+                              child: Text("${item.firstName} ${item.lastName}"),
+                            ))
                         .toList(),
                     onChanged: (value) {
                       setState(() {
@@ -266,17 +266,19 @@ class _EditLeadState extends State<EditLead> {
                   const SizedBox(height: 10),
                   Wrap(
                     spacing: 8,
-                    children: selectedTags.map((tag) => Chip(
-                      label: Text(tag),
-                      deleteIcon: const Icon(Icons.close),
-                      onDeleted: () {
-                        setState(() {
-                          int index = selectedTags.indexOf(tag);
-                          selectedTags.removeAt(index);
-                          _dropDownTagId.removeAt(index);
-                        });
-                      },
-                    )).toList(),
+                    children: selectedTags
+                        .map((tag) => Chip(
+                              label: Text(tag),
+                              deleteIcon: const Icon(Icons.close),
+                              onDeleted: () {
+                                setState(() {
+                                  int index = selectedTags.indexOf(tag);
+                                  selectedTags.removeAt(index);
+                                  _dropDownTagId.removeAt(index);
+                                });
+                              },
+                            ))
+                        .toList(),
                   ),
                   const SizedBox(height: 5),
                   DropdownButton<String>(
@@ -293,7 +295,7 @@ class _EditLeadState extends State<EditLead> {
                       if (tagId != null) {
                         // Find the tag corresponding to the selected ID
                         Tag? selectedTag = leadStore.tags.firstWhere(
-                              (tag) => tag.id == tagId,
+                          (tag) => tag.id == tagId,
                           orElse: null,
                         );
 
@@ -314,27 +316,27 @@ class _EditLeadState extends State<EditLead> {
                     hint: 'Enter Your Name',
                   ),
                   const SizedBox(height: 15),
-                   CommonTextField(
-                     controller: leadValueController,
+                  CommonTextField(
+                    controller: leadValueController,
                     label: 'Lead Value',
                     hint: 'Lead Value',
-                     // suffix: Text("₹",style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 18),),
+                    // suffix: Text("₹",style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 18),),
                   ),
                   const SizedBox(height: 15),
-                 CommonTextField(
-                   controller: positionController,
+                  CommonTextField(
+                    controller: positionController,
                     label: 'Position',
                     hint: 'Position',
                   ),
                   const SizedBox(height: 15),
-                   CommonTextField(
-                     controller: emailController,
+                  CommonTextField(
+                    controller: emailController,
                     label: 'Email',
                     hint: 'Enter Your Email',
                   ),
                   const SizedBox(height: 15),
-                 CommonTextField(
-                   controller: websiteController,
+                  CommonTextField(
+                    controller: websiteController,
                     label: 'Website',
                     hint: 'Enter Website Name',
                   ),
@@ -345,33 +347,40 @@ class _EditLeadState extends State<EditLead> {
                     hint: 'Enter Website Phone Number',
                   ),
                   const SizedBox(height: 15),
-                   CommonTextField(
-                     controller: companyController,
+                  CommonTextField(
+                    controller: companyController,
                     label: 'Company',
                     hint: 'Enter Company Name',
                   ),
                   const SizedBox(height: 15),
-                  DropdownButtonFormField<String>(
-                    value: country,
-                    items: leadStore.country
-                        .map((item) => DropdownMenuItem<String>(
-                      value: item.countryId,
-                      child: Text(item.shortName),
-                    ))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        country = value;
-                        state = null;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Select Country',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                  Container(
+                    width: double
+                        .infinity, // Allows dropdown to take full available width
+                    child: DropdownButtonFormField<String>(
+                      value: country,
+                      isExpanded: true, // Prevent overflow
+                      items: leadStore.country
+                          .map((item) => DropdownMenuItem<String>(
+                                value: item.countryId,
+                                child: Text(item.shortName),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          country = value;
+                          state =
+                              null; // Reset state when a new country is selected
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Select Country',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
                       ),
                     ),
-                  ),const SizedBox(height: 15),
+                  ),
+                  SizedBox(height: 15),
                   CommonTextField(
                     controller: stateController,
                     label: 'State',
@@ -407,7 +416,11 @@ class _EditLeadState extends State<EditLead> {
                     controller: lastContactController,
                     label: 'Last Contact',
                     hint: 'Select Last Contact Date',
-                    suffix: Icon(Icons.calendar_month_rounded,color: primaryColor,size: 18,),
+                    suffix: Icon(
+                      Icons.calendar_month_rounded,
+                      color: primaryColor,
+                      size: 18,
+                    ),
                     onTap: () => _selectLastContactDate(context),
                   ),
                 ],
@@ -419,7 +432,7 @@ class _EditLeadState extends State<EditLead> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(10),
         child: ElevatedButton(
-          onPressed:() async {
+          onPressed: () async {
             infoLog("________Tags1 $_dropDownTagId");
             infoLog("________Source2$_selectedItem");
             infoLog("________Status4 $_selectedStatusId");
@@ -427,57 +440,70 @@ class _EditLeadState extends State<EditLead> {
             bool isFieldUpdated(String currentValue, String? initialValue) {
               return currentValue != initialValue;
             }
+
             // Create form data
             FormData formData = FormData.fromMap({
-              "id":widget.lead.id,
-              'name':  isFieldUpdated(nameController.text, widget.lead.name ?? '')
-            ? nameController.text
-                : widget.lead.name,
-              'lead_value': isFieldUpdated(leadValueController.text, (widget.lead.leadValue ?? 0.00) as String?)
+              "id": widget.lead.id,
+              'name':
+                  isFieldUpdated(nameController.text, widget.lead.name ?? '')
+                      ? nameController.text
+                      : widget.lead.name,
+              'lead_value': isFieldUpdated(leadValueController.text,
+                      (widget.lead.leadValue ?? 0.00) as String?)
                   ? leadValueController.text
                   : widget.lead.leadValue,
-              'title':  isFieldUpdated(positionController.text, widget.lead.title!)
-                  ? positionController.text
-                  : widget.lead.title,
-              'email':isFieldUpdated(emailController.text, widget.lead.email!)
+              'title':
+                  isFieldUpdated(positionController.text, widget.lead.title!)
+                      ? positionController.text
+                      : widget.lead.title,
+              'email': isFieldUpdated(emailController.text, widget.lead.email!)
                   ? emailController.text
                   : widget.lead.email,
-              'website': isFieldUpdated(websiteController.text, widget.lead.website!)
-                  ? websiteController.text
-                  : widget.lead.website,
-              'phonenumber': isFieldUpdated(phoneController.text, widget.lead.phonenumber)
-                  ? phoneController.text
-                  : widget.lead.phonenumber,
-              'company':isFieldUpdated(companyController.text, widget.lead.company)
-                  ? companyController.text
-                  : widget.lead.company,
-              'address':  isFieldUpdated(addressController.text, widget.lead.address)
-                  ? addressController.text
-                  : widget.lead.address,
+              'website':
+                  isFieldUpdated(websiteController.text, widget.lead.website!)
+                      ? websiteController.text
+                      : widget.lead.website,
+              'phonenumber':
+                  isFieldUpdated(phoneController.text, widget.lead.phonenumber)
+                      ? phoneController.text
+                      : widget.lead.phonenumber,
+              'company':
+                  isFieldUpdated(companyController.text, widget.lead.company)
+                      ? companyController.text
+                      : widget.lead.company,
+              'address':
+                  isFieldUpdated(addressController.text, widget.lead.address)
+                      ? addressController.text
+                      : widget.lead.address,
               'city': isFieldUpdated(cityController.text, widget.lead.city)
                   ? cityController.text
                   : widget.lead.city,
-              'zip':isFieldUpdated(zipController.text, widget.lead.zip)
+              'zip': isFieldUpdated(zipController.text, widget.lead.zip)
                   ? zipController.text
                   : widget.lead.zip,
               'state': isFieldUpdated(stateController.text, widget.lead.state)
                   ? stateController.text
                   : widget.lead.state,
-              'country': isFieldUpdated(country ?? " ", widget.lead.country ?? " ")
-                  ? country
-                  : widget.lead.country,
+              'country':
+                  isFieldUpdated(country ?? " ", widget.lead.country ?? " ")
+                      ? country
+                      : widget.lead.country,
               'source': _selectedItem ?? widget.lead.source,
-              'status':  _selectedStatusId ?? widget.lead.status,
+              'status': _selectedStatusId ?? widget.lead.status,
               'assigned': _selectedEmployeeId ?? widget.lead.assigned,
-              'tags': selectedTags.isNotEmpty ? jsonEncode(_dropDownTagId) : widget.lead.tags!.map((tag) => tag.id).toList(),
-              'description': isFieldUpdated(descriptionController.text, widget.lead.description)
+              'tags': selectedTags.isNotEmpty
+                  ? jsonEncode(_dropDownTagId)
+                  : widget.lead.tags!.map((tag) => tag.id).toList(),
+              'description': isFieldUpdated(
+                      descriptionController.text, widget.lead.description)
                   ? descriptionController.text
                   : widget.lead.description,
-              'lastcontact': isFieldUpdated(lastContactController.text, widget.lead.lastcontact ?? '')
+              'lastcontact': isFieldUpdated(
+                      lastContactController.text, widget.lead.lastcontact ?? '')
                   ? lastContactController.text
                   : widget.lead.lastcontact,
             });
-warningLog("Entered Form data ---$formData");
+            warningLog("Entered Form data ---$formData");
             infoLog("________Tags6 $_dropDownTagId");
             infoLog("________Source7$_selectedItem");
             infoLog("________Status8 $_selectedStatusId");
@@ -488,17 +514,16 @@ warningLog("Entered Form data ---$formData");
 
               // Make API call (replace `apiClient.post` with your actual API call method)
               final (
-              bool status,
-              Map<String, dynamic> response,
-              String? message
+                bool status,
+                Map<String, dynamic> response,
+                String? message
               ) = await ApiService.addLeads(formData);
 
               if (status) {
                 print('Success: ${message}');
                 // Handle success (e.g., show a success message or navigate)
               } else {
-                print(
-                    'Error: ${status} - ${response}');
+                print('Error: ${status} - ${response}');
                 // Handle API error
               }
             } catch (e) {
@@ -521,81 +546,79 @@ warningLog("Entered Form data ---$formData");
   }
 }
 
-
-
 Widget bodyMedText(
-    String text,
-    BuildContext context, {
-      TextAlign? textAlign,
-      int? maxLines,
-      TextOverflow? overflow,
-      TextStyle? style,
-      Color? color,
-      bool? isButton,
-      double? fontSize,
-      FontWeight? fontWeight,
-      double? letterSpacing,
-      double? lineHeight,
-      TextDecoration? decoration,
-      double opacity = 1,
-      bool autoSize = false,
-      double minFontSize = 12,
-    }) =>
+  String text,
+  BuildContext context, {
+  TextAlign? textAlign,
+  int? maxLines,
+  TextOverflow? overflow,
+  TextStyle? style,
+  Color? color,
+  bool? isButton,
+  double? fontSize,
+  FontWeight? fontWeight,
+  double? letterSpacing,
+  double? lineHeight,
+  TextDecoration? decoration,
+  double opacity = 1,
+  bool autoSize = false,
+  double minFontSize = 12,
+}) =>
     autoSize
         ? AutoSizeText(
-      text,
-      minFontSize: minFontSize,
-      textAlign: textAlign,
-      overflow: overflow,
-      maxLines: maxLines ?? 3,
-      style: GoogleFonts.ubuntu(
-        textStyle: style ??
-            getTheme(context).textTheme.bodyMedium!.copyWith(
-                fontWeight: fontWeight,
-                letterSpacing: letterSpacing,
-                color: (color ??
-                    (isButton != null
-                        ? (isButton
-                        ? (getTheme(context).brightness ==
-                        Brightness.dark
-                        ? Colors.white
-                        : Colors.black)
-                        : null)
-                        : null)),
-                decorationColor: color,
-                fontSize: fontSize,
-                height: lineHeight,
-                fontFamily:
-                getTheme(context).textTheme.bodyMedium?.fontFamily,
-                decoration: decoration)
-              ..color?.withOpacity(opacity),
-      ),
-    )
+            text,
+            minFontSize: minFontSize,
+            textAlign: textAlign,
+            overflow: overflow,
+            maxLines: maxLines ?? 3,
+            style: GoogleFonts.ubuntu(
+              textStyle: style ??
+                  getTheme(context).textTheme.bodyMedium!.copyWith(
+                      fontWeight: fontWeight,
+                      letterSpacing: letterSpacing,
+                      color: (color ??
+                          (isButton != null
+                              ? (isButton
+                                  ? (getTheme(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black)
+                                  : null)
+                              : null)),
+                      decorationColor: color,
+                      fontSize: fontSize,
+                      height: lineHeight,
+                      fontFamily:
+                          getTheme(context).textTheme.bodyMedium?.fontFamily,
+                      decoration: decoration)
+                ..color?.withOpacity(opacity),
+            ),
+          )
         : Text(
-      text,
-      textAlign: textAlign,
-      overflow: overflow,
-      maxLines: maxLines ?? 3,
-      style: GoogleFonts.ubuntu(
-        textStyle: style ??
-            getTheme(context).textTheme.bodyMedium!.copyWith(
-                fontWeight: fontWeight,
-                letterSpacing: letterSpacing,
-                color: (color ??
-                    (isButton != null
-                        ? (isButton
-                        ? (getTheme(context).brightness ==
-                        Brightness.dark
-                        ? Colors.white
-                        : Colors.black)
-                        : null)
-                        : null)),
-                decorationColor: color,
-                fontSize: fontSize,
-                height: lineHeight,
-                fontFamily:
-                getTheme(context).textTheme.bodyMedium?.fontFamily,
-                decoration: decoration)
-              ..color?.withOpacity(opacity),
-      ),
-    );
+            text,
+            textAlign: textAlign,
+            overflow: overflow,
+            maxLines: maxLines ?? 3,
+            style: GoogleFonts.ubuntu(
+              textStyle: style ??
+                  getTheme(context).textTheme.bodyMedium!.copyWith(
+                      fontWeight: fontWeight,
+                      letterSpacing: letterSpacing,
+                      color: (color ??
+                          (isButton != null
+                              ? (isButton
+                                  ? (getTheme(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black)
+                                  : null)
+                              : null)),
+                      decorationColor: color,
+                      fontSize: fontSize,
+                      height: lineHeight,
+                      fontFamily:
+                          getTheme(context).textTheme.bodyMedium?.fontFamily,
+                      decoration: decoration)
+                ..color?.withOpacity(opacity),
+            ),
+          );
