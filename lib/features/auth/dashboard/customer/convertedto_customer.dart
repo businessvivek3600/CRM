@@ -1,9 +1,12 @@
+import 'package:crm/features/auth/dashboard/leads/leads_details.dart';
+import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
 import 'package:crm/utils/extensions.dart';
 import 'package:crm/utils/text_field.dart';
 import 'package:dio/src/form_data.dart';
 import 'package:flutter/material.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 import '../../../../Models/leads_model.dart';
 import '../../../../services/api_services.dart';
@@ -258,6 +261,12 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                     ElevatedButton(
                       onPressed: () {
                         // Back to lead action
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LeadsScreen(),
+                          ),
+                        );
                       },
                       child: const Text("Back to lead"),
                     ),
@@ -265,6 +274,20 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                     ElevatedButton(
                       onPressed: () async {
                         // Collect updated data
+                        //                    Fluttertoast.showToast(
+                        //   msg: mgs, // Display the message from the API
+                        //   toastLength: Toast.LENGTH_SHORT,
+                        //   gravity: ToastGravity.BOTTOM,
+                        //   timeInSecForIosWeb: 2,
+                        // );
+
+                        // Navigate to the next screen
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => const LeadDetails()),
+                        // );
+
                         final updatedData = <String, dynamic>{};
 
                         // Compare each field with the initial value and add only changed fields

@@ -456,6 +456,12 @@ class _MyWidgetState extends State<AddLeads> {
 
                         if (status) {
                           print('Success: ${message}');
+                          Fluttertoast.showToast(
+                            msg: '$message',
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 2,
+                          );
                           // Handle success (e.g., show a success message or navigate)
                         } else {
                           print('Error: ${status} - ${response}');
