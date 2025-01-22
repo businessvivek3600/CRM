@@ -72,22 +72,22 @@ class _EditLeadState extends State<EditLead> {
 
     // Initialize dropdowns
     _selectedItem = leadStore.leadSource
-        .firstWhere((source) => source.id == widget.lead.source, orElse: null)
-        .id;
+        .any((source) => source.id == widget.lead.source) ? widget.lead.source : null;
     _statusSelectedItem = leadStore.leadStatus
-        .firstWhere((status) => status.id == widget.lead.status, orElse: null)
-        .id;
-    _selectedEmployeeId = leadStore.staff
-        .firstWhere((staff) => staff.staffId == widget.lead.assigned,
-            orElse: null)
-        .staffId;
+        .any((status) => status.id == widget.lead.status) ?widget.lead.status :  null ;
+    _selectedEmployeeId = leadStore.staff.any((staff) => staff.staffId == widget.lead.assigned)
+        ? widget.lead.assigned
+        : null;
 
     // Initialize tags
     selectedTags = widget.lead.tags!.map((tag) => tag.name).toList();
     _dropDownTagId.addAll(widget.lead.tags!.map((tag) => tag.id));
 
     // Initialize country and state
-    country = widget.lead.country ?? " ";
+    // Validate country against the available countries in leadStore
+    country = leadStore.country.any((country) => country.countryId == widget.lead.country)
+        ? widget.lead.country
+        : null;
     state = widget.lead.state;
 
     // Handle last contact
@@ -230,7 +230,7 @@ class _EditLeadState extends State<EditLead> {
                   ),
                   const SizedBox(height: 15),
                   DropdownButtonFormField<String>(
-                    value: _selectedEmployeeId,
+                    value: _selectedEmployeeId?.isEmpty ?? true ? null : _selectedEmployeeId,
                     items: leadStore.staff
                         .map((item) => DropdownMenuItem<String>(
                               value: item.staffId,

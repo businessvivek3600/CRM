@@ -59,21 +59,21 @@ class LeadStatus {
   int total;
 
   LeadStatus({
-    required this.id,
-    required this.name,
-    required this.statusOrder,
-    required this.color,
-    required this.isDefault,
+    this.id = '',
+    this.name = '',
+    this.statusOrder = '',
+    this.color = '',
+    this.isDefault = '',
     this.total = 0,
   });
 
   factory LeadStatus.fromJson(Map<String, dynamic> json) {
     return LeadStatus(
-      id: json['id'],
-      name: json['name'],
-      statusOrder: json['statusorder'],
-      color: json['color'],
-      isDefault: json['isdefault'],
+      id: json['id'] ?? "",
+      name: json['name'] ?? "",
+      statusOrder: json['statusorder'] ?? "",
+      color: json['color'] ?? "",
+      isDefault: json['isdefault'] ?? "",
       total: json['total'] ?? 0,
     );
   }
@@ -101,8 +101,8 @@ class LeadSource {
 
   factory LeadSource.fromJson(Map<String, dynamic> json) {
     return LeadSource(
-      id: json['id'],
-      name: json['name'],
+      id: json['id'] ?? "",
+      name: json['name'] ?? "",
     );
   }
 
@@ -113,6 +113,7 @@ class LeadSource {
     };
   }
 }
+
 ///----Staff-Member------
 class Lead {
   String id;
@@ -196,35 +197,35 @@ class Lead {
   factory Lead.fromJson(Map<String, dynamic> json) {
     return Lead(
       id: json['id'] ?? '',
-      hash: json['hash'],
+      hash: json['hash'] ?? "",
       name: json['name'] ?? '',
-      title: json['title'],
-      company: json['company'],
-      description: json['description'],
+      title: json['title'] ?? "",
+      company: json['company'] ?? "",
+      description: json['description'] ?? "",
       country: json['country'] ?? '0',
-      zip: json['zip'],
-      city: json['city'],
-      state: json['state'],
-      address: json['address'],
+      zip: json['zip'] ?? "",
+      city: json['city'] ?? "",
+      state: json['state'] ?? "",
+      address: json['address'] ?? "",
       assigned: json['assigned'] ?? '',
       dateadded: json['dateadded'] ?? '',
       fromFormId: json['from_form_id'] ?? '',
       status: json['status'] ?? '',
       source: json['source'] ?? '',
-      lastcontact: json['lastcontact'],
-      dateassigned: json['dateassigned'],
+      lastcontact: json['lastcontact'] ?? "",
+      dateassigned: json['dateassigned'] ?? "",
       lastStatusChange: json['last_status_change'],
       addedfrom: json['addedfrom'] ?? '',
-      email: json['email'],
-      website: json['website'],
+      email: json['email'] ?? "",
+      website: json['website'] ?? "",
       leadorder: json['leadorder'] ?? '',
-      phonenumber: json['phonenumber'],
+      phonenumber: json['phonenumber'] ?? "",
       dateConverted: json['date_converted'],
       lost: json['lost'] ?? '',
       junk: json['junk'] ?? '',
       lastLeadStatus: json['last_lead_status'] ?? '',
       isImportedFromEmailIntegration:
-      json['is_imported_from_email_integration'] ?? '',
+          json['is_imported_from_email_integration'] ?? '',
       emailIntegrationUid: json['email_integration_uid'],
       isPublic: json['is_public'] ?? '',
       defaultLanguage: json['default_language'],
@@ -272,8 +273,7 @@ class Lead {
       'lost': lost,
       'junk': junk,
       'last_lead_status': lastLeadStatus,
-      'is_imported_from_email_integration':
-      isImportedFromEmailIntegration,
+      'is_imported_from_email_integration': isImportedFromEmailIntegration,
       'email_integration_uid': emailIntegrationUid,
       'is_public': isPublic,
       'default_language': defaultLanguage,
@@ -416,22 +416,20 @@ class Reminder {
   }
 }
 
-
-
 ///----Staff-Member------
 class Staff {
   final String staffId;
   final String firstName;
   final String lastName;
 
-  Staff({required this.staffId, required this.firstName, required this.lastName});
+  Staff({this.staffId = '', this.firstName = '', this.lastName = ''});
 
   // Factory constructor for creating a new instance from a JSON map
   factory Staff.fromJson(Map<String, dynamic> json) {
     return Staff(
-      staffId: json['staffid'],
-      firstName: json['firstname'],
-      lastName: json['lastname'],
+      staffId: json['staffid'] ?? "",
+      firstName: json['firstname'] ?? "",
+      lastName: json['lastname'] ?? "",
     );
   }
 
@@ -444,6 +442,7 @@ class Staff {
     };
   }
 }
+
 ///----Tags ----
 class Tag {
   final String id;
@@ -491,7 +490,6 @@ class Country {
     );
   }
 
-
   /// Method to convert a `Country` object to a JSON map
   Map<String, dynamic> toJson() {
     return {
@@ -502,7 +500,6 @@ class Country {
     };
   }
 }
-
 
 class StateModel {
   String? id;
@@ -525,7 +522,6 @@ class StateModel {
     return data;
   }
 }
-
 
 class LeadSummary {
   String id;
