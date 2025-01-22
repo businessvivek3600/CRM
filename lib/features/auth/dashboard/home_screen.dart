@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Workmanager().registerPeriodicTask(
       'fetchLocationTask',
       'fetchLocation',
-      frequency: const Duration(minutes: 1),
+      frequency: const Duration(minutes: 15),
       inputData: {'id': appStore.staffId},
     );
   }
