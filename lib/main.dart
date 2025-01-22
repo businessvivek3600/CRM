@@ -20,6 +20,7 @@ import 'widgets/loader_widget.dart';
 
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
+    WidgetsFlutterBinding.ensureInitialized();
     final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     final userId = inputData?['id'];
