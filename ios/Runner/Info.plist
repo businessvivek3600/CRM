@@ -34,9 +34,16 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSLocationAlwaysUsageDescription</key>
-    <string>We need your location to provide better services.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>We need your location to update in the background</string>
     <key>NSLocationWhenInUseUsageDescription</key>
+    <string>We need your location for this app</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+        <string>fetch</string>
+    </array>
+	<key>NSLocationAlwaysUsageDescription</key>
     <string>We need your location to provide better services.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>We need your location to provide better services.</string>
