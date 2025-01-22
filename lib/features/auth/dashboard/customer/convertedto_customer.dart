@@ -52,15 +52,19 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
   void initState() {
     super.initState();
     //Initialize variables with lead data
-    String laslName = '';
+    String lastName = '';
     String firstName = '';
-    if (widget.lead.name.split(' ').length > 1) {
-      laslName = widget.lead.name.split(' ').last;
-      firstName =
-          widget.lead.name.substring(0, widget.lead.name.lastIndexOf(' '));
+
+    List<String> nameParts = widget.lead.name.split(' ');
+
+    if (nameParts.length == 1) {
+      firstName = nameParts[0];
+    } else {
+      firstName = nameParts[0];
+      lastName = nameParts.sublist(1).join(' ');
     }
     nameController = TextEditingController(text: firstName);
-    lastNameController = TextEditingController(text: laslName);
+    lastNameController = TextEditingController(text: lastName);
     positionController = TextEditingController(text: widget.lead.title ?? "");
     emailController = TextEditingController(text: widget.lead.email ?? "");
     companyController = TextEditingController(text: widget.lead.company ?? "");
@@ -86,266 +90,263 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
         automaticallyImplyLeading: true,
       ),
       body: SafeArea(
-        child: Expanded(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  CommonTextField(
-                    controller: nameController,
-                    label: 'First Name',
-                    hint: 'Enter First Name',
-                    initialValue: firstName, // Set initial value
-                    onChanged: (value) => firstName = value,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                CommonTextField(
+                  controller: nameController,
+                  label: 'First Name',
+                  hint: 'Enter First Name',
+                  initialValue: firstName, // Set initial value
+                  onChanged: (value) => firstName = value,
+                ),
+                const SizedBox(height: 15),
+                CommonTextField(
+                  controller: lastNameController,
+                  label: 'Last Name',
+                  hint: 'Enter Last Name',
+                  initialValue: firstName, // Set initial value
+                  onChanged: (value) => firstName = value,
+                ),
+                const SizedBox(height: 15),
+                CommonTextField(
+                  controller: positionController,
+                  label: 'Position',
+                  hint: 'Enter Position',
+                  initialValue: position,
+                  onChanged: (value) => position = value,
+                ),
+                const SizedBox(height: 15),
+                CommonTextField(
+                  controller: emailController,
+                  label: 'Email',
+                  hint: 'Enter Email',
+                  initialValue: email,
+                  onChanged: (value) => email = value,
+                ),
+                const SizedBox(height: 15),
+                CommonTextField(
+                  controller: companyController,
+                  label: 'Company',
+                  hint: 'Enter Company Name',
+                  initialValue: company,
+                  onChanged: (value) => company = value,
+                ),
+                const SizedBox(height: 15),
+                CommonTextField(
+                  controller: phoneController,
+                  label: 'Phone',
+                  hint: 'Enter Phone Number',
+                  initialValue: phone,
+                  onChanged: (value) => phone = value,
+                ),
+                const SizedBox(height: 15),
+                CommonTextField(
+                  controller: addressController,
+                  label: 'Address',
+                  hint: 'Enter Address',
+                  initialValue: address,
+                  onChanged: (value) => address = value,
+                ),
+                const SizedBox(height: 15),
+                CommonTextField(
+                  controller: cityController,
+                  label: 'City',
+                  hint: 'Enter City',
+                  initialValue: city,
+                  onChanged: (value) => city = value,
+                ),
+                const SizedBox(height: 15),
+                Container(
+                  width: double
+                      .infinity, // Allows dropdown to take full available width
+                  child: DropdownButtonFormField<String>(
+                    value: leadStore.country
+                        .firstWhereOrNull((v) => v.countryId == country)
+                        ?.countryId,
+                    isExpanded: true, // Prevent overflow
+                    items: leadStore.country
+                        .map((item) => DropdownMenuItem<String>(
+                              value: item.countryId,
+                              child: Text(item.shortName),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        country = value;
+                        state = null;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Select Country',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 15),
-                  CommonTextField(
-                    controller: lastNameController,
-                    label: 'Last Name',
-                    hint: 'Enter Last Name',
-                    initialValue: firstName, // Set initial value
-                    onChanged: (value) => firstName = value,
+                ),
+                const SizedBox(height: 15),
+                CommonTextField(
+                  controller: stateController,
+                  label: 'State',
+                  hint: 'Enter State',
+                ),
+                const SizedBox(height: 15),
+                CommonTextField(
+                  controller: zipController,
+                  label: 'Zip Code',
+                  hint: 'Enter Zip Code',
+                  initialValue: zipCode,
+                  onChanged: (value) => zipCode = value,
+                ),
+                const SizedBox(height: 15),
+                if (!sendSetPasswordEmail)
+                  TextField(
+                    controller: passwordController,
+                    obscureText: isPasswordHidden,
+                    decoration: InputDecoration(
+                      labelText: "Password",
+                      border: const OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          isPasswordHidden
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            isPasswordHidden = !isPasswordHidden;
+                          });
+                        },
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 15),
-                  CommonTextField(
-                    controller: positionController,
-                    label: 'Position',
-                    hint: 'Enter Position',
-                    initialValue: position,
-                    onChanged: (value) => position = value,
-                  ),
-                  const SizedBox(height: 15),
-                  CommonTextField(
-                    controller: emailController,
-                    label: 'Email',
-                    hint: 'Enter Email',
-                    initialValue: email,
-                    onChanged: (value) => email = value,
-                  ),
-                  const SizedBox(height: 15),
-                  CommonTextField(
-                    controller: companyController,
-                    label: 'Company',
-                    hint: 'Enter Company Name',
-                    initialValue: company,
-                    onChanged: (value) => company = value,
-                  ),
-                  const SizedBox(height: 15),
-                  CommonTextField(
-                    controller: phoneController,
-                    label: 'Phone',
-                    hint: 'Enter Phone Number',
-                    initialValue: phone,
-                    onChanged: (value) => phone = value,
-                  ),
-                  const SizedBox(height: 15),
-                  CommonTextField(
-                    controller: addressController,
-                    label: 'Address',
-                    hint: 'Enter Address',
-                    initialValue: address,
-                    onChanged: (value) => address = value,
-                  ),
-                  const SizedBox(height: 15),
-                  CommonTextField(
-                    controller: cityController,
-                    label: 'City',
-                    hint: 'Enter City',
-                    initialValue: city,
-                    onChanged: (value) => city = value,
-                  ),
-                  const SizedBox(height: 15),
-                  Container(
-                    width: double
-                        .infinity, // Allows dropdown to take full available width
-                    child: DropdownButtonFormField<String>(
-                      value: leadStore.country
-                          .firstWhereOrNull((v) => v.countryId == country)
-                          ?.countryId,
-                      isExpanded: true, // Prevent overflow
-                      items: leadStore.country
-                          .map((item) => DropdownMenuItem<String>(
-                                value: item.countryId,
-                                child: Text(item.shortName),
-                              ))
-                          .toList(),
+                const SizedBox(height: 16.0),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: sendSetPasswordEmail,
                       onChanged: (value) {
                         setState(() {
-                          country = value;
-                          state = null;
+                          sendSetPasswordEmail = value ?? false;
                         });
                       },
-                      decoration: InputDecoration(
-                        labelText: 'Select Country',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
                     ),
-                  ),
-                  const SizedBox(height: 15),
-                  CommonTextField(
-                    controller: stateController,
-                    label: 'State',
-                    hint: 'Enter State',
-                  ),
-                  const SizedBox(height: 15),
-                  CommonTextField(
-                    controller: zipController,
-                    label: 'Zip Code',
-                    hint: 'Enter Zip Code',
-                    initialValue: zipCode,
-                    onChanged: (value) => zipCode = value,
-                  ),
-                  const SizedBox(height: 15),
-                  if (!sendSetPasswordEmail)
-                    TextField(
-                      controller: passwordController,
-                      obscureText: isPasswordHidden,
-                      decoration: InputDecoration(
-                        labelText: "Password",
-                        border: const OutlineInputBorder(),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            isPasswordHidden
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              isPasswordHidden = !isPasswordHidden;
-                            });
-                          },
-                        ),
-                      ),
+                    const Text("Send SET password email"),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: doNotSendWelcomeEmail,
+                      onChanged: (value) {
+                        setState(() {
+                          doNotSendWelcomeEmail = value ?? false;
+                        });
+                      },
                     ),
-                  const SizedBox(height: 16.0),
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: sendSetPasswordEmail,
-                        onChanged: (value) {
-                          setState(() {
-                            sendSetPasswordEmail = value ?? false;
-                          });
-                        },
-                      ),
-                      const Text("Send SET password email"),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: doNotSendWelcomeEmail,
-                        onChanged: (value) {
-                          setState(() {
-                            doNotSendWelcomeEmail = value ?? false;
-                          });
-                        },
-                      ),
-                      const Text("Do not send welcome email"),
-                    ],
-                  ),
-                  const SizedBox(height: 16.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          // Back to lead action
-                        },
-                        child: const Text("Back to lead"),
-                      ),
-                      const SizedBox(width: 8.0),
-                      ElevatedButton(
-                        onPressed: () async {
-                          // Collect updated data
-                          final updatedData = <String, dynamic>{};
+                    const Text("Do not send welcome email"),
+                  ],
+                ),
+                const SizedBox(height: 16.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        // Back to lead action
+                      },
+                      child: const Text("Back to lead"),
+                    ),
+                    const SizedBox(width: 8.0),
+                    ElevatedButton(
+                      onPressed: () async {
+                        // Collect updated data
+                        final updatedData = <String, dynamic>{};
 
-                          // Compare each field with the initial value and add only changed fields
-                          if (firstName?.trim() != widget.lead.name?.trim()) {
-                            updatedData['firstname'] = firstName?.trim();
-                          }
-                          if (position?.trim() != widget.lead.title?.trim()) {
-                            updatedData['title'] = position?.trim();
-                          }
-                          if (email?.trim() != widget.lead.email?.trim()) {
-                            updatedData['email'] = email?.trim();
-                          }
-                          if (company?.trim() != widget.lead.company?.trim()) {
-                            updatedData['company'] = company?.trim();
-                          }
-                          if (phone?.trim() !=
-                              widget.lead.phonenumber?.trim()) {
-                            updatedData['phonenumber'] = phone?.trim();
-                          }
-                          if (address?.trim() != widget.lead.address?.trim()) {
-                            updatedData['address'] = address?.trim();
-                          }
-                          if (city?.trim() != widget.lead.city?.trim()) {
-                            updatedData['city'] = city?.trim();
-                          }
-                          if (zipCode?.trim() != widget.lead.zip?.trim()) {
-                            updatedData['zip'] = zipCode?.trim();
-                          }
-                          if (country?.trim() != widget.lead.country?.trim()) {
-                            updatedData['country'] = country?.trim();
-                          }
-                          if (stateController.text.trim() !=
-                              widget.lead.state?.trim()) {
-                            updatedData['state'] = stateController.text.trim();
-                          }
+                        // Compare each field with the initial value and add only changed fields
+                        if (firstName?.trim() != widget.lead.name?.trim()) {
+                          updatedData['firstname'] = firstName?.trim();
+                        }
+                        if (position?.trim() != widget.lead.title?.trim()) {
+                          updatedData['title'] = position?.trim();
+                        }
+                        if (email?.trim() != widget.lead.email?.trim()) {
+                          updatedData['email'] = email?.trim();
+                        }
+                        if (company?.trim() != widget.lead.company?.trim()) {
+                          updatedData['company'] = company?.trim();
+                        }
+                        if (phone?.trim() != widget.lead.phonenumber?.trim()) {
+                          updatedData['phonenumber'] = phone?.trim();
+                        }
+                        if (address?.trim() != widget.lead.address?.trim()) {
+                          updatedData['address'] = address?.trim();
+                        }
+                        if (city?.trim() != widget.lead.city?.trim()) {
+                          updatedData['city'] = city?.trim();
+                        }
+                        if (zipCode?.trim() != widget.lead.zip?.trim()) {
+                          updatedData['zip'] = zipCode?.trim();
+                        }
+                        if (country?.trim() != widget.lead.country?.trim()) {
+                          updatedData['country'] = country?.trim();
+                        }
+                        if (stateController.text.trim() !=
+                            widget.lead.state?.trim()) {
+                          updatedData['state'] = stateController.text.trim();
+                        }
 
-                          // Handle password if "Send SET password email" is not selected
-                          if (!sendSetPasswordEmail &&
-                              passwordController.text.isNotEmpty) {
-                            updatedData['password'] = passwordController.text;
-                          }
+                        // Handle password if "Send SET password email" is not selected
+                        if (!sendSetPasswordEmail &&
+                            passwordController.text.isNotEmpty) {
+                          updatedData['password'] = passwordController.text;
+                        }
 
-                          // notes
-                          /// TODO : if user has notes 1, else 0
-                          updatedData['transfer_notes'] = 1;
+                        // notes
+                        /// TODO : if user has notes 1, else 0
+                        updatedData['transfer_notes'] = 1;
 
-                          // Additional options
-                          updatedData['sendSetPasswordEmail'] =
-                              sendSetPasswordEmail;
-                          updatedData['doNotSendWelcomeEmail'] =
-                              doNotSendWelcomeEmail;
-                          updatedData['leadid'] = widget.lead.id;
-                          // Check if any data has changed
-                          final formData = FormData.fromMap(updatedData);
-                          if (updatedData.isNotEmpty) {
-                            try {
-                              final (
-                                bool status,
-                                Map<String, dynamic> response,
-                                String? message
-                              ) = await ApiService.addLeads(formData);
+                        // Additional options
+                        updatedData['sendSetPasswordEmail'] =
+                            sendSetPasswordEmail;
+                        updatedData['doNotSendWelcomeEmail'] =
+                            doNotSendWelcomeEmail;
+                        updatedData['leadid'] = widget.lead.id;
+                        // Check if any data has changed
+                        final formData = FormData.fromMap(updatedData);
+                        if (updatedData.isNotEmpty) {
+                          try {
+                            final (
+                              bool status,
+                              Map<String, dynamic> response,
+                              String? message
+                            ) = await ApiService.addLeads(formData);
 
-                              if (status) {
-                                infoLog('Success: ${message}');
-                                // Show success message or navigate
-                              } else {
-                                infoLog('API Error: $response');
-                                // Show error feedback
-                              }
-                            } catch (error) {
-                              infoLog('Error during API request: $error');
-                              // Handle network or API error
+                            if (status) {
+                              infoLog('Success: ${message}');
+                              // Show success message or navigate
+                            } else {
+                              infoLog('API Error: $response');
+                              // Show error feedback
                             }
-                          } else {
-                            infoLog('No changes detected.');
-                            // Show feedback for no changes
+                          } catch (error) {
+                            infoLog('Error during API request: $error');
+                            // Handle network or API error
                           }
-                        },
-                        child: const Text("Save"),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                        } else {
+                          infoLog('No changes detected.');
+                          // Show feedback for no changes
+                        }
+                      },
+                      child: const Text("Save"),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),

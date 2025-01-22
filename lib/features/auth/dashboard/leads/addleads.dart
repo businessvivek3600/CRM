@@ -6,6 +6,7 @@ import 'package:crm/constants/app_constants.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
+import 'package:crm/utils/extensions.dart';
 import 'package:crm/utils/text_field.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -78,6 +79,7 @@ class _MyWidgetState extends State<AddLeads> {
     descriptionFocusNode.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -303,27 +305,35 @@ class _MyWidgetState extends State<AddLeads> {
                     },
                   ),
                   const SizedBox(height: 15),
-                  DropdownButtonFormField<String>(
-                    value: country,
-                    items: leadStore.country
-                        .map((item) => DropdownMenuItem<String>(
-                      value: item.countryId,
-                      child: Text(item.shortName),
-                    ))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        country = value;
-                        state = null;  // Reset state when a new country is selected
-                      });
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Select Country',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                  Container(
+                    width: double
+                        .infinity, // Allows dropdown to take full available width
+                    child: DropdownButtonFormField<String>(
+                      value: leadStore.country
+                          .firstWhereOrNull((v) => v.countryId == country)
+                          ?.countryId,
+                      isExpanded: true, // Prevent overflow
+                      items: leadStore.country
+                          .map((item) => DropdownMenuItem<String>(
+                                value: item.countryId,
+                                child: Text(item.shortName),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          country = value;
+                          state = null;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Select Country',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
                       ),
                     ),
-                  ),const SizedBox(height: 15),
+                  ),
+                  const SizedBox(height: 15),
                   CommonTextField(
                     controller: stateController,
                     label: 'State',
@@ -429,7 +439,8 @@ class _MyWidgetState extends State<AddLeads> {
                         'source': _selectedSourceId,
                         'status': _selectedStatusId,
                         'assigned': _selectedEmployeeId,
-                        'tags': jsonEncode(_dropDownTagId), // Assuming IDs for tags
+                        'tags':
+                            jsonEncode(_dropDownTagId), // Assuming IDs for tags
                         'description': descriptionController.text.trim(),
                       });
 
@@ -438,17 +449,16 @@ class _MyWidgetState extends State<AddLeads> {
 
                         // Make API call (replace `apiClient.post` with your actual API call method)
                         final (
-                        bool status,
-                        Map<String, dynamic> response,
-                        String? message
+                          bool status,
+                          Map<String, dynamic> response,
+                          String? message
                         ) = await ApiService.addLeads(formData);
 
                         if (status) {
                           print('Success: ${message}');
                           // Handle success (e.g., show a success message or navigate)
                         } else {
-                          print(
-                              'Error: ${status} - ${response}');
+                          print('Error: ${status} - ${response}');
                           // Handle API error
                         }
                       } catch (e) {
