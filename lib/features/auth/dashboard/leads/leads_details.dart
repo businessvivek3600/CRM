@@ -349,34 +349,40 @@ class _ProfileTabState extends State<ProfileTab> {
                   height20(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.lead.name ?? '',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                      // Left side: Name
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          widget.lead.name ?? '',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
+                        ),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            "₹ ${widget.lead.leadValue}" ?? '0.00',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                      const SizedBox(
+                          width: 8), // Spacing between name and value
+                      // Right side: Lead Value
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          "₹ ${widget.lead.leadValue ?? '0.00'}",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
+                          maxLines: 2, // Allow wrapping to two lines
+                          overflow: TextOverflow
+                              .visible, // Show full text without truncation
+                          textAlign: TextAlign.end, // Align text to the right
+                        ),
                       ),
                     ],
                   ),
-                  height10(),
+
+                  height20(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
