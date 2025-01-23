@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:crm/Models/dashboard_model.dart';
 import 'package:crm/constants/api_constant.dart';
 import 'package:crm/database/function.dart';
+import 'package:crm/utils/colors.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -81,9 +82,14 @@ class ApiService {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
           await await ApiHandler.fetchData(ApiConstant.addNote, data: info);
-      log('data : $data');
-      if (status) {
+
+
+      if (data['status']) {
+
+        toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
         TF.success;
+        log('data ________________________-: $data');
+        return (status, data, message);
       } else {
         return (false, data, message);
       }
@@ -99,7 +105,8 @@ class ApiService {
       var (bool status, Map<String, dynamic> data, String? message) =
           await await ApiHandler.fetchData(ApiConstant.editNote, data: info);
       log('data : $data');
-      if (status) {
+      toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
+      if (data['status']) {
         log("message --$message");
       } else {
         return (false, data, message);
@@ -116,6 +123,7 @@ class ApiService {
       var (bool status, Map<String, dynamic> data, String? message) =
           await await ApiHandler.fetchData(ApiConstant.deleteNote, data: info);
       log('data : $data');
+      toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
       if (status) {
         log("message --$message");
       } else {
