@@ -106,8 +106,8 @@ class _LeadDetailsState extends State<LeadDetails> {
                 dividerColor: Colors.black.withOpacity(0.1),
                 indicatorSize: TabBarIndicatorSize.tab,
 
-                labelColor: textPrimaryColor,
-                unselectedLabelColor: textPrimaryColor.withOpacity(0.6),
+                labelColor: textPrimaryColors,
+                unselectedLabelColor: textPrimaryColors.withOpacity(0.6),
                 indicatorColor: acceptColor, // Tab indicator color
                 tabs: const [
                   Tab(text: 'Profile'),

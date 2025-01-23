@@ -31,7 +31,12 @@ void callbackDispatcher() {
     return Future.value(true);
   });
 }
-
+Future<void> openAppSettingsForLocationPermission() async {
+  bool opened = await Geolocator.openAppSettings();
+  if (!opened) {
+    print('Failed to open app settings.');
+  }
+}
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Workmanager().initialize(callbackDispatcher);
@@ -79,47 +84,36 @@ Future<void> initNbUtils() async {
   textPrimarySizeGlobal = 14;
   textSecondarySizeGlobal = 12;
 }
-
 Future<void> requestLocationPermission() async {
-  LocationPermission permission;
-
-  // Check current permission status
-  permission = await Geolocator.checkPermission();
+  LocationPermission permission = await Geolocator.checkPermission();
 
   if (permission == LocationPermission.denied) {
-    // Request location permission
     permission = await Geolocator.requestPermission();
     if (permission == LocationPermission.denied) {
-      print('Location permissions are denied.');
+      warningLog('Location permissions are denied.');
       return;
     }
   }
 
   if (permission == LocationPermission.deniedForever) {
-    // Notify the user about permanently denied permissions
-    print('Location permissions are permanently denied.');
+    warningLog('Location permissions are permanently denied. Please enable it in Settings.');
+    await openAppSettingsForLocationPermission();
     return;
   }
 
   if (permission == LocationPermission.whileInUse) {
-    // Upgrade to always permission
-    permission = await Geolocator.requestPermission();
-    if (permission != LocationPermission.always) {
-      print('Failed to get "always" location permission.');
-      return;
-    }
+    warningLog('While in use location permission granted.');
+    // Notify the user to go to Settings and grant "Always Allow" permission
+    warningLog('Please upgrade to "Always Allow" in Settings.');
   }
 
   if (permission == LocationPermission.always) {
-    print('Location permission granted: Always');
+    warningLog('Location permission granted: Always');
   }
 }
 
-// Future<void> setupAppStore() async {
-//   ///check for login
-//   await appStore.setLoggedIn(getBoolAsync(IS_LOGGED_IN), isInitializing: true);
 
-// }
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 

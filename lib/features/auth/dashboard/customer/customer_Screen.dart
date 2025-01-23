@@ -157,27 +157,26 @@ class _CustomerScreenState extends State<CustomerScreen> {
                 ),
                 height20(),
 
-              Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
                     Row(
-                        children: [
-                          Container(
-                            width: 4,
-                            height: 24,
-                            color: Colors.blue,
+                      children: [
+                        Container(
+                          width: 4,
+                          height: 24,
+                          color: Colors.blue,
+                        ),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Customers',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(width: 8),
-                          const    Text(
-                            'Customers',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
                     // Row(
                     //   children: [
                     //     IconButton(
@@ -199,7 +198,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
                     // ),
                   ],
                 ),
-height10(),
+                height10(),
                 // Customer List
                 Expanded(
                   child: ListView.separated(

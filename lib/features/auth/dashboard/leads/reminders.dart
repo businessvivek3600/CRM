@@ -94,23 +94,23 @@ class _RemindersTabState extends State<RemindersTab> {
                         onTap: _pickDateTime, // Open picker on tap
                         decoration: InputDecoration(
                           hintText: "yyyy-MM-dd HH:mm   ",
-                          labelStyle: const TextStyle(color: textPrimaryColor),
+                          labelStyle: const TextStyle(color: textPrimaryColors),
                           suffixIcon: IconButton(
                             icon: const Icon(Icons.calendar_today,
-                                color: textPrimaryColor),
+                                color: textPrimaryColors),
                             onPressed: _pickDateTime,
                           ),
                           border: const OutlineInputBorder(
-                            borderSide: BorderSide(color: textPrimaryColor),
+                            borderSide: BorderSide(color: textPrimaryColors),
                           ),
                           focusedBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: textPrimaryColor),
+                            borderSide: BorderSide(color: textPrimaryColors),
                           ),
                           enabledBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: textPrimaryColor),
+                            borderSide: BorderSide(color: textPrimaryColors),
                           ),
                         ),
-                        style: const TextStyle(color: textPrimaryColor),
+                        style: const TextStyle(color: textPrimaryColors),
                       ),
                     ],
                   ),
@@ -187,17 +187,17 @@ class _RemindersTabState extends State<RemindersTab> {
                   maxLines: 4,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(
-                      borderSide: BorderSide(color: textPrimaryColor),
+                      borderSide: BorderSide(color: textPrimaryColors),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: textPrimaryColor),
+                      borderSide: BorderSide(color: textPrimaryColors),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: textPrimaryColor),
+                      borderSide: BorderSide(color: textPrimaryColors),
                     ),
                     hintText: 'Enter description here',
                   ),
-                  style: const TextStyle(color: textPrimaryColor),
+                  style: const TextStyle(color: textPrimaryColors),
                 ),
                 const SizedBox(height: 10),
                 Row(
@@ -209,13 +209,13 @@ class _RemindersTabState extends State<RemindersTab> {
                           isChecked = value!;
                         });
                       },
-                      activeColor: textPrimaryColor,
+                      activeColor: textPrimaryColors,
                       checkColor: Colors.white,
                     ),
                     const Expanded(
                       child: Text(
                         'Send also an email for this reminder',
-                        style: TextStyle(color: textPrimaryColor),
+                        style: TextStyle(color: textPrimaryColors),
                       ),
                     ),
                   ],
