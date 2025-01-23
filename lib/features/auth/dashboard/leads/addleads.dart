@@ -305,9 +305,9 @@ class _MyWidgetState extends State<AddLeads> {
                     },
                   ),
                   const SizedBox(height: 15),
-                  Container(
+                  SizedBox(
                     width: double
-                        .infinity, // Allows dropdown to take full available width
+                        .infinity,
                     child: DropdownButtonFormField<String>(
                       value: leadStore.country
                           .firstWhereOrNull((v) => v.countryId == country)
