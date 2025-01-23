@@ -64,16 +64,16 @@ class _CommonTextFieldState extends State<CommonTextField> {
         onChanged: widget.onChanged,
         decoration: InputDecoration(
           labelText: widget.label,
-          labelStyle: const TextStyle(color: textPrimaryColor),
+          labelStyle: const TextStyle(color: textPrimaryColors),
           hintText: widget.hint,
-          hintStyle: TextStyle(color: textPrimaryColor.withOpacity(0.6)),
+          hintStyle: TextStyle(color: textPrimaryColors.withOpacity(0.6)),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(color: textPrimaryColor),
+            borderSide: const BorderSide(color: textPrimaryColors),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(color: textPrimaryColor.withOpacity(0.6)),
+            borderSide: BorderSide(color: textPrimaryColors.withOpacity(0.6)),
           ),
         ),
       );
@@ -90,16 +90,16 @@ class _CommonTextFieldState extends State<CommonTextField> {
         onFieldSubmitted: widget.onFieldSubmitted,
         decoration: InputDecoration(
           labelText: widget.label,
-          labelStyle: const TextStyle(color: textPrimaryColor),
+          labelStyle: const TextStyle(color: textPrimaryColors),
           hintText: widget.hint,
-          hintStyle: TextStyle(color: textPrimaryColor.withOpacity(0.6)),
+          hintStyle: TextStyle(color: textPrimaryColors.withOpacity(0.6)),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(color: textPrimaryColor),
+            borderSide: const BorderSide(color: textPrimaryColors),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(color: textPrimaryColor.withOpacity(0.6)),
+            borderSide: BorderSide(color: textPrimaryColors.withOpacity(0.6)),
           ),
           suffix: widget.suffix,
           suffixIcon: widget.isPassword
