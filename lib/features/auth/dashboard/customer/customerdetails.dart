@@ -69,8 +69,8 @@ class _CustomerDetailsState extends State<CustomerDetails> {
               child: TabBar(
                 dividerColor: Colors.black.withOpacity(0.1),
                 indicatorSize: TabBarIndicatorSize.tab,
-                labelColor: textPrimaryColor,
-                unselectedLabelColor: textPrimaryColor.withOpacity(0.6),
+                labelColor: textPrimaryColors,
+                unselectedLabelColor: textPrimaryColors.withOpacity(0.6),
                 indicatorColor: acceptColor,
                 tabs: const [
                   Tab(text: 'Profile'),
@@ -203,13 +203,13 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildEditableRow(
-                      'Company', "" ,_editableCustomer.company, (value) {
+                      'Company', "" ,_editableCustomer.company ?? "", (value) {
                     _editableCustomer =
                         _editableCustomer.copyWith(company: value);
                   }),
                   const Divider(),
                   _buildEditableRow(
-                      'VAT Number', "" ,_editableCustomer.vat!, (value) {
+                      'VAT Number', "" ,_editableCustomer.vat ?? "", (value) {
                     _editableCustomer = _editableCustomer.copyWith(vat: value);
                   }),
                   const Divider(),
@@ -282,35 +282,38 @@ class _CustomerDetailsState extends State<CustomerDetails> {
             Expanded(
               child: _isEditMode
                   ? (type == 'country' || type == 'shippingCountry' || type == 'billingCountry'
-                  ? DropdownButtonFormField<String>(
-                value: _getSelectedCountry(type),
-                decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: 8,
-                  ),
-                  border: OutlineInputBorder(),
-                ),
-                items: leadStore.country.map((c) {
-                  return DropdownMenuItem<String>(
-                    value: c.countryId,
-                    child: SizedBox(
-                      width: 150,
-                      child: Text(
-                        c.shortName ?? 'N/A',
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                  ? SizedBox(
+                width: double.infinity,
+                    child: DropdownButtonFormField<String>(
+                                    value: _getSelectedCountry(type).isNotEmpty ? _getSelectedCountry(type) : null,
+                                    decoration: const InputDecoration(
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 8,
                     ),
-                  );
-                }).toList(),
-                onChanged: (selectedValue) {
-                  if (selectedValue != null) {
-                    setState(() {
-                      _updateCountry(type, selectedValue);
-                    });
-                  }
-                },
-              )
+                    border: OutlineInputBorder(),
+                                    ),
+                                    items: leadStore.country.map((c) {
+                    return DropdownMenuItem<String>(
+                      value: c.countryId,
+                      child: SizedBox(
+                        width: 100,
+                        child: Text(
+                          c.shortName ?? 'N/A',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    );
+                                    }).toList(),
+                                    onChanged: (selectedValue) {
+                    if (selectedValue != null) {
+                      setState(() {
+                        _updateCountry(type, selectedValue);
+                      });
+                    }
+                                    },
+                                  ),
+                  )
                   : TextField(
                 maxLines: null,
                 keyboardType: TextInputType.multiline,
