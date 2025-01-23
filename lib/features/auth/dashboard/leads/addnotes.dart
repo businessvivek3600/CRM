@@ -5,6 +5,7 @@ import 'package:crm/utils/size_utils.dart';
 import 'package:crm/widgets/date_formation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 import '../../../../services/api_services.dart';
 import '../../../../widgets/toastification/toastification.dart';
@@ -21,11 +22,14 @@ class _AddNotesTabState extends State<AddNotesTab> {
   String selectedStatus = "I have not contacted this lead";
   final TextEditingController noteController = TextEditingController();
   final TextEditingController dateTimeController = TextEditingController();
+  final FocusNode noteFocusNode = FocusNode();
+  final FocusNode dateTimeFocusNode = FocusNode();
 
   // Method to pick a date and set the time to current time automatically
   DateTime? selectedDateTime;
 
   Future<void> _pickDateTime() async {
+    FocusScope.of(context).unfocus();
     // Step 1: Pick a date
     DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -63,6 +67,15 @@ class _AddNotesTabState extends State<AddNotesTab> {
   }
 
   @override
+  void dispose() {
+    noteController.dispose();
+    dateTimeController.dispose();
+    noteFocusNode.dispose();
+    dateTimeFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
@@ -77,20 +90,25 @@ class _AddNotesTabState extends State<AddNotesTab> {
                 TextField(
                   controller: noteController,
                   maxLines: 4,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) {
+                    // Move focus to the date/time field
+                    FocusScope.of(context).requestFocus(dateTimeFocusNode);
+                  },
                   decoration: const InputDecoration(
                     labelText: 'Add Note',
-                    labelStyle: TextStyle(color: textPrimaryColor),
+                    labelStyle: TextStyle(color: textPrimaryColors),
                     border: OutlineInputBorder(
-                      borderSide: BorderSide(color: textPrimaryColor),
+                      borderSide: BorderSide(color: textPrimaryColors),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: textPrimaryColor),
+                      borderSide: BorderSide(color: textPrimaryColors),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: textPrimaryColor),
+                      borderSide: BorderSide(color: textPrimaryColors),
                     ),
                   ),
-                  style: const TextStyle(color: textPrimaryColor),
+                  style: const TextStyle(color: textPrimaryColors),
                 ),
                 height10(),
                 Visibility(
@@ -102,25 +120,26 @@ class _AddNotesTabState extends State<AddNotesTab> {
                         controller: dateTimeController,
                         readOnly: true, // Prevent keyboard from opening
                         onTap: _pickDateTime, // Open calendar picker on tap
+
                         decoration: InputDecoration(
                           labelText: 'Select Date and Time',
-                          labelStyle: const TextStyle(color: textPrimaryColor),
+                          labelStyle: const TextStyle(color: textPrimaryColors),
                           suffixIcon: IconButton(
                             icon: const Icon(Icons.calendar_today,
-                                color: textPrimaryColor),
+                                color: textPrimaryColors),
                             onPressed: _pickDateTime,
                           ),
                           border: const OutlineInputBorder(
-                            borderSide: BorderSide(color: textPrimaryColor),
+                            borderSide: BorderSide(color: textPrimaryColors),
                           ),
                           focusedBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: textPrimaryColor),
+                            borderSide: BorderSide(color: textPrimaryColors),
                           ),
                           enabledBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: textPrimaryColor),
+                            borderSide: BorderSide(color: textPrimaryColors),
                           ),
                         ),
-                        style: const TextStyle(color: textPrimaryColor),
+                        style: const TextStyle(color: textPrimaryColors),
                       ),
                     ],
                   ),
@@ -129,11 +148,11 @@ class _AddNotesTabState extends State<AddNotesTab> {
                 RadioListTile(
                   title: const Text(
                     "I got in touch with this lead",
-                    style: TextStyle(color: textPrimaryColor),
+                    style: TextStyle(color: textPrimaryColors),
                   ),
                   value: "I got in touch with this lead",
                   groupValue: selectedStatus,
-                  activeColor: textPrimaryColor,
+                  activeColor: textPrimaryColors,
                   onChanged: (value) {
                     setState(() {
                       selectedStatus = value!;
@@ -144,11 +163,11 @@ class _AddNotesTabState extends State<AddNotesTab> {
                 RadioListTile(
                   title: const Text(
                     "I have not contacted this lead",
-                    style: TextStyle(color: textPrimaryColor),
+                    style: TextStyle(color: textPrimaryColors),
                   ),
                   value: "I have not contacted this lead",
                   groupValue: selectedStatus,
-                  activeColor: textPrimaryColor,
+                  activeColor: textPrimaryColors,
                   onChanged: (value) {
                     setState(() {
                       selectedStatus = value!;
@@ -182,26 +201,23 @@ class _AddNotesTabState extends State<AddNotesTab> {
                           Map<String, dynamic> response,
                           String? message
                         ) = await ApiService.addNote(data);
-
-                        // Check the status and handle accordingly
-                        if (status) {
-                          // Success - Optionally show a success message and clear the form or do other actions
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content:
-                                    Text(message ?? "Note added successfully")),
-                          );
-                          // Optionally clear the input fields
+                        if (response["status"] == true) {
+                          toast(response['message'],
+                              gravity: ToastGravity.TOP,
+                              textColor: Colors.white,
+                              bgColor: completedColor);
                           noteController.clear();
                           setState(() {
                             selectedStatus =
-                                "I have not contacted this lead"; // Reset status if needed
+                                "I have not contacted this lead";
                           });
                         } else {
-                          // Failure - Show an error message
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                                content: Text(message ?? "Failed to add note")),
+                              content: Text(
+                                  response['message'] ?? "Failed to add note"),
+                              backgroundColor: Colors.red,
+                            ),
                           );
                         }
                       },
