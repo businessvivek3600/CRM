@@ -8,6 +8,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:nb_utils/nb_utils.dart';
 import '../../../../Models/leads_model.dart';
 import '../../../../services/api_services.dart';
 import '../../../../store/app_store.dart';
@@ -71,13 +72,18 @@ class _EditLeadState extends State<EditLead> {
         TextEditingController(text: widget.lead.description);
 
     // Initialize dropdowns
-    _selectedItem = leadStore.leadSource
-        .any((source) => source.id == widget.lead.source) ? widget.lead.source : null;
-    _statusSelectedItem = leadStore.leadStatus
-        .any((status) => status.id == widget.lead.status) ?widget.lead.status :  null ;
-    _selectedEmployeeId = leadStore.staff.any((staff) => staff.staffId == widget.lead.assigned)
-        ? widget.lead.assigned
-        : null;
+    _selectedItem =
+        leadStore.leadSource.any((source) => source.id == widget.lead.source)
+            ? widget.lead.source
+            : null;
+    _statusSelectedItem =
+        leadStore.leadStatus.any((status) => status.id == widget.lead.status)
+            ? widget.lead.status
+            : null;
+    _selectedEmployeeId =
+        leadStore.staff.any((staff) => staff.staffId == widget.lead.assigned)
+            ? widget.lead.assigned
+            : null;
 
     // Initialize tags
     selectedTags = widget.lead.tags!.map((tag) => tag.name).toList();
@@ -85,7 +91,8 @@ class _EditLeadState extends State<EditLead> {
 
     // Initialize country and state
     // Validate country against the available countries in leadStore
-    country = leadStore.country.any((country) => country.countryId == widget.lead.country)
+    country = leadStore.country
+            .any((country) => country.countryId == widget.lead.country)
         ? widget.lead.country
         : null;
     state = widget.lead.state;
@@ -230,7 +237,9 @@ class _EditLeadState extends State<EditLead> {
                   ),
                   const SizedBox(height: 15),
                   DropdownButtonFormField<String>(
-                    value: _selectedEmployeeId?.isEmpty ?? true ? null : _selectedEmployeeId,
+                    value: _selectedEmployeeId?.isEmpty ?? true
+                        ? null
+                        : _selectedEmployeeId,
                     items: leadStore.staff
                         .map((item) => DropdownMenuItem<String>(
                               value: item.staffId,
@@ -440,7 +449,6 @@ class _EditLeadState extends State<EditLead> {
             bool isFieldUpdated(String currentValue, String? initialValue) {
               return currentValue != initialValue;
             }
-            
 
             // Create form data
             FormData formData = FormData.fromMap({
@@ -522,6 +530,12 @@ class _EditLeadState extends State<EditLead> {
 
               if (status) {
                 print('Success: ${message}');
+                Fluttertoast.showToast(
+                  msg: message ?? 'Conversion successful!',
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 2,
+                );
                 // Handle success (e.g., show a success message or navigate)
               } else {
                 print('Error: ${status} - ${response}');
