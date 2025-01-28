@@ -272,9 +272,18 @@ class _RemindersTabState extends State<RemindersTab> {
                           }
                         } else {
                           // Add new reminder
-                          final (bool success, _, String? message) =
-                          await ApiService.addReminder(reminderInfo);
+                          final reminderAdd = {
+                            // "id":id,
 
+                            "rel_id": widget.lead.id,
+                            'date': dateTimeController.text,
+                            'staff': _selectedItem,
+                            'description': descriptionController.text,
+                            'notify_by_email': isChecked ? "1" : "0",
+                          };
+                          final (bool success, _, String? message) =
+                          await ApiService.addReminder(reminderAdd);
+infoLog("$reminderInfo");
                           if (success) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Reminder added successfully')),

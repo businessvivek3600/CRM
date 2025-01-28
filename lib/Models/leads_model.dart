@@ -153,6 +153,7 @@ class Lead {
   List<Tag>? tags;
   List<NoteData>? notesData;
   List<Reminder>? reminders;
+  Permission? permission;
 
   Lead({
     required this.id,
@@ -192,44 +193,45 @@ class Lead {
     this.tags,
     this.notesData,
     this.reminders,
+    this.permission,
   });
 
   factory Lead.fromJson(Map<String, dynamic> json) {
     return Lead(
       id: json['id'] ?? '',
-      hash: json['hash'] ?? "",
+      hash: json['hash'],
       name: json['name'] ?? '',
-      title: json['title'] ?? "",
-      company: json['company'] ?? "",
-      description: json['description'] ?? "",
-      country: json['country'] ?? '0',
-      zip: json['zip'] ?? "",
-      city: json['city'] ?? "",
-      state: json['state'] ?? "",
-      address: json['address'] ?? "",
-      assigned: json['assigned'] ?? '',
+      title: json['title'],
+      company: json['company'],
+      description: json['description'],
+      country: (json['country'] ?? '0').toString(),
+      zip: json['zip'],
+      city: json['city'],
+      state: json['state'],
+      address: json['address'],
+      assigned: (json['assigned'] ?? '0').toString(),
       dateadded: json['dateadded'] ?? '',
-      fromFormId: json['from_form_id'] ?? '',
-      status: json['status'] ?? '',
-      source: json['source'] ?? '',
-      lastcontact: json['lastcontact'] ?? "",
-      dateassigned: json['dateassigned'] ?? "",
+      fromFormId: (json['from_form_id'] ?? '0').toString(),
+      status: (json['status'] ?? '0').toString(),
+      source: (json['source'] ?? '0').toString(),
+      lastcontact: json['lastcontact'],
+      dateassigned: json['dateassigned'],
       lastStatusChange: json['last_status_change'],
-      addedfrom: json['addedfrom'] ?? '',
-      email: json['email'] ?? "",
-      website: json['website'] ?? "",
-      leadorder: json['leadorder'] ?? '',
-      phonenumber: json['phonenumber'] ?? "",
+      addedfrom: (json['addedfrom'] ?? '0').toString(),
+      email: json['email'],
+      website: json['website'],
+      leadorder: (json['leadorder'] ?? '0').toString(),
+      phonenumber: json['phonenumber'],
       dateConverted: json['date_converted'],
-      lost: json['lost'] ?? '',
-      junk: json['junk'] ?? '',
-      lastLeadStatus: json['last_lead_status'] ?? '',
+      lost: (json['lost'] ?? '0').toString(),
+      junk: (json['junk'] ?? '0').toString(),
+      lastLeadStatus: (json['last_lead_status'] ?? '0').toString(),
       isImportedFromEmailIntegration:
-          json['is_imported_from_email_integration'] ?? '',
+      (json['is_imported_from_email_integration'] ?? '0').toString(),
       emailIntegrationUid: json['email_integration_uid'],
-      isPublic: json['is_public'] ?? '',
+      isPublic: (json['is_public'] ?? '0').toString(),
       defaultLanguage: json['default_language'],
-      clientId: json['client_id'] ?? '',
+      clientId: (json['client_id'] ?? '0').toString(),
       leadValue: json['lead_value'],
       tags: (json['tags'] as List<dynamic>?)
           ?.map((e) => Tag.fromJson(e))
@@ -240,6 +242,9 @@ class Lead {
       reminders: (json['reminders'] as List<dynamic>?)
           ?.map((e) => Reminder.fromJson(e))
           .toList(),
+      permission: json['permission'] != null
+          ? Permission.fromJson(json['permission'])
+          : null,
     );
   }
 
@@ -282,9 +287,32 @@ class Lead {
       'tags': tags?.map((e) => e.toJson()).toList(),
       'notes_data': notesData?.map((e) => e.toJson()).toList(),
       'reminders': reminders?.map((e) => e.toJson()).toList(),
+      'permission': permission?.toJson(),
     };
   }
 }
+
+class Permission {
+  String canDelete;
+  String alreadyCustomer;
+
+  Permission({required this.canDelete, required this.alreadyCustomer});
+
+  factory Permission.fromJson(Map<String, dynamic> json) {
+    return Permission(
+      canDelete: (json['can_delete'] ?? '0').toString(),
+      alreadyCustomer: (json['already_customer'] ?? '0').toString(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'can_delete': canDelete,
+      'already_customer': alreadyCustomer,
+    };
+  }
+}
+
 
 ///----Note-Data------
 class NoteData {

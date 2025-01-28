@@ -183,9 +183,7 @@ class _AddNotesTabState extends State<AddNotesTab> {
                         // Prepare the data to be passed to the API
                         final String noteDescription = noteController.text;
                         final int contactedIndicator =
-                            selectedStatus == "I got in touch with this lead"
-                                ? 1
-                                : 0;
+                        selectedStatus == "I got in touch with this lead" ? 1 : 0;
 
                         // Create the data map
                         final Map<String, dynamic> data = {
@@ -196,26 +194,35 @@ class _AddNotesTabState extends State<AddNotesTab> {
                         };
 
                         // Call the API to add the note
-                        final (
-                          bool status,
-                          Map<String, dynamic> response,
-                          String? message
-                        ) = await ApiService.addNote(data);
+                        final (bool status, Map<String, dynamic> response, String? message) =
+                        await ApiService.addNote(data);
+
                         if (response["status"] == true) {
+                          // Parse the new note from response
+                          final newNoteData = (response['data'] as List)
+                              .map((e) => NoteData.fromJson(e))
+                              .toList();
+
+                          // Update the noteData list and refresh the UI
+                          setState(() {
+                            widget.noteData.insertAll(0, newNoteData); // Insert at the top
+                          });
+
+                          // Clear the form and reset status
+                          noteController.clear();
+                          setState(() {
+                            selectedStatus = "I have not contacted this lead";
+                          });
+
                           toast(response['message'],
                               gravity: ToastGravity.TOP,
                               textColor: Colors.white,
                               bgColor: completedColor);
-                          noteController.clear();
-                          setState(() {
-                            selectedStatus =
-                                "I have not contacted this lead";
-                          });
                         } else {
+                          // Show an error message
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(
-                                  response['message'] ?? "Failed to add note"),
+                              content: Text(response['message'] ?? "Failed to add note"),
                               backgroundColor: Colors.red,
                             ),
                           );
@@ -233,6 +240,7 @@ class _AddNotesTabState extends State<AddNotesTab> {
                         ),
                       ),
                     ),
+
                   ],
                 ),
                 height20(),

@@ -16,7 +16,6 @@ class CustomerScreen extends StatefulWidget {
 }
 
 class _CustomerScreenState extends State<CustomerScreen> {
-  final CustomerStore customerStore = CustomerStore();
 
   @override
   void initState() {
@@ -291,7 +290,11 @@ class _CustomerScreenState extends State<CustomerScreen> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+
+        floatingActionButton: Observer(
+        builder: (_) {
+      return customerStore.canEdit == "1"
+          ? FloatingActionButton(
         shape: const CircleBorder(),
         backgroundColor: secondaryPrimaryColor,
         onPressed: () {
@@ -311,7 +314,8 @@ class _CustomerScreenState extends State<CustomerScreen> {
             size: 30,
           ),
         ),
-      ),
+      )
+          : Container();}),
     );
   }
 }

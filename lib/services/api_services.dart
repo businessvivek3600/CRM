@@ -28,7 +28,6 @@ class ApiService {
       var (bool status, Map<String, dynamic> data, String? message) =
           await ApiHandler.fetchData('${ApiConstant.getLeads}?page=$page',
               method: ApiMethod.POST);
-
       if (status && data.isNotEmpty) {
         return (true, data, message);
       } else {
@@ -51,6 +50,7 @@ class ApiService {
       log('data : $data');
       if (status) {
         log("message --$message");
+        return (status, data, message);
       } else {
         return (false, data, message);
       }
@@ -68,6 +68,7 @@ class ApiService {
       log('data : $data');
       if (status) {
         log("message --$message");
+        return (status, data, message);
       } else {
         return (false, data, message);
       }
@@ -91,6 +92,7 @@ class ApiService {
         log('data ________________________-: $data');
         return (status, data, message);
       } else {
+
         return (false, data, message);
       }
     } catch (e) {
@@ -108,6 +110,7 @@ class ApiService {
       toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
       if (data['status']) {
         log("message --$message");
+        return (status, data, message);
       } else {
         return (false, data, message);
       }
@@ -126,6 +129,7 @@ class ApiService {
       toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
       if (status) {
         log("message --$message");
+        return (status, data, message);
       } else {
         return (false, data, message);
       }
@@ -144,6 +148,7 @@ class ApiService {
       log('data : $data');
       if (status) {
         log("message --$message");
+        return (status, data, message);
       } else {
         return (false, data, message);
       }
@@ -203,7 +208,7 @@ class ApiService {
       } else {
         message = message?.split('.').first;
         // Uncomment below line to show toast notification
-        // toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
+        toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
         return (false, <String, dynamic>{}, message);
       }
     } catch (e) {
@@ -227,6 +232,7 @@ class ApiService {
       } else {
         message = message?.split('.').first;
         // Optionally log or handle the error
+        toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
         logger.e('Dashboard API error: $message', tag: 'DashboardAPI');
         return (false, <String, dynamic>{}, message);
       }
@@ -248,8 +254,11 @@ class ApiService {
           data: info);
       log('data : $data');
       if (status) {
+        toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
         log("message --$message");
+        return (status, data, message);
       } else {
+        toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
         return (false, data, message);
       }
     } catch (e) {
@@ -267,6 +276,7 @@ class ApiService {
       log('data : $data');
       if (status) {
         log("message --$message");
+        return (status, data, message);
       } else {
         return (false, data, message);
       }

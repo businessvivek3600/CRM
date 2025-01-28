@@ -1,5 +1,7 @@
+import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 import '../../../../constants/app_constants.dart';
@@ -21,7 +23,8 @@ class _AddCustomerState extends State<AddCustomer> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _websiteController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _zipController = TextEditingController();  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _zipController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
 
   final TextEditingController _billingStreetController =
       TextEditingController();
@@ -34,7 +37,7 @@ class _AddCustomerState extends State<AddCustomer> {
       TextEditingController();
   final TextEditingController _shippingZipController = TextEditingController();
   final TextEditingController _shippingCityController = TextEditingController();
-
+  final GlobalKey<FormState> _profileFormKey = GlobalKey<FormState>();
   String? country;
 
   String? countryBilling;
@@ -42,6 +45,7 @@ class _AddCustomerState extends State<AddCustomer> {
   String? countryShipping;
 
   bool _sameAsBilling = false;
+
   void _copyBillingToShipping() {
     if (_sameAsBilling) {
       _shippingStreetController.text = _billingStreetController.text;
@@ -55,7 +59,7 @@ class _AddCustomerState extends State<AddCustomer> {
       _shippingZipController.clear();
       _shippingCityController.clear();
       countryShipping = null;
-    stateShippingController.clear();
+      stateShippingController.clear();
     }
   }
 
@@ -86,244 +90,290 @@ class _AddCustomerState extends State<AddCustomer> {
               ),
             ),
             Expanded(
-              child: TabBarView(
-                children: [
-                  // Profile Tab
-                  SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 10),
-                      child: Column(
-                        children: [
-                          CommonTextField(
-                            controller: _companyController,
-                            label: 'Legal Company Name',
-                            hint: 'Legal Company Name',
-                          ),
-                          const SizedBox(height: 15),
-                          CommonTextField(
-                            controller: _vatController,
-                            label: 'VAT Number',
-                          ),
-                          const SizedBox(height: 15),
-                          CommonTextField(
-                            controller: _phoneController,
-                            label: 'Phone',
-                            hint: 'Enter Phone Number',
-                          ),
-                          const SizedBox(height: 15),
-                          CommonTextField(
-                            controller: _websiteController,
-                            label: 'Website',
-                            hint: 'Enter Website URL',
-                          ),
-                          const SizedBox(height: 15),
-                          CommonTextField(
-                            controller: _addressController,
-                            label: 'Address',
-                            hint: 'Enter Address',
-                          ),
-                          const SizedBox(height: 15),
-                          DropdownButtonFormField<String>(
-                            value: country,
-                            items: leadStore.country
-                                .map((item) => DropdownMenuItem<String>(
-                                      value: item.countryId,
-                                      child: Text(item.shortName),
-                                    ))
-                                .toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                country = value;
-                              });
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Select  Country',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          CommonTextField(
-                            controller: stateController,
-                            label: 'Enter State',
-                            hint: 'Enter State',
-                          ),
-                          const SizedBox(height: 15),
-                          CommonTextField(
-                            controller: _cityController,
-                            label: 'City',
-                            hint: 'Enter City',
-                          ),
-                          const SizedBox(height: 15),
-                          CommonTextField(
-                            controller: _zipController,
-                            label: 'Zip Code',
-                            hint: 'Enter Zip Code',
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Billing Details Tab
-                  SingleChildScrollView(
-                    child: Padding(
+              child: Form(
+                key: _profileFormKey,
+                child: TabBarView(
+                  children: [
+                    // Profile Tab
+                    SingleChildScrollView(
+                      child: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 10),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // const SizedBox(height: 15),
                             CommonTextField(
-                              controller: _billingStreetController,
-                              label: 'Billing Street',
-                              hint: 'Billing Street',
-                            ),
-                            const SizedBox(height: 15),
-                            CommonTextField(
-                              controller: _billingCityController,
-                              label: 'Billing City',
-                              hint: 'Billing City',
-                            ),
-                            const SizedBox(height: 15),
-                            CommonTextField(
-                              controller: _billingZipController,
-                              label: 'Billing Zip',
-                              hint: 'Billing Zip',
-                            ),
-                            const SizedBox(height: 15),
-                            DropdownButtonFormField<String>(
-                              value: countryBilling,
-                              items: leadStore.country
-                                  .map((item) => DropdownMenuItem<String>(
-                                        value: item.countryId,
-                                        child: Text(item.shortName),
-                                      ))
-                                  .toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  countryBilling = value;
-                                });
+                              controller: _companyController,
+                              label: 'Legal Company Name',
+                              hint: 'Legal Company Name',
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Company Name is required';
+                                }
+                                return null;
                               },
-                              decoration: InputDecoration(
-                                labelText: 'Select Billing Country',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                              ),
                             ),
                             const SizedBox(height: 15),
                             CommonTextField(
-                              controller: stateBillingController,
-                              label: 'Billing State',
-                              hint: 'Enter State',
+                              controller: _vatController,
+                              label: 'VAT Number',
                             ),
                             const SizedBox(height: 15),
-                            // Checkbox for "Same as Billing Address"
-                            Row(
-                              children: [
-                                Checkbox(
-                                  value: _sameAsBilling,
-                                  activeColor: acceptColor,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _sameAsBilling = value!;
-                                      _copyBillingToShipping();
-                                    });
-                                  },
-                                ),
-                                const Text("Same as billing address"),
+                            CommonTextField(
+                              controller: _phoneController,
+                              label: 'Phone',
+                              formatter: [
+                                FilteringTextInputFormatter.digitsOnly
                               ],
+                              hint: 'Enter Phone Number',
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Phone number is required';
+                                }
+                                return null;
+                              },
                             ),
                             const SizedBox(height: 15),
                             CommonTextField(
-                              controller: _shippingStreetController,
-                              label: 'Shipping Street',
-                              hint: 'Shipping Street',
+                              controller: _websiteController,
+                              label: 'Website',
+                              hint: 'Enter Website URL',
                             ),
                             const SizedBox(height: 15),
                             CommonTextField(
-                              controller: _shippingCityController,
-                              label: 'Shipping City',
-                              hint: 'Shipping City',
-                            ),
-                            const SizedBox(height: 15),
-                            CommonTextField(
-                              controller: _shippingZipController,
-                              label: 'Shipping Zip',
-                              hint: 'Shipping Zip',
+                              controller: _addressController,
+                              label: 'Address',
+                              hint: 'Enter Address',
                             ),
                             const SizedBox(height: 15),
                             DropdownButtonFormField<String>(
-                              value: countryShipping,
+                              value: country,
                               items: leadStore.country
                                   .map((item) => DropdownMenuItem<String>(
                                         value: item.countryId,
-                                        child: Text(item.shortName),
+                                        child: SizedBox(
+                                            width: 250,
+                                            child: Text(item.shortName)),
                                       ))
                                   .toList(),
                               onChanged: (value) {
                                 setState(() {
-                                  countryShipping = value;
-
+                                  country = value;
                                 });
                               },
                               decoration: InputDecoration(
-                                labelText: 'Select Shipping Country',
+                                labelText: 'Select  Country',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
                               ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Country is required';
+                                }
+                                return null;
+                              },
                             ),
                             const SizedBox(height: 15),
                             CommonTextField(
-                              controller: stateShippingController,
-                              label: 'Shipping State',
+                              controller: stateController,
+                              label: 'Enter State',
                               hint: 'Enter State',
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'State is required';
+                                }
+                                return null;
+                              },
                             ),
                             const SizedBox(height: 15),
+                            CommonTextField(
+                              controller: _cityController,
+                              label: 'City',
+                              hint: 'Enter City',
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'City is required';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 15),
+                            CommonTextField(
+                              controller: _zipController,
+                              label: 'Zip Code',
+                              hint: 'Enter Zip Code',
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Zip Code is required';
+                                }
+                                return null;
+                              },
+                            ),
                           ],
-                        )),
-                  ),
-                ],
+                        ),
+                      ),
+                    ),
+                    // Billing Details Tab
+                    SingleChildScrollView(
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              // const SizedBox(height: 15),
+                              CommonTextField(
+                                controller: _billingStreetController,
+                                label: 'Billing Street',
+                                hint: 'Billing Street',
+                              ),
+                              const SizedBox(height: 15),
+                              CommonTextField(
+                                controller: _billingCityController,
+                                label: 'Billing City',
+                                hint: 'Billing City',
+                              ),
+                              const SizedBox(height: 15),
+                              CommonTextField(
+                                controller: _billingZipController,
+                                label: 'Billing Zip',
+                                hint: 'Billing Zip',
+                              ),
+                              const SizedBox(height: 15),
+                              DropdownButtonFormField<String>(
+                                value: countryBilling,
+                                items: leadStore.country
+                                    .map((item) => DropdownMenuItem<String>(
+                                          value: item.countryId,
+                                          child: SizedBox(
+                                              width: 250,
+                                              child: Text(item.shortName)),
+                                ))
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    countryBilling = value;
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Select Billing Country',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                              CommonTextField(
+                                controller: stateBillingController,
+                                label: 'Billing State',
+                                hint: 'Enter State',
+                              ),
+                              const SizedBox(height: 15),
+                              // Checkbox for "Same as Billing Address"
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: _sameAsBilling,
+                                    activeColor: acceptColor,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _sameAsBilling = value!;
+                                        _copyBillingToShipping();
+                                      });
+                                    },
+                                  ),
+                                  const Text("Same as billing address"),
+                                ],
+                              ),
+                              const SizedBox(height: 15),
+                              CommonTextField(
+                                controller: _shippingStreetController,
+                                label: 'Shipping Street',
+                                hint: 'Shipping Street',
+                              ),
+                              const SizedBox(height: 15),
+                              CommonTextField(
+                                controller: _shippingCityController,
+                                label: 'Shipping City',
+                                hint: 'Shipping City',
+                              ),
+                              const SizedBox(height: 15),
+                              CommonTextField(
+                                controller: _shippingZipController,
+                                label: 'Shipping Zip',
+                                hint: 'Shipping Zip',
+                              ),
+                              const SizedBox(height: 15),
+                              DropdownButtonFormField<String>(
+                                value: countryShipping,
+                                items: leadStore.country
+                                    .map((item) => DropdownMenuItem<String>(
+                                          value: item.countryId,
+                                          child: SizedBox(
+                                              width: 250,
+                                              child: Text(item.shortName)),
+                                ))
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    countryShipping = value;
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Select Shipping Country',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                              CommonTextField(
+                                controller: stateShippingController,
+                                label: 'Shipping State',
+                                hint: 'Enter State',
+                              ),
+                              const SizedBox(height: 15),
+                            ],
+                          )),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
         ),
         // Bottom Navigation Button
         bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.only(left: 15,right: 1,bottom: 20),
           child: ElevatedButton(
             onPressed: () {
+    if (_profileFormKey.currentState!.validate()) {
+              final Map<String, dynamic> formData = {
+                "company": _companyController.text,
+                "vat": _vatController.text,
+                "phonenumber": _phoneController.text,
+                "website": _websiteController.text,
+                "address": _addressController.text,
+                "country": country??"",
+                "state": stateController.text,
+                "zip": _zipController.text,
+                "city": _cityController.text,
+                'billing_street': _billingStreetController.text,
+                'billing_city': _billingCityController.text,
+                'billing_state': stateBillingController.text,
+                'billing_zip': _billingZipController.text,
+                'billing_country': countryBilling??"",
+                'shipping_street': _shippingStreetController.text,
+                'shipping_city': _shippingCityController.text,
+                'shipping_state': stateShippingController.text,
+                'shipping_zip': _shippingZipController.text,
+                'shipping_country': countryShipping ??"",
+              };
+              infoLog("Add Customer DATA ----$formData");
 
-                final Map<String, dynamic> formData = {
-                  "company": _companyController.text,
-                  "vat": _vatController.text,
-                  "phonenumber": _phoneController.text,
-                  "website": _websiteController.text,
-                  "address": _addressController.text,
-                  "country": country,
-                  "state": stateController.text,
-                  "zip": _zipController.text,
-                  "city": _cityController.text,
-                  'billing_street': _billingStreetController.text,
-                  'billing_city': _billingCityController.text,
-                  'billing_state': stateBillingController.text,
-                  'billing_zip': _billingZipController.text,
-                  'billing_country': countryBilling,
-                  'shipping_street': _shippingStreetController.text,
-                  'shipping_city': _shippingCityController.text,
-                  'shipping_state': stateShippingController.text,
-                  'shipping_zip': _shippingZipController.text,
-                  'shipping_country': countryShipping,
-                };
-                infoLog("Add Customer DATA ----$formData");
-
-                // Call the _saveCustomerData method
-                _saveCustomerData(formData);
-
-            },
+              // Call the _saveCustomerData method
+              _saveCustomerData(formData);
+            }},
             child: const Text('Submit'),
           ),
         ),
@@ -334,15 +384,53 @@ class _AddCustomerState extends State<AddCustomer> {
   void _saveCustomerData(Map<String, dynamic> formData) async {
     warningLog("Editable customer Data: $formData");
 
-    final (bool status, Map<String, dynamic> response, String? message) =
-        await ApiService.editCustomer(formData);
+    try {
+      final (bool status, Map<String, dynamic> response, String? message) =
+          await ApiService.editCustomer(formData);
 
-    if (status) {
-      infoLog('Success: $message');
-      // Handle success (e.g., show a success message or navigate)
-    } else {
-      print('Error: $status - $response');
-      // Handle API error
+      // Print the response data to the console
+      print("Response status: $status");
+      print("Response data: ${response['message']}");
+      print("Response message: $message");
+
+      if (status) {
+        toastLong(response['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
+        _companyController.clear();
+        _vatController.clear();
+        _phoneController.clear();
+        _websiteController.clear();
+        _addressController.clear();
+        _zipController.clear();
+        _cityController.clear();
+        _billingStreetController.clear();
+        _billingZipController.clear();
+        _billingCityController.clear();
+        stateShippingController.clear();
+        stateController.clear();
+        stateBillingController.clear();
+        _shippingStreetController.clear();
+        _shippingZipController.clear();
+        _shippingCityController.clear();
+
+        // Reset selected countries and states
+        country = null;
+        countryBilling = null;
+        countryShipping = null;
+
+        // Optionally, uncheck the "Same as billing" checkbox
+        setState(() {
+          _sameAsBilling = false;
+        });
+
+        // Navigate back to the previous screen
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => CustomerScreen(),));
+        print("Customer data successfully edited.");
+      } else {
+
+        print("Failed to edit customer data: $message");
+      }
+    } catch (error) {
+      print("Error while saving customer data: $error");
     }
   }
 }
