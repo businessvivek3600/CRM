@@ -1,5 +1,6 @@
 import 'package:crm/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CommonTextField extends StatefulWidget {
   const CommonTextField({
@@ -7,7 +8,6 @@ class CommonTextField extends StatefulWidget {
     required this.label,
     this.hint,
     this.controller,
-    this.validation,
     this.isPassword = false,
     this.dropdownItems,
     this.selectedValue,
@@ -19,12 +19,12 @@ class CommonTextField extends StatefulWidget {
     this.maxLines,
     this.textInputAction = TextInputAction.done,
     this.focusNode,
-    this.onFieldSubmitted,
+    this.onFieldSubmitted, this.validator, this.formatter,
   });
 
   final String? label, hint, initialValue;
   final TextEditingController? controller;
-  final Function? validation;
+
   final bool isPassword;
   final Widget? suffix;
   final GestureTapCallback? onTap;
@@ -32,8 +32,10 @@ class CommonTextField extends StatefulWidget {
   final List<String>? dropdownItems;
   final String? selectedValue;
   final int? maxLines;
+  final List<TextInputFormatter>? formatter;
   final ValueChanged<String?>? onChanged;
   final TextInputAction textInputAction;
+  final FormFieldValidator<String>? validator;
   final FocusNode? focusNode;
   final void Function(String)? onFieldSubmitted;
 
@@ -80,8 +82,10 @@ class _CommonTextFieldState extends State<CommonTextField> {
     } else {
       return TextFormField(
         onTap: widget.onTap,
+        inputFormatters: widget.formatter,
         maxLines: widget.maxLines,
         obscureText: _obscureText,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         controller: widget.controller,
         initialValue: widget.initialValue,
         style: widget.style,
@@ -117,7 +121,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
               : null,
         ),
         cursorColor: Theme.of(context).primaryColor,
-        validator: widget.validation as String? Function(String?)?,
+        validator: widget.validator,
       );
     }
   }
