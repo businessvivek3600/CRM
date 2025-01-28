@@ -38,50 +38,58 @@ class _CustomDrawerState extends State<CustomDrawer> {
               // Drawer Header
               DrawerHeader(
                 decoration: const BoxDecoration(),
-                child: Row(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.grey[200],
-                      backgroundImage: appStore.profileImage.isNotEmpty
-                          ? NetworkImage(appStore.profileImage)
-                          : null,
-                      child: appStore.profileImage.isEmpty
-                          ? Text(
-                              appStore.fullName.isNotEmpty
-                                  ? appStore.fullName[0].toUpperCase()
-                                  : '',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                    Text("data"),
+                    SizedBox(height: 20),
+                    Row(
+                      children: [
+                        // CircleAvatar(
+                        //   radius: 30,
+                        //   backgroundColor: Colors.grey[200],
+                        //   backgroundImage: appStore.profileImage.isNotEmpty
+                        //       ? NetworkImage(appStore.profileImage)
+                        //       : null,
+                        //   child: appStore.profileImage.isEmpty
+                        //       ? Text(
+                        //           appStore.fullName.isNotEmpty
+                        //               ? appStore.fullName[0].toUpperCase()
+                        //               : '',
+                        //           style: const TextStyle(
+                        //             fontSize: 24,
+                        //             fontWeight: FontWeight.bold,
+                        //             color: Colors.black,
+                        //           ),
+                        //         )
+                        //       : null,
+                        // ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                appStore.fullName,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 24,
+                                ),
                               ),
-                            )
-                          : null,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            appStore.fullName,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 24,
-                            ),
+                              Text(
+                                appStore.userEmail,
+                                style: const TextStyle(
+                                  color: Colors.lightBlueAccent,
+                                  fontSize: 14,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            appStore.userEmail,
-                            style: const TextStyle(
-                              color: Colors.lightBlueAccent,
-                              fontSize: 14,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
