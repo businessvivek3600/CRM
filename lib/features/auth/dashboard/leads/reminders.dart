@@ -3,6 +3,7 @@ import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../../../services/api_services.dart';
@@ -34,7 +35,7 @@ class _RemindersTabState extends State<RemindersTab> {
       dateTimeController.text = reminder.date;
       _selectedItem = reminder.staffid;
       descriptionController.text = reminder.description;
-      isChecked = reminder.isnotified== "1";
+      isChecked = reminder.isnotified == "1";
       id = reminder.id;
     });
   }
@@ -225,7 +226,7 @@ class _RemindersTabState extends State<RemindersTab> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton(
-                      onPressed:  _clearFields,
+                      onPressed: _clearFields,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: secondaryPrimaryColor,
                       ),
@@ -241,13 +242,14 @@ class _RemindersTabState extends State<RemindersTab> {
                             _selectedItem == null ||
                             descriptionController.text.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Please fill all fields')),
+                            const SnackBar(
+                                content: Text('Please fill all fields')),
                           );
                           return;
                         }
 
                         final reminderInfo = {
-                          "id":id,
+                          "id": id,
                           "rel_id": widget.lead.id,
                           'date': dateTimeController.text,
                           'staff': _selectedItem,
@@ -258,16 +260,20 @@ class _RemindersTabState extends State<RemindersTab> {
                         if (editingReminder != null) {
                           // Update existing reminder
                           final (bool success, _, String? message) =
-                          await ApiService.editReminder(reminderInfo);
+                              await ApiService.editReminder(reminderInfo);
 
                           if (success) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Reminder updated successfully')),
+                              const SnackBar(
+                                  content:
+                                      Text('Reminder updated successfully')),
                             );
                             _clearFields();
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(message ?? 'Failed to update reminder')),
+                              SnackBar(
+                                  content: Text(
+                                      message ?? 'Failed to update reminder')),
                             );
                           }
                         } else {
@@ -281,17 +287,50 @@ class _RemindersTabState extends State<RemindersTab> {
                             'description': descriptionController.text,
                             'notify_by_email': isChecked ? "1" : "0",
                           };
-                          final (bool success, _, String? message) =
-                          await ApiService.addReminder(reminderAdd);
-infoLog("$reminderInfo");
-                          if (success) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Reminder added successfully')),
-                            );
-                            _clearFields();
+                          final (
+                            bool status,
+                            Map<String, dynamic> response,
+                            String? message
+                          ) = await ApiService.addReminder(reminderAdd);
+                          infoLog("---------$reminderAdd");
+                          infoLog("${response['data']}");
+
+                          _clearFields();
+
+                          if (status) {
+                            // Check if 'data' is a List or a Map
+                            if (response['data'] is List) {
+                              final newNoteData = (response['data'] as List)
+                                  .map((e) => Reminder.fromJson(e))
+                                  .toList();
+
+                              // Update the noteData list and refresh the UI
+                              setState(() {
+                                widget.remainder.insertAll(
+                                    0, newNoteData); // Insert at the top
+                              });
+                            } else if (response['data'] is Map) {
+                              final newNoteData = [
+                                Reminder.fromJson(response['data'])
+                              ];
+
+                              // Update the noteData list and refresh the UI
+                              setState(() {
+                                widget.remainder.insertAll(
+                                    0, newNoteData); // Insert at the top
+                              });
+                            }
+
+                            toast(response['message'],
+                                gravity: ToastGravity.TOP,
+                                textColor: Colors.white,
+                                bgColor: completedColor);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(message ?? 'Failed to add reminder')),
+                              SnackBar(
+                                content:
+                                    Text(message ?? 'Failed to add reminder'),
+                              ),
                             );
                           }
                         }
@@ -366,7 +405,8 @@ infoLog("$reminderInfo");
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
@@ -398,50 +438,48 @@ infoLog("$reminderInfo");
                                   ],
                                 ),
                                 width40(),
+                                if (remainder.canDelete == 1 ||
+                                    remainder.canEdit == 1 &&
+                                        remainder.date != DateTime.now())
+                                  PopupMenuButton<String>(
+                                    icon: const Icon(Icons.more_vert_outlined,
+                                        size: 25),
+                                    onSelected: (value) {
+                                      if (value == 'edit') {
+                                        setState(() {
+                                          isEditing = true;
+                                        });
+                                        _populateFieldsForEditing(remainder);
+                                      } else if (value == 'delete') {
+                                        _showDeleteConfirmationDialog(
+                                            remainder.id);
+                                      }
+                                    },
+                                    itemBuilder: (BuildContext context) {
+                                      final List<PopupMenuEntry<String>>
+                                          menuItems = [];
 
-                                if(remainder.canDelete == 1 || remainder.canEdit == 1)
-                                PopupMenuButton<String>(
-                                  icon: const Icon(Icons.more_vert_outlined,
-                                      size: 25),
-                                  onSelected: (value) {
-                                    if (value == 'edit') {
-                                      print('Edit selected');
-                                      setState(() {
-                                        isEditing = true;
-                                      });
-                                      _populateFieldsForEditing(remainder);
-                                      // Add your edit functionality here
-                                    } else if (value == 'delete') {
-                                      // Handle delete action
-                                      _showDeleteConfirmationDialog(remainder.id);
-                                      print('Delete selected');
-                                      // Add your delete functionality here
-                                    }
-                                  },
-                                  itemBuilder: (BuildContext context) {
-                                    final List<PopupMenuEntry<String>> menuItems = [];
+                                      if (remainder.canEdit == 1) {
+                                        menuItems.add(
+                                          const PopupMenuItem<String>(
+                                            value: 'edit',
+                                            child: Text('Edit'),
+                                          ),
+                                        );
+                                      }
 
-                                    if (remainder.canEdit == 1) {
-                                      menuItems.add(
-                                        const PopupMenuItem<String>(
-                                          value: 'edit',
-                                          child: Text('Edit'),
-                                        ),
-                                      );
-                                    }
+                                      if (remainder.canDelete == 1) {
+                                        menuItems.add(
+                                          const PopupMenuItem<String>(
+                                            value: 'delete',
+                                            child: Text('Delete'),
+                                          ),
+                                        );
+                                      }
 
-                                    if (remainder.canDelete == 1) {
-                                      menuItems.add(
-                                        const PopupMenuItem<String>(
-                                          value: 'delete',
-                                          child: Text('Delete'),
-                                        ),
-                                      );
-                                    }
-
-                                    return menuItems;
-                                  },
-                                ),
+                                      return menuItems;
+                                    },
+                                  ),
                               ],
                             ),
                             const SizedBox(
@@ -452,7 +490,7 @@ infoLog("$reminderInfo");
                                 children: [
                                   TextField(
                                     controller: descriptionController,
-                                    maxLines: 3    ,
+                                    maxLines: 3,
                                     decoration: const InputDecoration(
                                       border: OutlineInputBorder(),
                                     ),
@@ -464,9 +502,13 @@ infoLog("$reminderInfo");
                                       TextButton(
                                         onPressed: () {
                                           setState(() {
-                                            isEditing = false; // Cancel editing
-                                            descriptionController.text = remainder
-                                                .description; // Reset to original value
+                                            isEditing = false;
+
+                                            /// Cancel editing
+                                            descriptionController.text =
+                                                remainder.description;
+
+                                            /// Reset to original value
                                           });
                                         },
                                         child: const Text('Cancel'),
@@ -478,7 +520,6 @@ infoLog("$reminderInfo");
                                           setState(() {
                                             isEditing = false;
                                           });
-
                                         },
                                         child: const Text('Save'),
                                       ),
@@ -512,6 +553,7 @@ infoLog("$reminderInfo");
       ),
     );
   }
+
   void _showDeleteConfirmationDialog(String reminderId) {
     showDialog(
       context: context,
@@ -522,14 +564,21 @@ infoLog("$reminderInfo");
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
+
+                /// Close the dialog
               },
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop(); // Close the dialog
-                await _deleteReminder(reminderId); // Call API to delete reminder
+                Navigator.of(context).pop();
+                setState(() {
+
+                });
+                await _deleteReminder(reminderId);
+
+                /// Call API to delete reminder
               },
               child: const Text('Delete', style: TextStyle(color: Colors.red)),
             ),
@@ -540,15 +589,22 @@ infoLog("$reminderInfo");
   }
 
   Future<void> _deleteReminder(String reminderId) async {
-    final (bool success, _, String? message) =
-    await ApiService.deleteReminder({'id': reminderId});
+    final (
+    bool status,
+    Map<String, dynamic> response,
+    String? message
+    ) =
+        await ApiService.deleteReminder({'id': reminderId});
+    infoLog("status: $status" );
+    infoLog("response:-- ${response['message']}");
+    infoLog("meas: $message");
 
-    if (success) {
+    if (status) {
       setState(() {
         widget.remainder.removeWhere((reminder) => reminder.id == reminderId);
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Reminder deleted successfully')),
+         SnackBar(content: Text(message ?? 'Reminder deleted successfully')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -558,25 +614,27 @@ infoLog("$reminderInfo");
   }
 
   Future<void> _pickDateTime() async {
-    // Step 1: Pick a date
+    /// Step 1: Pick a date
+    DateTime currentDate = DateTime.now();
     DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: selectedDateTime ?? DateTime.now(),
-      firstDate: DateTime(2000),
+      initialDate: selectedDateTime ?? currentDate,
+      firstDate: currentDate,
       lastDate: DateTime(2100),
     );
 
     if (pickedDate != null) {
-      // Step 2: Pick a time
+      /// Step 2: Pick a time
+      /// If the picked date is the current date, set the initial time to the current time
       TimeOfDay? pickedTime = await showTimePicker(
         context: context,
-        initialTime: selectedDateTime != null
-            ? TimeOfDay.fromDateTime(selectedDateTime!)
+        initialTime: (pickedDate.isAtSameMomentAs(currentDate))
+            ? TimeOfDay.fromDateTime(currentDate)
             : TimeOfDay.now(),
       );
 
       if (pickedTime != null) {
-        // Combine the picked date and time
+        /// Combine the picked date and time
         DateTime combinedDateTime = DateTime(
           pickedDate.year,
           pickedDate.month,
@@ -585,11 +643,22 @@ infoLog("$reminderInfo");
           pickedTime.minute,
         );
 
-        setState(() {
-          selectedDateTime = combinedDateTime;
-          dateTimeController.text =
-              DateFormat('yyyy-MM-dd HH:mm').format(combinedDateTime);
-        });
+        /// Check if the selected date and time are in the future
+        if (combinedDateTime.isBefore(DateTime.now())) {
+          /// Show an error if the selected date and time are in the past
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Please select a date and time in the future.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        } else {
+          setState(() {
+            selectedDateTime = combinedDateTime;
+            dateTimeController.text =
+                DateFormat('yyyy-MM-dd HH:mm').format(combinedDateTime);
+          });
+        }
       }
     }
   }
