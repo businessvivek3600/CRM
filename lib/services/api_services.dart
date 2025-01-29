@@ -28,22 +28,9 @@ class ApiService {
       var (bool status, Map<String, dynamic> data, String? message) =
           await ApiHandler.fetchData('${ApiConstant.getLeads}?page=$page',
               method: ApiMethod.POST);
-
       if (status && data.isNotEmpty) {
-        toastLong(
-          data['message'],
-          gravity: ToastGravity.TOP,
-          bgColor: completedColor,
-          textColor: Colors.white,
-        );
         return (true, data, message);
       } else {
-        toastLong(
-          data['message'],
-          gravity: ToastGravity.TOP,
-          bgColor: buyColor,
-          textColor: Colors.white,
-        );
         message = message?.split('.').first;
         // Uncomment below line to show toast notification
         // toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
@@ -61,15 +48,9 @@ class ApiService {
       var (bool status, Map<String, dynamic> data, String? message) =
           await await ApiHandler.fetchData(ApiConstant.addLead, data: info);
       log('data : $data');
-
       if (status) {
         log("message --$message");
-        toastLong(
-          data['message'],
-          gravity: ToastGravity.TOP,
-          bgColor: completedColor,
-          textColor: Colors.white,
-        );
+        return (status, data, message);
       } else {
         return (false, data, message);
       }
@@ -78,29 +59,16 @@ class ApiService {
     }
     return (false, <String, dynamic>{}, '');
   }
-
   ///__________Convert-lead-to-customer----------
   static Future<(bool, Map<String, dynamic>, String?)> convertCustomer(
       FormData info) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-          await await ApiHandler.fetchData(ApiConstant.convertToCustomer,
-              data: info);
+      await await ApiHandler.fetchData(ApiConstant.convertToCustomer, data: info);
       log('data : $data');
-      toastLong(
-        data['message'],
-        gravity: ToastGravity.TOP,
-        bgColor: completedColor,
-        textColor: Colors.white,
-      );
       if (status) {
         log("message --$message");
-        toastLong(
-          data['message'],
-          gravity: ToastGravity.TOP,
-          bgColor: buyColor,
-          textColor: Colors.white,
-        );
+        return (status, data, message);
       } else {
         return (false, data, message);
       }
@@ -109,7 +77,6 @@ class ApiService {
     }
     return (false, <String, dynamic>{}, '');
   }
-
   ///---ADD & Edit & delete note----
   static Future<(bool, Map<String, dynamic>, String?)> addNote(
       Map<String, dynamic> info) async {
@@ -117,23 +84,15 @@ class ApiService {
       var (bool status, Map<String, dynamic> data, String? message) =
           await await ApiHandler.fetchData(ApiConstant.addNote, data: info);
 
+
       if (data['status']) {
-        toastLong(
-          data['message'],
-          gravity: ToastGravity.TOP,
-          bgColor: completedColor,
-          textColor: Colors.white,
-        );
+
+        toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
         TF.success;
         log('data ________________________-: $data');
         return (status, data, message);
       } else {
-        toastLong(
-          data['message'],
-          gravity: ToastGravity.TOP,
-          bgColor: buyColor,
-          textColor: Colors.white,
-        );
+
         return (false, data, message);
       }
     } catch (e) {
@@ -148,20 +107,10 @@ class ApiService {
       var (bool status, Map<String, dynamic> data, String? message) =
           await await ApiHandler.fetchData(ApiConstant.editNote, data: info);
       log('data : $data');
-      toastLong(
-        data['message'],
-        gravity: ToastGravity.TOP,
-        bgColor: completedColor,
-        textColor: Colors.white,
-      );
+      toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
       if (data['status']) {
         log("message --$message");
-        toastLong(
-          data['message'],
-          gravity: ToastGravity.TOP,
-          bgColor: buyColor,
-          textColor: Colors.white,
-        );
+        return (status, data, message);
       } else {
         return (false, data, message);
       }
@@ -177,20 +126,10 @@ class ApiService {
       var (bool status, Map<String, dynamic> data, String? message) =
           await await ApiHandler.fetchData(ApiConstant.deleteNote, data: info);
       log('data : $data');
-      toastLong(
-        data['message'],
-        gravity: ToastGravity.TOP,
-        bgColor: completedColor,
-        textColor: Colors.white,
-      );
+      toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
       if (status) {
         log("message --$message");
-        toastLong(
-          data['message'],
-          gravity: ToastGravity.TOP,
-          bgColor: buyColor,
-          textColor: Colors.white,
-        );
+        return (status, data, message);
       } else {
         return (false, data, message);
       }
@@ -207,20 +146,9 @@ class ApiService {
       var (bool status, Map<String, dynamic> data, String? message) =
           await await ApiHandler.fetchData(ApiConstant.addReminder, data: info);
       log('data : $data');
-      toastLong(
-        data['message'],
-        gravity: ToastGravity.TOP,
-        bgColor: completedColor,
-        textColor: Colors.white,
-      );
       if (status) {
         log("message --$message");
-        toastLong(
-          data['message'],
-          gravity: ToastGravity.TOP,
-          bgColor: buyColor,
-          textColor: Colors.white,
-        );
+        return (status, data, message);
       } else {
         return (false, data, message);
       }
@@ -237,20 +165,8 @@ class ApiService {
           await await ApiHandler.fetchData(ApiConstant.editReminder,
               data: info);
       log('data : $data');
-      toastLong(
-        data['message'],
-        gravity: ToastGravity.TOP,
-        bgColor: completedColor,
-        textColor: Colors.white,
-      );
       if (status) {
         log("message --$message");
-        toastLong(
-          data['message'],
-          gravity: ToastGravity.TOP,
-          bgColor: buyColor,
-          textColor: Colors.white,
-        );
       } else {
         return (false, data, message);
       }
@@ -267,20 +183,8 @@ class ApiService {
           await await ApiHandler.fetchData(ApiConstant.deleteReminder,
               data: info);
       log('data : $data');
-      toastLong(
-        data['message'],
-        gravity: ToastGravity.TOP,
-        bgColor: completedColor,
-        textColor: Colors.white,
-      );
       if (status) {
         log("message --$message");
-        toastLong(
-          data['message'],
-          gravity: ToastGravity.TOP,
-          bgColor: buyColor,
-          textColor: Colors.white,
-        );
       } else {
         return (false, data, message);
       }
@@ -298,25 +202,13 @@ class ApiService {
       var (bool status, Map<String, dynamic> data, String? message) =
           await ApiHandler.fetchData('${ApiConstant.getCustomer}?page=$page',
               method: ApiMethod.POST);
-      toastLong(
-        data['message'],
-        gravity: ToastGravity.TOP,
-        bgColor: completedColor,
-        textColor: Colors.white,
-      );
 
       if (status && data.isNotEmpty) {
         return (true, data, message);
       } else {
-        toastLong(
-          data['message'],
-          gravity: ToastGravity.TOP,
-          bgColor: buyColor,
-          textColor: Colors.white,
-        );
         message = message?.split('.').first;
         // Uncomment below line to show toast notification
-        // toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
+        toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
         return (false, <String, dynamic>{}, message);
       }
     } catch (e) {
@@ -340,6 +232,7 @@ class ApiService {
       } else {
         message = message?.split('.').first;
         // Optionally log or handle the error
+        toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
         logger.e('Dashboard API error: $message', tag: 'DashboardAPI');
         return (false, <String, dynamic>{}, message);
       }
@@ -357,12 +250,15 @@ class ApiService {
       Map<String, dynamic> info) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-          await await ApiHandler.fetchData(ApiConstant.editCustomer,
-              data: info);
+      await await ApiHandler.fetchData(ApiConstant.editCustomer,
+          data: info);
       log('data : $data');
       if (status) {
+        toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
         log("message --$message");
+        return (status, data, message);
       } else {
+        toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
         return (false, data, message);
       }
     } catch (e) {
@@ -376,11 +272,11 @@ class ApiService {
       FormData info) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-          await await ApiHandler.fetchData(ApiConstant.userLocation,
-              data: info);
+      await await ApiHandler.fetchData(ApiConstant.userLocation, data: info);
       log('data : $data');
       if (status) {
         log("message --$message");
+        return (status, data, message);
       } else {
         return (false, data, message);
       }
@@ -389,4 +285,5 @@ class ApiService {
     }
     return (false, <String, dynamic>{}, '');
   }
+
 }
