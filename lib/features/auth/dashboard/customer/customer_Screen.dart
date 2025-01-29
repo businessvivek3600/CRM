@@ -3,6 +3,7 @@ import 'package:crm/features/auth/dashboard/customer/customerdetails.dart';
 import 'package:crm/features/auth/dashboard/home_screen.dart';
 import 'package:crm/store/customer_store.dart';
 import 'package:crm/utils/colors.dart';
+import 'package:crm/utils/default_logger.dart';
 import 'package:crm/utils/size_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -176,25 +177,6 @@ class _CustomerScreenState extends State<CustomerScreen> {
                         ),
                       ],
                     ),
-                    // Row(
-                    //   children: [
-                    //     IconButton(
-                    //       onPressed: () {},
-                    //       icon: Icon(
-                    //         Icons.filter_list,
-                    //         color: Theme.of(context).colorScheme.primary,
-                    //         size: 25,
-                    //       ),
-                    //     ),
-                    //     const Text(
-                    //       'Filter',
-                    //       style: TextStyle(
-                    //         fontSize: 18,
-                    //         fontWeight: FontWeight.bold,
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
                   ],
                 ),
                 height10(),
@@ -293,7 +275,8 @@ class _CustomerScreenState extends State<CustomerScreen> {
 
         floatingActionButton: Observer(
         builder: (_) {
-      return customerStore.canEdit == "1"
+          infoLog("canEdit or create a floating  - ${customerStore.canEdit}");
+      return customerStore.canEdit == 1
           ? FloatingActionButton(
         shape: const CircleBorder(),
         backgroundColor: secondaryPrimaryColor,

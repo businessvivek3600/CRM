@@ -2,6 +2,8 @@ import 'package:mobx/mobx.dart';
 import 'package:crm/Models/usercustomer_model.dart';
 import 'package:crm/services/api_services.dart';
 
+import '../utils/default_logger.dart';
+
 part 'customer_store.g.dart';
 
 final customerStore = CustomerStore();
@@ -19,7 +21,7 @@ abstract class _CustomerStore with Store {
   bool isShow = true;
 
   @observable
-  String canEdit = "0";
+  int canEdit = 0;
   // Getter for total customers
   @computed
   int get totalCustomer => customers.length;
@@ -34,18 +36,21 @@ abstract class _CustomerStore with Store {
   @action
   Future<void> fetchCustomerData() async {
     try {
+
       // Start fetching data
       customerFuture = ObservableFuture(ApiService.getCustomers(page: 0));
       final response = await customerFuture;
 
       if (response != null && response.$1) {
+        canEdit = response.$2['can_create'] ?? 0;
+        infoLog("canEdit  - ${response.$2['can_create']}");
         // Clear existing customers and populate with new data
         customers.clear();
         final userCustomer = UserCustomer.fromJson(response.$2);
         if (userCustomer.customers.isNotEmpty) {
           customers.addAll(userCustomer.customers);
         }
-        canEdit = response.$2['can_edit'] ?? "0";
+
       } else {
         throw Exception(
             response?.$3 ?? 'Unknown error occurred while fetching data');

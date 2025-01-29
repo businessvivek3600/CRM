@@ -59,6 +59,31 @@ class ApiService {
     }
     return (false, <String, dynamic>{}, '');
   }
+
+  static Future<(bool, Map<String, dynamic>, String?)> deleteLead(
+      Map<String, dynamic> info) async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+      await await ApiHandler.fetchData(ApiConstant.deleteLead, data: info);
+
+
+      if (data['status']) {
+
+        toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
+        TF.success;
+        log('data ________________________-: $data');
+        return (status, data, message);
+      } else {
+
+        return (false, data, message);
+      }
+    } catch (e) {
+      logger.e('register error : $e', tag: tag);
+    }
+    return (false, <String, dynamic>{}, '');
+  }
+
+
   ///__________Convert-lead-to-customer----------
   static Future<(bool, Map<String, dynamic>, String?)> convertCustomer(
       FormData info) async {
