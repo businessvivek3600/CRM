@@ -149,7 +149,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         label: "Email",
                         hint: "test@gmail.com",
                         controller: _emailController,
-                        validation: (value) {
+                        validator: (value) {
                           if (value!.isEmpty) {
                             return 'Please enter username Or Login ID';
                           }

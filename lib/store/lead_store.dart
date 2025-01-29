@@ -140,7 +140,8 @@ abstract class _LeadStore with Store {
     infoLog(
         "API Dashboard Data according page: ${data['second_box']?['total_c_leads']}");
     infoLog(
-        "API Dashboard Data according page: ${data['third_box']?['total_new_leads']}");    infoLog(
+        "API Dashboard Data according page: ${data['third_box']?['total_new_leads']}");
+    infoLog(
         "API Dashboard Data according page: ${data['fourth_box']?['total_contact_leads']}");
     if (status) {
       loadingLeads.value = false;
@@ -159,9 +160,9 @@ abstract class _LeadStore with Store {
         country =
             (data['country'] as List).map((e) => Country.fromJson(e)).toList();
       }
-        leadStatusDashboard = (data["leadStatus"] as List)
-            .map((e) => LeadStatus.fromJson(e))
-            .toList();
+      leadStatusDashboard = (data["leadStatus"] as List)
+          .map((e) => LeadStatus.fromJson(e))
+          .toList();
       infoLog("Updated leadStatusDashboard: $leadStatusDashboard");
       loadingLeads.value = false;
     }

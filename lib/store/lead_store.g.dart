@@ -56,6 +56,22 @@ mixin _$LeadStore on _LeadStore, Store {
     });
   }
 
+  late final _$leadStatusDashboardAtom =
+      Atom(name: '_LeadStore.leadStatusDashboard', context: context);
+
+  @override
+  List<LeadStatus> get leadStatusDashboard {
+    _$leadStatusDashboardAtom.reportRead();
+    return super.leadStatusDashboard;
+  }
+
+  @override
+  set leadStatusDashboard(List<LeadStatus> value) {
+    _$leadStatusDashboardAtom.reportWrite(value, super.leadStatusDashboard, () {
+      super.leadStatusDashboard = value;
+    });
+  }
+
   late final _$leadSourceAtom =
       Atom(name: '_LeadStore.leadSource', context: context);
 
@@ -118,6 +134,22 @@ mixin _$LeadStore on _LeadStore, Store {
     });
   }
 
+  late final _$leadSummaryAtom =
+      Atom(name: '_LeadStore.leadSummary', context: context);
+
+  @override
+  List<LeadSummary> get leadSummary {
+    _$leadSummaryAtom.reportRead();
+    return super.leadSummary;
+  }
+
+  @override
+  set leadSummary(List<LeadSummary> value) {
+    _$leadSummaryAtom.reportWrite(value, super.leadSummary, () {
+      super.leadSummary = value;
+    });
+  }
+
   late final _$leadTagsAtom =
       Atom(name: '_LeadStore.leadTags', context: context);
 
@@ -131,6 +163,101 @@ mixin _$LeadStore on _LeadStore, Store {
   set leadTags(List<Tag> value) {
     _$leadTagsAtom.reportWrite(value, super.leadTags, () {
       super.leadTags = value;
+    });
+  }
+
+  late final _$countryAtom = Atom(name: '_LeadStore.country', context: context);
+
+  @override
+  List<Country> get country {
+    _$countryAtom.reportRead();
+    return super.country;
+  }
+
+  @override
+  set country(List<Country> value) {
+    _$countryAtom.reportWrite(value, super.country, () {
+      super.country = value;
+    });
+  }
+
+  late final _$metricDataAtom =
+      Atom(name: '_LeadStore.metricData', context: context);
+
+  @override
+  ObservableList<Map<String, dynamic>> get metricData {
+    _$metricDataAtom.reportRead();
+    return super.metricData;
+  }
+
+  @override
+  set metricData(ObservableList<Map<String, dynamic>> value) {
+    _$metricDataAtom.reportWrite(value, super.metricData, () {
+      super.metricData = value;
+    });
+  }
+
+  late final _$firstBoxAtom =
+      Atom(name: '_LeadStore.firstBox', context: context);
+
+  @override
+  FirstBox get firstBox {
+    _$firstBoxAtom.reportRead();
+    return super.firstBox;
+  }
+
+  @override
+  set firstBox(FirstBox value) {
+    _$firstBoxAtom.reportWrite(value, super.firstBox, () {
+      super.firstBox = value;
+    });
+  }
+
+  late final _$secondBoxAtom =
+      Atom(name: '_LeadStore.secondBox', context: context);
+
+  @override
+  SecondBox get secondBox {
+    _$secondBoxAtom.reportRead();
+    return super.secondBox;
+  }
+
+  @override
+  set secondBox(SecondBox value) {
+    _$secondBoxAtom.reportWrite(value, super.secondBox, () {
+      super.secondBox = value;
+    });
+  }
+
+  late final _$thirdBoxAtom =
+      Atom(name: '_LeadStore.thirdBox', context: context);
+
+  @override
+  ThirdBox get thirdBox {
+    _$thirdBoxAtom.reportRead();
+    return super.thirdBox;
+  }
+
+  @override
+  set thirdBox(ThirdBox value) {
+    _$thirdBoxAtom.reportWrite(value, super.thirdBox, () {
+      super.thirdBox = value;
+    });
+  }
+
+  late final _$fourthBoxAtom =
+      Atom(name: '_LeadStore.fourthBox', context: context);
+
+  @override
+  FourthBox get fourthBox {
+    _$fourthBoxAtom.reportRead();
+    return super.fourthBox;
+  }
+
+  @override
+  set fourthBox(FourthBox value) {
+    _$fourthBoxAtom.reportWrite(value, super.fourthBox, () {
+      super.fourthBox = value;
     });
   }
 
@@ -192,11 +319,19 @@ mixin _$LeadStore on _LeadStore, Store {
 loadingLeads: ${loadingLeads},
 leads: ${leads},
 leadStatus: ${leadStatus},
+leadStatusDashboard: ${leadStatusDashboard},
 leadSource: ${leadSource},
 reminders: ${reminders},
 staff: ${staff},
 tags: ${tags},
-leadTags: ${leadTags}
+leadSummary: ${leadSummary},
+leadTags: ${leadTags},
+country: ${country},
+metricData: ${metricData},
+firstBox: ${firstBox},
+secondBox: ${secondBox},
+thirdBox: ${thirdBox},
+fourthBox: ${fourthBox}
     ''';
   }
 }

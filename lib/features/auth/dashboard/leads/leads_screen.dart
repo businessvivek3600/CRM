@@ -10,6 +10,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../Models/leads_model.dart';
+import '../../../../services/api_services.dart';
 import '../../../../store/app_store.dart';
 import '../../../../store/lead_store.dart';
 import '../../../../widgets/date_formation.dart';
@@ -27,6 +28,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
   bool isLoadingMore = false;
   bool hasMore = true;
   final ScrollController _scrollController = ScrollController();
+
 
   @override
   void initState() {
@@ -47,7 +49,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
 
   void _onScroll() {
     if (_scrollController.position.pixels ==
-            _scrollController.position.maxScrollExtent &&
+        _scrollController.position.maxScrollExtent &&
         !isLoadingMore &&
         hasMore) {
       _loadMoreLeads();
@@ -137,7 +139,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                       isShow
                           ? Icons.keyboard_arrow_up_outlined // Show up arrow
                           : Icons
-                              .keyboard_arrow_down_outlined, // Show down arrow
+                          .keyboard_arrow_down_outlined, // Show down arrow
                       size: 25,
                     ),
                   ),
@@ -146,26 +148,26 @@ class _LeadsScreenState extends State<LeadsScreen> {
               const SizedBox(height: 10),
               isShow
                   ? Observer(builder: (_) {
-                      List<LeadSummary> leadsSummary = leadStore.leadSummary;
-                      if (leadsSummary.isEmpty) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      return SizedBox(
-                        height: 100,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: leadStore.leadSummary.length,
-                          itemBuilder: (context, index) {
-                            final summary = leadsSummary[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(
-                                  right: 8.0), // Add spacing between cards
-                              child: _buildSummaryCard(summary),
-                            );
-                          },
-                        ),
+                List<LeadSummary> leadsSummary = leadStore.leadSummary;
+                if (leadsSummary.isEmpty) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return SizedBox(
+                  height: 100,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: leadStore.leadSummary.length,
+                    itemBuilder: (context, index) {
+                      final summary = leadsSummary[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(
+                            right: 8.0), // Add spacing between cards
+                        child: _buildSummaryCard(summary),
                       );
-                    })
+                    },
+                  ),
+                );
+              })
                   : const SizedBox(),
               const SizedBox(height: 20),
 
@@ -181,7 +183,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                   const Text(
                     'Leads',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -256,8 +258,8 @@ class _LeadsScreenState extends State<LeadsScreen> {
           context,
           MaterialPageRoute(
               builder: (context) => LeadDetails(
-                    lead: lead,
-                  )),
+                lead: lead,
+              )),
         );
       },
       child: Stack(children: [
@@ -265,7 +267,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
           child: Card(
             elevation: 8,
             shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             child: Row(
               children: [
                 // Colored bar
@@ -420,7 +422,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
 Color getStatusColor(String statusId) {
 
   final summary = leadStore.leadSummary.firstWhere(
-    (leadSummary) => leadSummary.id == statusId,
+        (leadSummary) => leadSummary.id == statusId,
     orElse: () => LeadSummary(
         id: '',
         name: '',
