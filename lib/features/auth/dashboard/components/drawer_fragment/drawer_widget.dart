@@ -19,147 +19,141 @@ class _CustomDrawerState extends State<CustomDrawer> {
   @override
   Widget build(BuildContext context) {
     infoLog(appStore.profileImage);
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.only(
-          top: 5,
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Drawer(
+        elevation: 6,
+        backgroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
         ),
-        child: Drawer(
-          elevation: 6,
-          backgroundColor: Colors.white,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              topRight: Radius.circular(15),
-              bottomRight: Radius.circular(15),
-            ),
-          ),
-          child: ListView(
-            children: [
-              // Drawer Header
-              DrawerHeader(
-                decoration: const BoxDecoration(),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("data"),
-                    SizedBox(height: 20),
-                    Row(
-                      children: [
-                        // CircleAvatar(
-                        //   radius: 30,
-                        //   backgroundColor: Colors.grey[200],
-                        //   backgroundImage: appStore.profileImage.isNotEmpty
-                        //       ? NetworkImage(appStore.profileImage)
-                        //       : null,
-                        //   child: appStore.profileImage.isEmpty
-                        //       ? Text(
-                        //           appStore.fullName.isNotEmpty
-                        //               ? appStore.fullName[0].toUpperCase()
-                        //               : '',
-                        //           style: const TextStyle(
-                        //             fontSize: 24,
-                        //             fontWeight: FontWeight.bold,
-                        //             color: Colors.black,
-                        //           ),
-                        //         )
-                        //       : null,
-                        // ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                appStore.fullName,
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 24,
-                                ),
+        child: ListView(
+          children: [
+            // Drawer Header
+            DrawerHeader(
+              decoration: const BoxDecoration(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("qetyue"),
+                  Row(
+                    children: [
+                      // CircleAvatar(
+                      //   radius: 30,
+                      //   backgroundColor: Colors.grey[200],
+                      //   backgroundImage: appStore.profileImage.isNotEmpty
+                      //       ? NetworkImage(appStore.profileImage)
+                      //       : null,
+                      //   child: appStore.profileImage.isEmpty
+                      //       ? Text(
+                      //           appStore.fullName.isNotEmpty
+                      //               ? appStore.fullName[0].toUpperCase()
+                      //               : '',
+                      //           style: const TextStyle(
+                      //             fontSize: 24,
+                      //             fontWeight: FontWeight.bold,
+                      //             color: Colors.black,
+                      //           ),
+                      //         )
+                      //       : null,
+                      // ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              appStore.fullName,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 24,
                               ),
-                              Text(
-                                appStore.userEmail,
-                                style: const TextStyle(
-                                  color: Colors.lightBlueAccent,
-                                  fontSize: 14,
-                                  decoration: TextDecoration.underline,
-                                ),
+                            ),
+                            Text(
+                              appStore.userEmail,
+                              style: const TextStyle(
+                                color: Colors.lightBlueAccent,
+                                fontSize: 14,
+                                decoration: TextDecoration.underline,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              // Customer ListTile
-              ListTile(
-                title: const Text('Customer'),
-                leading: const Icon(Icons.people),
-                trailing: const Icon(Icons.keyboard_arrow_right),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CustomerScreen(),
-                    ),
-                  );
-                },
-              ),
-              // Leads ListTile
-              ListTile(
-                title: const Text('Leads'),
-                leading: const Icon(Icons.leaderboard),
-                trailing: const Icon(Icons.keyboard_arrow_right),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LeadsScreen(),
-                    ),
-                  );
-                },
-              ),
-              // Logout ListTile
-              ListTile(
-                leading: const Icon(Icons.logout, color: Colors.red),
-                title: const Text(
-                  'Logout',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                      ),
+                    ],
                   ),
-                ),
-                onTap: () async {
-                  // Await the dialog result
-                  bool logoutConfirmed = await _showLogoutDialog(context);
-
-                  if (logoutConfirmed) {
-                    // Proceed with logout
-                    Fluttertoast.showToast(msg: 'Logging out...');
-                    bool success = await AuthService().logout(
-                      context: context, // Passing context
-                      isSessionExpired: true, // Passing isSessionExpired
-                    );
-
-                    if (success) {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (_) => AuthScreen()),
-                        (_) => false,
-                      );
-                    } else {
-                      Fluttertoast.cancel();
-                      Fluttertoast.showToast(msg: 'Something went wrong!');
-                    }
-                  }
-                },
+                ],
               ),
-            ],
-          ),
+            ),
+            // Customer ListTile
+            ListTile(
+              title: const Text('Customer'),
+              leading: const Icon(Icons.people),
+              trailing: const Icon(Icons.keyboard_arrow_right),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CustomerScreen(),
+                  ),
+                );
+              },
+            ),
+            // Leads ListTile
+            ListTile(
+              title: const Text('Leads'),
+              leading: const Icon(Icons.leaderboard),
+              trailing: const Icon(Icons.keyboard_arrow_right),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LeadsScreen(),
+                  ),
+                );
+              },
+            ),
+            // Logout ListTile
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text(
+                'Logout',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              onTap: () async {
+                // Await the dialog result
+                bool logoutConfirmed = await _showLogoutDialog(context);
+
+                if (logoutConfirmed) {
+                  // Proceed with logout
+                  Fluttertoast.showToast(msg: 'Logging out...');
+                  bool success = await AuthService().logout(
+                    context: context, // Passing context
+                    isSessionExpired: true, // Passing isSessionExpired
+                  );
+
+                  if (success) {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => AuthScreen()),
+                      (_) => false,
+                    );
+                  } else {
+                    Fluttertoast.cancel();
+                    Fluttertoast.showToast(msg: 'Something went wrong!');
+                  }
+                }
+              },
+            ),
+          ],
         ),
       ),
     );

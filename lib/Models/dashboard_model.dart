@@ -34,7 +34,8 @@ class Dashboard {
       loginToken: json['login_token'],
       userData: User.fromJson(json['userData']),
       title: json['title'],
-      leadStatus: json['leadStatus'].map((e) => LeadStatus.fromJson(e)).toList(),
+      leadStatus:
+          json['leadStatus'].map((e) => LeadStatus.fromJson(e)).toList(),
       firstBox: FirstBox.fromJson(json['first_box']),
       secondBox: SecondBox.fromJson(json['second_box']),
       thirdBox: ThirdBox.fromJson(json['third_box']),
@@ -47,7 +48,7 @@ class Dashboard {
       'status': status,
       'is_logged_in': isLoggedIn,
       'login_token': loginToken,
-      'title':title,
+      'title': title,
       'userData': userData,
       'leadStatus': leadStatus,
       'first_box': firstBox.toJson(),
@@ -124,10 +125,4 @@ class FourthBox {
   }
 }
 
-
-
 enum Color { THE_28_B8_DA, THE_757575, THE_7_CB342 }
-
-
-
-
