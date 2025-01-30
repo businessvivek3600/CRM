@@ -1,5 +1,6 @@
 import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
 import 'package:crm/utils/colors.dart';
+import 'package:crm/utils/size_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -77,11 +78,12 @@ class _AddCustomerState extends State<AddCustomer> {
               color: Colors.white,
               child: TabBar(
                 unselectedLabelColor: AppConst.defaultPrimaryColor,
-                indicatorColor: waitingColor,
+                indicatorColor: acceptColor,
+
                 labelColor: black,
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicatorWeight: 2.0,
-                labelStyle: const TextStyle(fontSize: 18),
+                labelStyle: const TextStyle(fontSize: 18,fontWeight: FontWeight.w700),
                 unselectedLabelStyle: const TextStyle(fontSize: 16),
                 tabs: const [
                   Tab(text: "Profile"),
@@ -101,6 +103,7 @@ class _AddCustomerState extends State<AddCustomer> {
                             horizontal: 10, vertical: 10),
                         child: Column(
                           children: [
+                            height10(),
                             CommonTextField(
                               controller: _companyController,
                               label: 'Legal Company Name',

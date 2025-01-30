@@ -2,6 +2,8 @@ import 'package:mobx/mobx.dart';
 import 'package:crm/Models/usercustomer_model.dart';
 import 'package:crm/services/api_services.dart';
 
+import '../utils/default_logger.dart';
+
 part 'customer_store.g.dart';
 
 final customerStore = CustomerStore();
@@ -10,16 +12,13 @@ class CustomerStore = _CustomerStore with _$CustomerStore;
 abstract class _CustomerStore with Store {
 
   @observable
-  ObservableFuture<(bool, Map<String, dynamic>, String?)>? customerFuture;
-
-  @observable
-  ObservableList<Customer> customers = ObservableList<Customer>();
+  List<Customer> customers = [];
 
   @observable
   bool isShow = true;
 
   @observable
-  String canEdit = "0";
+  int canEdit = 0;
   // Getter for total customers
   @computed
   int get totalCustomer => customers.length;
@@ -32,23 +31,24 @@ abstract class _CustomerStore with Store {
 
 
   @action
-  Future<void> fetchCustomerData() async {
+  Future<void> fetchCustomerData({int page = 0}) async {
     try {
-      // Start fetching data
-      customerFuture = ObservableFuture(ApiService.getCustomers(page: 0));
-      final response = await customerFuture;
 
-      if (response != null && response.$1) {
-        // Clear existing customers and populate with new data
-        customers.clear();
-        final userCustomer = UserCustomer.fromJson(response.$2);
-        if (userCustomer.customers.isNotEmpty) {
-          customers.addAll(userCustomer.customers);
-        }
-        canEdit = response.$2['can_edit'] ?? "0";
+      // Start fetching data
+      var (status, data, message) = await ApiService.getCustomers(page: page);
+
+      if (status) {
+        canEdit = data['can_create'] ?? 0;
+        infoLog("canEdit  - ${data['can_create']}");
+      List<Customer> _customers = [];
+        tryCatch(() =>  _customers = (data['customers'] as List).map((e) {
+          return Customer.fromJson(e);
+        }).toList());
+        customers.addAll(_customers);
+
       } else {
         throw Exception(
-            response?.$3 ?? 'Unknown error occurred while fetching data');
+            message ?? 'Unknown error occurred while fetching data');
       }
     } catch (error) {
       // Log or handle the error as needed

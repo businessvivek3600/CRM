@@ -71,13 +71,18 @@ class _EditLeadState extends State<EditLead> {
         TextEditingController(text: widget.lead.description);
 
     // Initialize dropdowns
-    _selectedItem = leadStore.leadSource
-        .any((source) => source.id == widget.lead.source) ? widget.lead.source : null;
-    _statusSelectedItem = leadStore.leadStatus
-        .any((status) => status.id == widget.lead.status) ?widget.lead.status :  null ;
-    _selectedEmployeeId = leadStore.staff.any((staff) => staff.staffId == widget.lead.assigned)
-        ? widget.lead.assigned
-        : null;
+    _selectedItem =
+        leadStore.leadSource.any((source) => source.id == widget.lead.source)
+            ? widget.lead.source
+            : null;
+    _statusSelectedItem =
+        leadStore.leadStatus.any((status) => status.id == widget.lead.status)
+            ? widget.lead.status
+            : null;
+    _selectedEmployeeId =
+        leadStore.staff.any((staff) => staff.staffId == widget.lead.assigned)
+            ? widget.lead.assigned
+            : null;
 
     // Initialize tags
     selectedTags = widget.lead.tags!.map((tag) => tag.name).toList();
@@ -85,7 +90,8 @@ class _EditLeadState extends State<EditLead> {
 
     // Initialize country and state
     // Validate country against the available countries in leadStore
-    country = leadStore.country.any((country) => country.countryId == widget.lead.country)
+    country = leadStore.country
+            .any((country) => country.countryId == widget.lead.country)
         ? widget.lead.country
         : null;
     state = widget.lead.state;
@@ -155,8 +161,6 @@ class _EditLeadState extends State<EditLead> {
 
   @override
   Widget build(BuildContext context) {
-    warningLog(" LOGIN TOKEN ____________${appStore.token}");
-    infoLog("initial Value -----${widget.lead.name}");
     return Scaffold(
       appBar: AppBar(
         backgroundColor: secondaryPrimaryColor,
@@ -196,7 +200,7 @@ class _EditLeadState extends State<EditLead> {
                         String sourceId = leadStore.leadSource
                                 .firstWhere((source) => source.id == value,
                                     orElse: null)
-                                ?.id ??
+                                .id ??
                             '';
                       });
                     },
@@ -230,7 +234,9 @@ class _EditLeadState extends State<EditLead> {
                   ),
                   const SizedBox(height: 15),
                   DropdownButtonFormField<String>(
-                    value: _selectedEmployeeId?.isEmpty ?? true ? null : _selectedEmployeeId,
+                    value: _selectedEmployeeId?.isEmpty ?? true
+                        ? null
+                        : _selectedEmployeeId,
                     items: leadStore.staff
                         .map((item) => DropdownMenuItem<String>(
                               value: item.staffId,
@@ -433,10 +439,6 @@ class _EditLeadState extends State<EditLead> {
         padding: const EdgeInsets.all(10),
         child: ElevatedButton(
           onPressed: () async {
-            infoLog("________Tags1 $_dropDownTagId");
-            infoLog("________Source2$_selectedItem");
-            infoLog("________Status4 $_selectedStatusId");
-            infoLog("________Employee5 $_selectedEmployeeId");
             bool isFieldUpdated(String currentValue, String? initialValue) {
               return currentValue != initialValue;
             }
@@ -447,67 +449,63 @@ class _EditLeadState extends State<EditLead> {
               'name':
                   isFieldUpdated(nameController.text, widget.lead.name ?? '')
                       ? nameController.text
-                      : widget.lead.name,
+                      : widget.lead.name ?? "",
               'lead_value': isFieldUpdated(leadValueController.text,
-                      (widget.lead.leadValue ?? 0.00) as String?)
+                      (widget.lead.leadValue ?? "0.00") as String?)
                   ? leadValueController.text
-                  : widget.lead.leadValue,
+                  : widget.lead.leadValue ?? "",
               'title':
-                  isFieldUpdated(positionController.text, widget.lead.title!)
+                  isFieldUpdated(positionController.text, widget.lead.title)
                       ? positionController.text
-                      : widget.lead.title,
-              'email': isFieldUpdated(emailController.text, widget.lead.email!)
+                      : widget.lead.title ?? "",
+              'email': isFieldUpdated(emailController.text, widget.lead.email)
                   ? emailController.text
-                  : widget.lead.email,
+                  : widget.lead.email ?? "",
               'website':
-                  isFieldUpdated(websiteController.text, widget.lead.website!)
+                  isFieldUpdated(websiteController.text, widget.lead.website)
                       ? websiteController.text
-                      : widget.lead.website,
+                      : widget.lead.website ?? "",
               'phonenumber':
                   isFieldUpdated(phoneController.text, widget.lead.phonenumber)
                       ? phoneController.text
-                      : widget.lead.phonenumber,
+                      : widget.lead.phonenumber ?? "",
               'company':
                   isFieldUpdated(companyController.text, widget.lead.company)
                       ? companyController.text
-                      : widget.lead.company,
+                      : widget.lead.company ?? "",
               'address':
                   isFieldUpdated(addressController.text, widget.lead.address)
                       ? addressController.text
-                      : widget.lead.address,
+                      : widget.lead.address ?? "",
               'city': isFieldUpdated(cityController.text, widget.lead.city)
                   ? cityController.text
-                  : widget.lead.city,
+                  : widget.lead.city ?? "",
               'zip': isFieldUpdated(zipController.text, widget.lead.zip)
                   ? zipController.text
-                  : widget.lead.zip,
+                  : widget.lead.zip ?? "",
               'state': isFieldUpdated(stateController.text, widget.lead.state)
                   ? stateController.text
-                  : widget.lead.state,
+                  : widget.lead.state ?? "",
               'country':
                   isFieldUpdated(country ?? " ", widget.lead.country ?? " ")
                       ? country
-                      : widget.lead.country,
-              'source': _selectedItem ?? widget.lead.source,
-              'status': _selectedStatusId ?? widget.lead.status,
-              'assigned': _selectedEmployeeId ?? widget.lead.assigned,
+                      : widget.lead.country ?? "",
+              'source': _selectedItem ?? widget.lead.source ?? "",
+              'status': _selectedStatusId ?? widget.lead.status ?? "",
+              'assigned': _selectedEmployeeId ?? widget.lead.assigned ?? "",
               'tags': selectedTags.isNotEmpty
                   ? jsonEncode(_dropDownTagId)
-                  : widget.lead.tags!.map((tag) => tag.id).toList(),
+                  : widget.lead.tags!.map((tag) => tag.id).toList() ?? [],
               'description': isFieldUpdated(
                       descriptionController.text, widget.lead.description)
                   ? descriptionController.text
-                  : widget.lead.description,
+                  : widget.lead.description ?? "",
               'lastcontact': isFieldUpdated(
                       lastContactController.text, widget.lead.lastcontact ?? '')
                   ? lastContactController.text
-                  : widget.lead.lastcontact,
+                  : widget.lead.lastcontact ?? "",
             });
             warningLog("Entered Form data ---$formData");
-            infoLog("________Tags6 $_dropDownTagId");
-            infoLog("________Source7$_selectedItem");
-            infoLog("________Status8 $_selectedStatusId");
-            infoLog("________Employee9 $_selectedEmployeeId");
             try {
               // Print data to console for debugging
               errorLog("--------${formData.fields}");
@@ -520,10 +518,10 @@ class _EditLeadState extends State<EditLead> {
               ) = await ApiService.addLeads(formData);
 
               if (status) {
-                print('Success: ${message}');
+                print('Success: $message');
                 // Handle success (e.g., show a success message or navigate)
               } else {
-                print('Error: ${status} - ${response}');
+                print('Error: $status - $response');
                 // Handle API error
               }
             } catch (e) {
@@ -546,79 +544,4 @@ class _EditLeadState extends State<EditLead> {
   }
 }
 
-Widget bodyMedText(
-  String text,
-  BuildContext context, {
-  TextAlign? textAlign,
-  int? maxLines,
-  TextOverflow? overflow,
-  TextStyle? style,
-  Color? color,
-  bool? isButton,
-  double? fontSize,
-  FontWeight? fontWeight,
-  double? letterSpacing,
-  double? lineHeight,
-  TextDecoration? decoration,
-  double opacity = 1,
-  bool autoSize = false,
-  double minFontSize = 12,
-}) =>
-    autoSize
-        ? AutoSizeText(
-            text,
-            minFontSize: minFontSize,
-            textAlign: textAlign,
-            overflow: overflow,
-            maxLines: maxLines ?? 3,
-            style: GoogleFonts.ubuntu(
-              textStyle: style ??
-                  getTheme(context).textTheme.bodyMedium!.copyWith(
-                      fontWeight: fontWeight,
-                      letterSpacing: letterSpacing,
-                      color: (color ??
-                          (isButton != null
-                              ? (isButton
-                                  ? (getTheme(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.white
-                                      : Colors.black)
-                                  : null)
-                              : null)),
-                      decorationColor: color,
-                      fontSize: fontSize,
-                      height: lineHeight,
-                      fontFamily:
-                          getTheme(context).textTheme.bodyMedium?.fontFamily,
-                      decoration: decoration)
-                ..color?.withOpacity(opacity),
-            ),
-          )
-        : Text(
-            text,
-            textAlign: textAlign,
-            overflow: overflow,
-            maxLines: maxLines ?? 3,
-            style: GoogleFonts.ubuntu(
-              textStyle: style ??
-                  getTheme(context).textTheme.bodyMedium!.copyWith(
-                      fontWeight: fontWeight,
-                      letterSpacing: letterSpacing,
-                      color: (color ??
-                          (isButton != null
-                              ? (isButton
-                                  ? (getTheme(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.white
-                                      : Colors.black)
-                                  : null)
-                              : null)),
-                      decorationColor: color,
-                      fontSize: fontSize,
-                      height: lineHeight,
-                      fontFamily:
-                          getTheme(context).textTheme.bodyMedium?.fontFamily,
-                      decoration: decoration)
-                ..color?.withOpacity(opacity),
-            ),
-          );
+

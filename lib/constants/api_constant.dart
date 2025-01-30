@@ -7,6 +7,7 @@ class ApiConstant {
   static const getCustomer = 'get-customers';
   static const addLead = 'add-leads';
   static const deleteNote = 'delete-note';
+  static const deleteLead = 'delete-lead';
   static const editNote = 'add-note';
   static const addNote = 'add-note';
   static const deleteReminder = 'delete-reminder';
