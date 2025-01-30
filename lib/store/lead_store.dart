@@ -72,7 +72,7 @@ abstract class _LeadStore with Store {
       tryCatch(() => _leads = (data['leads'] as List).map((e) {
             return Lead.fromJson(e);
           }).toList());
-      leads = _leads;
+      leads.addAll(_leads);
       pl('res _products length: ${_leads.length}');
       if (data['status_data'] != null) {
         leadStatus = (data['status_data'] as List)

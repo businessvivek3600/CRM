@@ -62,10 +62,14 @@ class _LeadsScreenState extends State<LeadsScreen> {
     });
 
     currentPage++; // Increment the current page
+    int previousLength = leadStore.leads.length;
     await leadStore.getLeads(page: currentPage);
 
     setState(() {
       isLoadingMore = false; // Stop the loading state
+      if (leadStore.leads.length == previousLength) {
+        hasMore = false; // No new data, stop loading
+      }
     });
   }
 
@@ -297,7 +301,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    lead.name,
+                                    lead.name ?? "--",
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,

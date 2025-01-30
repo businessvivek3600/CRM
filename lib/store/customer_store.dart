@@ -12,10 +12,7 @@ class CustomerStore = _CustomerStore with _$CustomerStore;
 abstract class _CustomerStore with Store {
 
   @observable
-  ObservableFuture<(bool, Map<String, dynamic>, String?)>? customerFuture;
-
-  @observable
-  ObservableList<Customer> customers = ObservableList<Customer>();
+  List<Customer> customers = [];
 
   @observable
   bool isShow = true;
@@ -34,26 +31,24 @@ abstract class _CustomerStore with Store {
 
 
   @action
-  Future<void> fetchCustomerData() async {
+  Future<void> fetchCustomerData({int page = 0}) async {
     try {
 
       // Start fetching data
-      customerFuture = ObservableFuture(ApiService.getCustomers(page: 0));
-      final response = await customerFuture;
+      var (status, data, message) = await ApiService.getCustomers(page: page);
 
-      if (response != null && response.$1) {
-        canEdit = response.$2['can_create'] ?? 0;
-        infoLog("canEdit  - ${response.$2['can_create']}");
-        // Clear existing customers and populate with new data
-        customers.clear();
-        final userCustomer = UserCustomer.fromJson(response.$2);
-        if (userCustomer.customers.isNotEmpty) {
-          customers.addAll(userCustomer.customers);
-        }
+      if (status) {
+        canEdit = data['can_create'] ?? 0;
+        infoLog("canEdit  - ${data['can_create']}");
+      List<Customer> _customers = [];
+        tryCatch(() =>  _customers = (data['customers'] as List).map((e) {
+          return Customer.fromJson(e);
+        }).toList());
+        customers.addAll(_customers);
 
       } else {
         throw Exception(
-            response?.$3 ?? 'Unknown error occurred while fetching data');
+            message ?? 'Unknown error occurred while fetching data');
       }
     } catch (error) {
       // Log or handle the error as needed

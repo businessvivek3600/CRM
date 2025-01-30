@@ -345,7 +345,12 @@ class _RemindersTabState extends State<RemindersTab> {
                     ),
                   ],
                 ),
-                height20(),
+                height10(),
+                const Divider(
+                  thickness: 2,
+                  color: Colors.black54,
+                ),
+                height10(),
                 ListView.separated(
                     physics: const NeverScrollableScrollPhysics(),
                     separatorBuilder: (context, index) {
@@ -614,7 +619,6 @@ class _RemindersTabState extends State<RemindersTab> {
   }
 
   Future<void> _pickDateTime() async {
-    /// Step 1: Pick a date
     DateTime currentDate = DateTime.now();
     DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -624,17 +628,19 @@ class _RemindersTabState extends State<RemindersTab> {
     );
 
     if (pickedDate != null) {
-      /// Step 2: Pick a time
-      /// If the picked date is the current date, set the initial time to the current time
+      /// Set initial time based on the picked date
+      TimeOfDay nowTime = TimeOfDay.fromDateTime(currentDate);
       TimeOfDay? pickedTime = await showTimePicker(
         context: context,
-        initialTime: (pickedDate.isAtSameMomentAs(currentDate))
-            ? TimeOfDay.fromDateTime(currentDate)
-            : TimeOfDay.now(),
+        initialTime: (pickedDate.year == currentDate.year &&
+            pickedDate.month == currentDate.month &&
+            pickedDate.day == currentDate.day)
+            ? nowTime // Ensure the current time is used if today is selected
+            : const TimeOfDay(hour: 0, minute: 0), // Default to start of the day
       );
 
       if (pickedTime != null) {
-        /// Combine the picked date and time
+        /// Combine picked date and time
         DateTime combinedDateTime = DateTime(
           pickedDate.year,
           pickedDate.month,
@@ -643,9 +649,8 @@ class _RemindersTabState extends State<RemindersTab> {
           pickedTime.minute,
         );
 
-        /// Check if the selected date and time are in the future
-        if (combinedDateTime.isBefore(DateTime.now())) {
-          /// Show an error if the selected date and time are in the past
+        /// Ensure selected time is in the future
+        if (combinedDateTime.isBefore(currentDate)) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Please select a date and time in the future.'),
@@ -662,4 +667,5 @@ class _RemindersTabState extends State<RemindersTab> {
       }
     }
   }
+
 }
