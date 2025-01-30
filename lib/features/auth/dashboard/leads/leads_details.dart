@@ -231,7 +231,7 @@ class _LeadDetailsState extends State<LeadDetails> {
                           ); // Close dialog
                           // Add delete functionality here
                            // Close dialog
-                          final Map<String, dynamic> deleteNote = {
+                          final Map<String, dynamic> deleteLead = {
                             'id': widget.lead.id,
                           };
                           // Call API to delete the note
@@ -239,7 +239,7 @@ class _LeadDetailsState extends State<LeadDetails> {
                             bool status,
                             Map<String, dynamic> data,
                             String? message
-                          ) = await ApiService.deleteLead(deleteNote);
+                          ) = await ApiService.deleteLead(deleteLead);
                           if (status) {
 
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -251,8 +251,8 @@ class _LeadDetailsState extends State<LeadDetails> {
                             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LeadsScreen(),));
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Failed to delete note"),
+                            SnackBar(
+                                content: Text(message ?? "Failed to delete lead"),
                                 backgroundColor: Colors.red,
                               ),
                             );
