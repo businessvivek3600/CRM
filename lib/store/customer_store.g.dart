@@ -24,34 +24,17 @@ mixin _$CustomerStore on _CustomerStore, Store {
               name: '_CustomerStore.activeCustomer'))
           .value;
 
-  late final _$customerFutureAtom =
-      Atom(name: '_CustomerStore.customerFuture', context: context);
-
-  @override
-  ObservableFuture<(bool, Map<String, dynamic>, String?)>? get customerFuture {
-    _$customerFutureAtom.reportRead();
-    return super.customerFuture;
-  }
-
-  @override
-  set customerFuture(
-      ObservableFuture<(bool, Map<String, dynamic>, String?)>? value) {
-    _$customerFutureAtom.reportWrite(value, super.customerFuture, () {
-      super.customerFuture = value;
-    });
-  }
-
   late final _$customersAtom =
       Atom(name: '_CustomerStore.customers', context: context);
 
   @override
-  ObservableList<Customer> get customers {
+  List<Customer> get customers {
     _$customersAtom.reportRead();
     return super.customers;
   }
 
   @override
-  set customers(ObservableList<Customer> value) {
+  set customers(List<Customer> value) {
     _$customersAtom.reportWrite(value, super.customers, () {
       super.customers = value;
     });
@@ -73,12 +56,29 @@ mixin _$CustomerStore on _CustomerStore, Store {
     });
   }
 
+  late final _$canEditAtom =
+      Atom(name: '_CustomerStore.canEdit', context: context);
+
+  @override
+  int get canEdit {
+    _$canEditAtom.reportRead();
+    return super.canEdit;
+  }
+
+  @override
+  set canEdit(int value) {
+    _$canEditAtom.reportWrite(value, super.canEdit, () {
+      super.canEdit = value;
+    });
+  }
+
   late final _$fetchCustomerDataAsyncAction =
       AsyncAction('_CustomerStore.fetchCustomerData', context: context);
 
   @override
-  Future<void> fetchCustomerData() {
-    return _$fetchCustomerDataAsyncAction.run(() => super.fetchCustomerData());
+  Future<void> fetchCustomerData({int page = 0}) {
+    return _$fetchCustomerDataAsyncAction
+        .run(() => super.fetchCustomerData(page: page));
   }
 
   late final _$_CustomerStoreActionController =
@@ -98,9 +98,9 @@ mixin _$CustomerStore on _CustomerStore, Store {
   @override
   String toString() {
     return '''
-customerFuture: ${customerFuture},
 customers: ${customers},
 isShow: ${isShow},
+canEdit: ${canEdit},
 totalCustomer: ${totalCustomer},
 activeCustomer: ${activeCustomer}
     ''';

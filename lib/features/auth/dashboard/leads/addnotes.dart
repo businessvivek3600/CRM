@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 import '../../../../services/api_services.dart';
-import '../../../../widgets/toastification/toastification.dart';
+
 
 class AddNotesTab extends StatefulWidget {
   const AddNotesTab({super.key, required this.noteData, required this.lead});
@@ -183,7 +183,21 @@ class _AddNotesTabState extends State<AddNotesTab> {
                         // Prepare the data to be passed to the API
                         final String noteDescription = noteController.text;
                         final int contactedIndicator =
-                        selectedStatus == "I got in touch with this lead" ? 1 : 0;
+                            selectedStatus == "I got in touch with this lead"
+                                ? 1
+                                : 0;
+
+                        if (selectedStatus == "I got in touch with this lead" &&
+                            dateTimeController.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Please select a date and time."),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return; // Stop execution
+                        }
+
 
                         // Create the data map
                         final Map<String, dynamic> data = {
@@ -194,8 +208,11 @@ class _AddNotesTabState extends State<AddNotesTab> {
                         };
 
                         // Call the API to add the note
-                        final (bool status, Map<String, dynamic> response, String? message) =
-                        await ApiService.addNote(data);
+                        final (
+                          bool status,
+                          Map<String, dynamic> response,
+                          String? message
+                        ) = await ApiService.addNote(data);
 
                         if (response["status"] == true) {
                           // Parse the new note from response
@@ -205,7 +222,8 @@ class _AddNotesTabState extends State<AddNotesTab> {
 
                           // Update the noteData list and refresh the UI
                           setState(() {
-                            widget.noteData.insertAll(0, newNoteData); // Insert at the top
+                            widget.noteData
+                                .insertAll(0, newNoteData); // Insert at the top
                           });
 
                           // Clear the form and reset status
@@ -222,7 +240,8 @@ class _AddNotesTabState extends State<AddNotesTab> {
                           // Show an error message
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(response['message'] ?? "Failed to add note"),
+                              content: Text(
+                                  response['message'] ?? "Failed to add note"),
                               backgroundColor: Colors.red,
                             ),
                           );
@@ -231,19 +250,27 @@ class _AddNotesTabState extends State<AddNotesTab> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: secondaryPrimaryColor,
                       ),
-                      child: const Text(
-                        'Add Notes',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 17,
-                          color: Colors.white,
+                      child: const Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                        child: Text(
+                          'Add Notes',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 17,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-
                   ],
                 ),
-                height20(),
+                height10(),
+                const Divider(
+                  thickness: 2,
+                  color: Colors.black54,
+                ),
+                height10(),
                 ListView.separated(
                   physics: const NeverScrollableScrollPhysics(),
                   separatorBuilder: (context, index) {
@@ -271,7 +298,7 @@ class _AddNotesTabState extends State<AddNotesTab> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(
-                            height: 20,
+                            height: 10,
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -367,18 +394,12 @@ class _AddNotesTabState extends State<AddNotesTab> {
                                                         deleteNote = {
                                                       'id': note.id,
                                                     };
-                                                    // Call API to delete the note
-                                                    final (
-                                                      bool status,
-                                                      Map<String, dynamic> data,
-                                                      String? message
-                                                    ) = await ApiService
+
+                                                    var (bool status, Map<String, dynamic> data, String? message) = await ApiService
                                                         .deleteNote(deleteNote);
-                                                    if (status) {
-                                                      // Remove the note from the list if deletion is successful
+                                                    if (data["status"]) {
                                                       setState(() {
-                                                        widget.noteData
-                                                            .removeAt(index);
+                                                       widget.noteData.removeAt(index);
                                                       });
                                                     } else {
                                                       ScaffoldMessenger.of(
@@ -450,8 +471,7 @@ class _AddNotesTabState extends State<AddNotesTab> {
                                               descriptionController.text,
                                           'id': note.id,
                                         };
-                                        infoLog("edit Note----------------");
-                                        infoLog("$editNoteData");
+
                                         // Call the API
                                         final (
                                           bool status,
@@ -509,9 +529,7 @@ class _AddNotesTabState extends State<AddNotesTab> {
                                 textAlign: TextAlign.justify,
                               ),
                             ),
-                          const SizedBox(
-                            height: 20,
-                          ),
+                          height10(),
                         ],
                       ),
                     );
