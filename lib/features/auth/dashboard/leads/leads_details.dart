@@ -12,6 +12,7 @@ import 'package:crm/utils/default_logger.dart';
 import 'package:crm/utils/size_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../../services/api_services.dart';
 import '../../../../store/lead_store.dart';
 import '../../../../widgets/date_formation.dart';
 
@@ -221,7 +222,7 @@ class _LeadDetailsState extends State<LeadDetails> {
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -229,10 +230,33 @@ class _LeadDetailsState extends State<LeadDetails> {
                             ),
                           ); // Close dialog
                           // Add delete functionality here
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(const SnackBar(
-                            content: Text("Lead deleted!"),
-                          ));
+                           // Close dialog
+                          final Map<String, dynamic> deleteLead = {
+                            'id': widget.lead.id,
+                          };
+                          // Call API to delete the note
+                          final (
+                            bool status,
+                            Map<String, dynamic> data,
+                            String? message
+                          ) = await ApiService.deleteLead(deleteLead);
+                          if (status) {
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Lead deleted successfully!"),
+                                backgroundColor: completedColor,
+                              ),
+                            );
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LeadsScreen(),));
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(message ?? "Failed to delete lead"),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
                         },
                         child: const Text(
                           "Yes",
@@ -268,6 +292,7 @@ class _ProfileTabState extends State<ProfileTab> {
     final source = leadStore.getSourceById(widget.lead.source);
     final assigned = leadStore.getAssignedById(widget.lead.assigned);
     String countryName = 'N/A';
+
     for (var c in leadStore.country) {
       if (c.countryId == widget.lead.country) {
         countryName = c.shortName ?? 'N/A'; // Set country name if found
@@ -280,51 +305,54 @@ class _ProfileTabState extends State<ProfileTab> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end, // Aligns to the right
-            children: [
-              ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all<Color>(Colors.green),
-                  foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
-                  padding: WidgetStateProperty.all<EdgeInsets>(
-                    const EdgeInsets.all(8),
-                  ),
-                  shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+          if (widget.lead.permission!.alreadyCustomer != "1")
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end, // Aligns to the right
+              children: [
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor:
+                        WidgetStateProperty.all<Color>(Colors.green),
+                    foregroundColor:
+                        WidgetStateProperty.all<Color>(Colors.white),
+                    padding: WidgetStateProperty.all<EdgeInsets>(
+                      const EdgeInsets.all(8),
                     ),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ConvertToCustomer(
-                        lead: widget.lead,
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                  );
-                },
-                child: const Row(
-                  children: [
-                    Icon(
-                      Icons.person_outline,
-                      color: Colors.white,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      'Convert To Customer',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-                    ),
-                  ],
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ConvertToCustomer(
+                          lead: widget.lead,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Row(
+                    children: [
+                      Icon(
+                        Icons.person_outline,
+                        color: Colors.white,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        'Convert To Customer',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
           const SizedBox(height: 10),
           // Top Summary Card
           Card(
