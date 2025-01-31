@@ -46,8 +46,10 @@ class ApiService {
       FormData info) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-          await await ApiHandler.fetchData(ApiConstant.addLead, data: info);
+         await ApiHandler.fetchData(ApiConstant.addLead, data: info);
       log('data : $data');
+      log("status : $status");
+      log("message : $message");
       if (status) {
         log("message --$message");
         return (status, data, message);
@@ -209,6 +211,7 @@ class ApiService {
               data: info);
       log('data : $data');
       if (status) {
+        return (true, data, message);
         log("message --$message");
       } else {
         return (false, data, message);

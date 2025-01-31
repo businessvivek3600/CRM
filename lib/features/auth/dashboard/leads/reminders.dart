@@ -186,10 +186,15 @@ class _RemindersTabState extends State<RemindersTab> {
                 TextField(
                   controller: descriptionController,
                   maxLines: 4,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (value) {
+                    FocusScope.of(context).unfocus();
+                  },
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(
                       borderSide: BorderSide(color: textPrimaryColors),
                     ),
+
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: textPrimaryColors),
                     ),
@@ -371,8 +376,7 @@ class _RemindersTabState extends State<RemindersTab> {
                       // State variable for inline editing
                       bool isEditing = false;
 
-                      return StatefulBuilder(
-                        builder: (context, setState) => Column(
+                      return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(
@@ -548,7 +552,7 @@ class _RemindersTabState extends State<RemindersTab> {
                               height: 20,
                             ),
                           ],
-                        ),
+
                       );
                     })
               ],
@@ -594,16 +598,8 @@ class _RemindersTabState extends State<RemindersTab> {
   }
 
   Future<void> _deleteReminder(String reminderId) async {
-    final (
-    bool status,
-    Map<String, dynamic> response,
-    String? message
-    ) =
+    var (bool status, Map<String, dynamic> data, String? message) =
         await ApiService.deleteReminder({'id': reminderId});
-    infoLog("status: $status" );
-    infoLog("response:-- ${response['message']}");
-    infoLog("meas: $message");
-
     if (status) {
       setState(() {
         widget.remainder.removeWhere((reminder) => reminder.id == reminderId);
