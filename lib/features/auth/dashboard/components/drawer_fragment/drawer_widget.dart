@@ -2,11 +2,11 @@ import 'package:crm/features/auth/auth/auth_screen.dart';
 import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/services/auth_services.dart';
-import 'package:crm/utils/default_logger.dart';
+import 'package:crm/store/app_store.dart';
+import 'package:crm/store/lead_store.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:nb_utils/nb_utils.dart';
-
-import '../../../../../store/app_store.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -16,11 +16,22 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
+  final LeadStore leadStore = LeadStore();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCompanyInfo();
+  }
+
+  Future<void> fetchCompanyInfo() async {
+    await leadStore.getDashboard();
+    if (mounted) setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    infoLog(appStore.profileImage);
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
+    return SafeArea(
       child: Drawer(
         elevation: 6,
         backgroundColor: Colors.white,
@@ -30,168 +41,195 @@ class _CustomDrawerState extends State<CustomDrawer> {
             bottomRight: Radius.circular(20),
           ),
         ),
-        child: ListView(
+        child: Column(
           children: [
-            // Drawer Header
-            DrawerHeader(
-              decoration: const BoxDecoration(),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.grey[200],
-                    backgroundImage: appStore.profileImage.isNotEmpty
-                        ? NetworkImage(appStore.profileImage)
-                        : null,
-                    child: appStore.profileImage.isEmpty
-                        ? Text(
-                            appStore.fullName.isNotEmpty
-                                ? appStore.fullName[0].toUpperCase()
-                                : '',
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
+            // Compact Drawer Header
+            Observer(
+              builder: (_) {
+                final companyInfo = leadStore.companyInfo;
+                return Padding(
+                  padding: EdgeInsets.only(right: 30),
+                  child: Container(
+                    height: 120, // Reduced height
+                    alignment: Alignment.center,
+                    child: companyInfo?.logo?.isNotEmpty ?? false
+                        ? Image.network(
+                            companyInfo!.logo!,
+                            width: 230, // Smaller width
+                            height: 100, // Smaller height
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const SizedBox(),
                           )
-                        : null,
+                        : const SizedBox(),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          appStore.fullName,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 24,
-                          ),
-                        ),
-                        Text(
-                          appStore.userEmail,
-                          style: const TextStyle(
-                            color: Colors.lightBlueAccent,
-                            fontSize: 14,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ],
+                );
+              },
+            ),
+            Divider(),
+
+            // Compact ListView Items
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  _buildDrawerItem(
+                    icon: Icons.people,
+                    text: "Customer",
+                    textStyle: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const CustomerScreen()),
                     ),
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.leaderboard,
+                    text: "Leads",
+                    textStyle: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LeadsScreen()),
+                    ),
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.delete,
+                    text: "Delete",
+                    iconColor: Colors.black,
+                    textStyle: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                    onTap: () {},
                   ),
                 ],
               ),
             ),
-            // Customer ListTile
-            ListTile(
-              title: const Text('Customer'),
-              leading: const Icon(Icons.people),
-              trailing: const Icon(Icons.keyboard_arrow_right),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CustomerScreen(),
-                  ),
-                );
-              },
-            ),
-            // Leads ListTile
-            ListTile(
-              title: const Text('Leads'),
-              leading: const Icon(Icons.leaderboard),
-              trailing: const Icon(Icons.keyboard_arrow_right),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LeadsScreen(),
-                  ),
-                );
-              },
-            ),
-            // Logout ListTile
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text(
-                'Logout',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onTap: () async {
-                // Await the dialog result
-                bool logoutConfirmed = await _showLogoutDialog(context);
 
-                if (logoutConfirmed) {
-                  // Proceed with logout
-                  Fluttertoast.showToast(msg: 'Logging out...');
-                  bool success = await AuthService().logout(
-                    context: context, // Passing context
-                    isSessionExpired: true, // Passing isSessionExpired
-                  );
-
-                  if (success) {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => AuthScreen()),
-                      (_) => false,
-                    );
-                  } else {
-                    Fluttertoast.cancel();
-                    Fluttertoast.showToast(msg: 'Something went wrong!');
-                  }
-                }
-              },
-            ),
+            // Profile Section
+            _buildProfileSection(),
           ],
         ),
       ),
     );
   }
 
-  // Logout Confirmation Dialog
+  // Compact Drawer Item
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String text,
+    Color iconColor = Colors.black,
+    TextStyle textStyle = const TextStyle(fontSize: 14),
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      leading: Icon(icon, color: iconColor, size: 22),
+      title: Text(text, style: textStyle),
+      trailing: const Icon(Icons.keyboard_arrow_right, size: 18),
+      onTap: onTap,
+    );
+  }
 
+  // Profile Section - Compact
+  Widget _buildProfileSection() {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.black12, width: 1.0),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 25, // Compact size
+            backgroundImage: appStore.profileImage?.isNotEmpty ?? false
+                ? NetworkImage(appStore.profileImage!)
+                : null,
+            child: appStore.profileImage?.isEmpty ?? true
+                ? Text(
+                    appStore.fullName?.isNotEmpty ?? false
+                        ? appStore.fullName![0].toUpperCase()
+                        : '',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  )
+                : null,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  appStore.fullName ?? "User Name",
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  appStore.userEmail ?? "user@example.com",
+                  style: const TextStyle(
+                    color: Colors.lightBlueAccent,
+                    fontSize: 12,
+                    decoration: TextDecoration.underline,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.black, size: 20),
+            onPressed: () async {
+              bool logoutConfirmed = await _showLogoutDialog(context);
+              if (logoutConfirmed) {
+                bool success = await AuthService().logout(
+                  context: context,
+                  isSessionExpired: true,
+                );
+                if (success) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AuthScreen()),
+                    (_) => false,
+                  );
+                }
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Logout Dialog
   Future<bool> _showLogoutDialog(BuildContext context) async {
-    bool result = await showDialog<bool>(
+    return await showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Text('Are you sure?'),
               content: const Text('Do you want to log out?'),
-              actions: <Widget>[
+              actions: [
                 TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false); // Cancel
-                  },
-                  child: const Text('Cancel'),
-                ),
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text('Cancel')),
                 TextButton(
-                  onPressed: () {
-                    // Simulate session expiration (remove user session data here if needed)
-                    // _logout(context);
-                    Navigator.of(context).pop(true);
-                  },
-                  child: const Text('Logout'),
-                ),
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text('Logout')),
               ],
             );
           },
         ) ??
-        false; // Default value if dialog returns null
-
-    return result; // Ensure returning a bool
-  }
-
-  void _logout(BuildContext context) {
-    // Navigate to AuthScreen and clear all previous routes
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => AuthScreen()),
-      (Route<dynamic> route) => false, // Clear all previous routes
-    );
+        false;
   }
 }

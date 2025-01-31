@@ -61,6 +61,9 @@ abstract class _LeadStore with Store {
   @observable
   FourthBox fourthBox = FourthBox(totalContactLeads: 0);
 
+  @observable
+  CompanyInfo? companyInfo;
+
   @action
   Future<void> getLeads({int page = 0}) async {
     infoLog("Leads Page Count --------$page");
@@ -145,6 +148,7 @@ abstract class _LeadStore with Store {
         "API Dashboard Data according page: ${data['fourth_box']?['total_contact_leads']}");
     if (status) {
       loadingLeads.value = false;
+      //  companyInfo = CompanyInfo.fromJson(data['companyInfo']);
       // Map data to FirstBox
       firstBox = FirstBox.fromJson(data['first_box'] ?? {});
 
@@ -156,6 +160,12 @@ abstract class _LeadStore with Store {
 
       // Map data to FourthBox
       fourthBox = FourthBox.fromJson(data['fourth_box'] ?? {});
+      //Company Info
+      if (data['company_info'] != null) {
+        companyInfo = CompanyInfo.fromJson(data['company_info']);
+      }
+       
+
       if (data['country'] != null) {
         country =
             (data['country'] as List).map((e) => Country.fromJson(e)).toList();
