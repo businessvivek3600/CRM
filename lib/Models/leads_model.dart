@@ -327,6 +327,7 @@ class NoteData {
   String smallImage;
   int? editDelete;
   String id;
+  bool isEditing;
 
   NoteData({
     required this.description,
@@ -340,6 +341,7 @@ class NoteData {
     required this.smallImage,
     this.editDelete,
     required this.id,
+    this.isEditing = false,
   });
 
   factory NoteData.fromJson(Map<String, dynamic> json) {
