@@ -33,6 +33,9 @@ class _LeadsScreenState extends State<LeadsScreen> {
   @override
   void initState() {
     super.initState();
+    leadStore.leads.clear();
+    currentPage = 0;
+    hasMore = true;
     leadStore.getLeads(page: currentPage).then((_) {
       setState(() {
         isShow = true;
@@ -200,18 +203,28 @@ class _LeadsScreenState extends State<LeadsScreen> {
                 return Expanded(
                   child: ListView.builder(
                     controller: _scrollController,
-                    itemCount: leadStore.leads.length + (hasMore ? 1 : 0),
+                    itemCount: leads.isEmpty ? 1 : leads.length + (hasMore ? 1 : 0),
                     itemBuilder: (context, index) {
-                      if (index == leadStore.leads.length) {
+                      if (leads.isEmpty) {
+                        return const Center(child: CircularProgressIndicator());// Prevent accessing empty list
+                      }
+
+                      if (index == leads.length) {
                         return const Center(child: CircularProgressIndicator());
                       }
 
-                      final lead = leads[index];
-                      return _buildLeadCard(lead);
+                      // Ensure index is within bounds
+                      if (index < leads.length) {
+                        final lead = leads[index];
+                        return _buildLeadCard(lead);
+                      } else {
+                        return const SizedBox();
+                      }
                     },
                   ),
                 );
               }),
+
             ],
           ),
         ),

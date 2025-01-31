@@ -17,8 +17,8 @@ import '../../../../store/lead_store.dart';
 import '../../../../widgets/date_formation.dart';
 
 class LeadDetails extends StatefulWidget {
-  const LeadDetails({Key? key, required this.lead}) : super(key: key);
-  final Lead lead;
+ LeadDetails({Key? key, required this.lead}) : super(key: key);
+  Lead lead;
   @override
   State<LeadDetails> createState() => _LeadDetailsState();
 }
@@ -77,15 +77,19 @@ class _LeadDetailsState extends State<LeadDetails> {
                 Icons.edit,
                 color: Colors.white,
               ),
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                final updatedLead = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EditLead(
-                      lead: widget.lead,
-                    ),
+                    builder: (context) => EditLead(lead: widget.lead),
                   ),
                 );
+
+                if (updatedLead != null) {
+                  setState(() {
+                    widget.lead = updatedLead; // Update UI with new lead data
+                  });
+                }
               },
             ),
             IconButton(

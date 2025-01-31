@@ -144,7 +144,7 @@ class _AddNotesTabState extends State<AddNotesTab> {
                     ],
                   ),
                 ),
-                height20(),
+                height10(),
                 RadioListTile(
                   title: const Text(
                     "I got in touch with this lead",
@@ -159,7 +159,6 @@ class _AddNotesTabState extends State<AddNotesTab> {
                     });
                   },
                 ),
-                height20(),
                 RadioListTile(
                   title: const Text(
                     "I have not contacted this lead",
@@ -174,7 +173,7 @@ class _AddNotesTabState extends State<AddNotesTab> {
                     });
                   },
                 ),
-                height20(),
+                height10(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -293,8 +292,7 @@ class _AddNotesTabState extends State<AddNotesTab> {
                     // State variable for inline editing
                     bool isEditing = false;
 
-                    return StatefulBuilder(
-                      builder: (context, setState) => Column(
+                    return  Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(
@@ -531,9 +529,8 @@ class _AddNotesTabState extends State<AddNotesTab> {
                             ),
                           height10(),
                         ],
-                      ),
-                    );
-                  },
+
+                    );},
                 )
               ],
             ),

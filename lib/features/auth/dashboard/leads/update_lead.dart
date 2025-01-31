@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:crm/features/auth/dashboard/leads/leads_details.dart';
 import 'package:crm/store/lead_store.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
@@ -8,10 +9,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:nb_utils/nb_utils.dart';
 import '../../../../Models/leads_model.dart';
 import '../../../../services/api_services.dart';
 import '../../../../store/app_store.dart';
 import '../../../../utils/size_utils.dart';
+import '../../../../widgets/toastification/toastification.dart';
 
 class EditLead extends StatefulWidget {
   const EditLead({super.key, required this.lead});
@@ -516,9 +519,20 @@ class _EditLeadState extends State<EditLead> {
                 Map<String, dynamic> response,
                 String? message
               ) = await ApiService.addLeads(formData);
+              errorLog("--------${formData.fields}");
+              errorLog("status:  $status");
+              errorLog("response  = ${response['data']}");
+              errorLog("message = $message");
 
               if (status) {
+                Lead _lead = Lead.fromJson(response['data'][0]);
+
+
+                print("updated lead");
                 print('Success: $message');
+                toastLong(message, gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
+                TF.success;
+                Navigator.pop(context, _lead);
                 // Handle success (e.g., show a success message or navigate)
               } else {
                 print('Error: $status - $response');
