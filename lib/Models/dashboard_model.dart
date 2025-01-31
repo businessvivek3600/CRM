@@ -13,6 +13,7 @@ class Dashboard {
   List<LeadStatus> leadStatus;
   ThirdBox thirdBox;
   FourthBox fourthBox;
+  CompanyInfo companyInfo;
 
   Dashboard({
     required this.status,
@@ -25,21 +26,23 @@ class Dashboard {
     required this.secondBox,
     required this.thirdBox,
     required this.fourthBox,
+    required this.companyInfo,
   });
 
   factory Dashboard.fromJson(Map<String, dynamic> json) {
     return Dashboard(
-      status: json['status'],
-      isLoggedIn: json['is_logged_in'],
-      loginToken: json['login_token'],
-      userData: User.fromJson(json['userData']),
-      title: json['title'],
-      leadStatus: json['leadStatus'].map((e) => LeadStatus.fromJson(e)).toList(),
-      firstBox: FirstBox.fromJson(json['first_box']),
-      secondBox: SecondBox.fromJson(json['second_box']),
-      thirdBox: ThirdBox.fromJson(json['third_box']),
-      fourthBox: FourthBox.fromJson(json['fourth_box']),
-    );
+        status: json['status'],
+        isLoggedIn: json['is_logged_in'],
+        loginToken: json['login_token'],
+        userData: User.fromJson(json['userData']),
+        title: json['title'],
+        leadStatus:
+            json['leadStatus'].map((e) => LeadStatus.fromJson(e)).toList(),
+        firstBox: FirstBox.fromJson(json['first_box']),
+        secondBox: SecondBox.fromJson(json['second_box']),
+        thirdBox: ThirdBox.fromJson(json['third_box']),
+        fourthBox: FourthBox.fromJson(json['fourth_box']),
+        companyInfo: CompanyInfo.fromJson(json["companyInfo"]));
   }
 
   Map<String, dynamic> toJson() {
@@ -47,13 +50,14 @@ class Dashboard {
       'status': status,
       'is_logged_in': isLoggedIn,
       'login_token': loginToken,
-      'title':title,
+      'title': title,
       'userData': userData,
       'leadStatus': leadStatus,
       'first_box': firstBox.toJson(),
       'second_box': secondBox.toJson(),
       'third_box': thirdBox.toJson(),
       'fourth_box': fourthBox.toJson(),
+      'companyInfo': companyInfo.toJson(),
     };
   }
 }
@@ -124,10 +128,38 @@ class FourthBox {
   }
 }
 
+class CompanyInfo {
+  String? logo;
+  String? companyName;
+  String? description; // This is an optional field
+  String? image;
 
+  CompanyInfo({
+    this.logo,
+    this.companyName,
+    this.description,
+    this.image,
+  });
+
+  // Factory method to create CompanyInfo from JSON
+  factory CompanyInfo.fromJson(Map<String, dynamic> json) {
+    return CompanyInfo(
+      logo: json['logo'] ?? '',
+      companyName: json['companyName'] ?? '',
+      description: json['description'] ?? '',
+      image: json['image'] ?? '',
+    );
+  }
+
+  // Convert CompanyInfo object to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'logo': logo,
+      'companyName': companyName,
+      'description': description,
+      'image': image,
+    };
+  }
+}
 
 enum Color { THE_28_B8_DA, THE_757575, THE_7_CB342 }
-
-
-
-

@@ -164,15 +164,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               )
                             : null,
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Welcome ${appStore.fullName}',
                             style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                           Text(
@@ -185,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 25),
 
                   // Dashboard Stats Section
                   GridView.builder(
