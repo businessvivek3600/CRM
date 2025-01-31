@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _scheduleLocationTask() {
-    _locationTimer = Timer.periodic(Duration(minutes: 10), (timer) {
+    _locationTimer = Timer.periodic(const Duration(minutes: 10), (timer) {
       getLocation();
     });
     Workmanager().registerPeriodicTask(
