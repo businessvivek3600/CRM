@@ -6,7 +6,6 @@ import 'package:crm/widgets/date_formation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
-
 import '../../../../services/api_services.dart';
 
 
@@ -24,8 +23,6 @@ class _AddNotesTabState extends State<AddNotesTab> {
   final TextEditingController dateTimeController = TextEditingController();
   final FocusNode noteFocusNode = FocusNode();
   final FocusNode dateTimeFocusNode = FocusNode();
-
-  // Method to pick a date and set the time to current time automatically
   DateTime? selectedDateTime;
 
   Future<void> _pickDateTime() async {
@@ -74,7 +71,7 @@ class _AddNotesTabState extends State<AddNotesTab> {
     dateTimeFocusNode.dispose();
     super.dispose();
   }
-
+  bool isEditing = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -290,7 +287,7 @@ class _AddNotesTabState extends State<AddNotesTab> {
                         TextEditingController(text: note.description);
 
                     // State variable for inline editing
-                    bool isEditing = false;
+
 
                     return  Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
