@@ -49,7 +49,7 @@ class _RemindersTabState extends State<RemindersTab> {
       isChecked = false;
     });
   }
-
+  bool isEditing = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -374,7 +374,7 @@ class _RemindersTabState extends State<RemindersTab> {
                           TextEditingController(text: remainder.description);
 
                       // State variable for inline editing
-                      bool isEditing = false;
+
 
                       return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

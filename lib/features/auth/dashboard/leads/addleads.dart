@@ -1,8 +1,5 @@
 import 'dart:convert';
-
-import 'package:country_state_picker/components/index.dart';
-import 'package:country_state_picker/country_state_picker.dart';
-import 'package:crm/constants/app_constants.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
@@ -16,6 +13,7 @@ import 'package:nb_utils/nb_utils.dart';
 import '../../../../Models/leads_model.dart';
 import '../../../../services/api_services.dart';
 import '../../../../store/lead_store.dart';
+import '../../../../widgets/custom_dropdown.dart';
 
 class AddLeads extends StatefulWidget {
   const AddLeads({super.key});
@@ -82,6 +80,48 @@ class _MyWidgetState extends State<AddLeads> {
     super.dispose();
   }
 
+  String? selectedSource;
+
+  String? getLeadSourceId(String name) {
+    try {
+      return leadStore.leadSource
+          .firstWhere((source) => source.name == name)
+          .id;
+    } catch (e) {
+      return null; // Return null if the name is not found
+    }
+  }
+
+  String? getLeadStatusId(String name) {
+    try {
+      return leadStore.leadStatus
+          .firstWhere((status) => status.name == name)
+          .id;
+    } catch (e) {
+      return null; // Return null if the name is not found
+    }
+  }
+
+  String? getStaffId(String name) {
+    try {
+      return leadStore.staff
+          .firstWhere((staff) => staff.firstName + staff.lastName == name)
+          .staffId;
+    } catch (e) {
+      return null; // Return null if the name is not found
+    }
+  }
+
+  String? getCountryId(String name) {
+    try {
+      return leadStore.country
+          .firstWhere((country) => country.shortName == name)
+          .countryId;
+    } catch (e) {
+      return null; // Return null if the name is not found
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,81 +155,44 @@ class _MyWidgetState extends State<AddLeads> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    DropdownButtonFormField<String>(
-                      value: _selectedSourceId,
-                      items: leadStore.leadSource
-                          .map((item) => DropdownMenuItem<String>(
-                                value: item.id,
-                                child: Text(item.name),
-                              ))
-                          .toList(),
+                    CustomDropdown(
+                      hint: 'Select Source',
+                      items: leadStore.leadSource.map((e) => e.name).toList(),
+                      selectedValue: selectedSource,
                       onChanged: (value) {
                         setState(() {
-                          _selectedSourceId = value;
+                          selectedSource = getLeadSourceId(value ?? "");
+                          warningLog("Selected Source: $selectedSource");
                         });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Select Source',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Source is required';
-                        }
-                        return null;
                       },
                     ),
                     const SizedBox(height: 15),
-                    DropdownButtonFormField<String>(
-                      value: _selectedStatusId,
-                      items: leadStore.leadStatus
-                          .map((item) => DropdownMenuItem<String>(
-                                value: item.id,
-                                child: Text(item.name),
-                              ))
-                          .toList(),
+                    CustomDropdown(
+                      hint: 'Select Status',
+                      items: leadStore.leadStatus.map((e) => e.name).toList(),
+                      selectedValue: _selectedStatusId,
                       onChanged: (value) {
                         setState(() {
-                          _selectedStatusId = value;
+                          _selectedStatusId = getLeadStatusId(value ?? "");
+                          warningLog("Selected Status: $_selectedStatusId");
                         });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Status',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Status is required';
-                        }
-                        return null;
                       },
                     ),
                     const SizedBox(height: 15),
-                    DropdownButtonFormField<String>(
-                      value: _selectedEmployeeId,
+                    CustomDropdown(
+                      hint: 'Assigned Lead',
                       items: leadStore.staff
-                          .map((item) => DropdownMenuItem<String>(
-                                value: item.staffId,
-                                child:
-                                    Text("${item.firstName} ${item.lastName}"),
-                              ))
+                          .map((e) => e.firstName + e.lastName)
                           .toList(),
+                      selectedValue: _selectedEmployeeId,
                       onChanged: (value) {
                         setState(() {
-                          _selectedEmployeeId = value;
+                          _selectedEmployeeId = getStaffId(value ?? "");
+                          warningLog("Selected Staff: $_selectedEmployeeId");
                         });
                       },
-                      decoration: InputDecoration(
-                        labelText: 'Assigned Lead',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
                     ),
+
                     const SizedBox(height: 15),
                     const Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -209,48 +212,47 @@ class _MyWidgetState extends State<AddLeads> {
                       spacing: 8,
                       children: selectedTags
                           .map((tag) => Chip(
-                                label: Text(tag),
-                                deleteIcon: const Icon(Icons.close),
-                                onDeleted: () {
-                                  setState(() {
-                                    // Remove the tag name and its corresponding ID
-                                    int index = selectedTags.indexOf(tag);
-                                    selectedTags.removeAt(index);
-                                    _dropDownTagId.removeAt(index);
-                                  });
-                                },
-                              ))
+                        label: Text(tag),
+                        deleteIcon: const Icon(Icons.close),
+                        onDeleted: () {
+                          setState(() {
+                            selectedTags.remove(tag);
+                          });
+                        },
+                      ))
                           .toList(),
                     ),
                     const SizedBox(height: 5),
-                    DropdownButton<String>(
-                      hint: const Text("Select a tag"),
-                      isExpanded: true,
-                      value: null,
-                      items: leadStore.tags.map((tag) {
-                        return DropdownMenuItem<String>(
-                          value: tag.id,
-                          child: Text(tag.name),
-                        );
-                      }).toList(),
-                      onChanged: (String? tagId) {
-                        if (tagId != null) {
-                          // Find the tag corresponding to the selected ID
-                          Tag? selectedTag = leadStore.tags.firstWhere(
-                            (tag) => tag.id == tagId,
-                            orElse: null,
-                          );
 
-                          if (!_dropDownTagId.contains(selectedTag.id)) {
-                            setState(() {
-                              // Add the selected tag's ID and name
-                              _dropDownTagId.add(selectedTag.id);
-                              selectedTags.add(selectedTag.name);
-                            });
-                          }
-                        }
-                      },
+// Tag Dropdown and Add Button
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CustomDropdown(
+                            hint: 'Select or Add a Tag',
+                            items: leadStore.tags.map((e) => e.name).toList(),
+                            onChanged: (value) {
+                              if (value != null && value.isNotEmpty) {
+                                setState(() {
+                                  if (!selectedTags.contains(value)) {
+                                    selectedTags.add(value); // Add tag name directly
+                                  }
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.add, color: Colors.blue),
+                          onPressed: () {
+                            _showAddTagDialog(); // Show input dialog for a new tag
+                          },
+                        ),
+                      ],
                     ),
+
+
+
                     const SizedBox(height: 15),
                     CommonTextField(
                       controller: nameController,
@@ -332,32 +334,16 @@ class _MyWidgetState extends State<AddLeads> {
                       },
                     ),
                     const SizedBox(height: 15),
-                    SizedBox(
-                      width: double.infinity,
-                      child: DropdownButtonFormField<String>(
-                        value: leadStore.country
-                            .firstWhereOrNull((v) => v.countryId == country)
-                            ?.countryId,
-                        isExpanded: true, // Prevent overflow
-                        items: leadStore.country
-                            .map((item) => DropdownMenuItem<String>(
-                                  value: item.countryId,
-                                  child: Text(item.shortName),
-                                ))
-                            .toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            country = value;
-                            state = null;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Select Country',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                      ),
+                    CustomDropdown(
+                      hint: 'Select Country',
+                      items: leadStore.country.map((e) => e.shortName).toList(),
+                      selectedValue: country,
+                      onChanged: (value) {
+                        setState(() {
+                          country = getCountryId(value ?? "");
+                          warningLog("Selected Country: $country");
+                        });
+                      },
                     ),
                     const SizedBox(height: 15),
                     CommonTextField(
@@ -462,11 +448,11 @@ class _MyWidgetState extends State<AddLeads> {
                             'country': country,
                             'is_public': isPublic ? 1 : 0,
                             'contacted_today': isContactNow ? 1 : 0,
-                            'source': _selectedSourceId,
+                            'source': selectedSource,
                             'status': _selectedStatusId,
                             'assigned': _selectedEmployeeId,
                             'tags': jsonEncode(
-                                _dropDownTagId), // Assuming IDs for tags
+                                selectedTags), // Assuming IDs for tags
                             'description': descriptionController.text.trim(),
                           });
 
@@ -530,4 +516,45 @@ class _MyWidgetState extends State<AddLeads> {
       ),
     );
   }
+  void _showAddTagDialog() {
+    TextEditingController tagController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Add New Tag"),
+          content: TextField(
+            controller: tagController,
+            decoration: InputDecoration(hintText: "Enter tag name"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context), // Close dialog
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                String newTag = tagController.text.trim();
+                if (newTag.isNotEmpty) {
+                  setState(() {
+                    if (!selectedTags.contains(newTag)) {
+                      selectedTags.add(newTag);
+                    }
+
+                    if (!leadStore.tags.any((tag) => tag.name == newTag)) {
+                      leadStore.tags.add(Tag(name: newTag, id: '')); // Add to tag list
+                    }
+                  });
+                }
+                Navigator.pop(context); // Close dialog after adding
+              },
+              child: Text("Add"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
