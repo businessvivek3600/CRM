@@ -16,17 +16,18 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-  final LeadStore leadStore = LeadStore();
-
   @override
   void initState() {
     super.initState();
-    fetchCompanyInfo();
+    // Fetch only if companyInfo is null (first-time fetch)
+    if (leadStore.companyInfo == null) {
+      fetchCompanyInfo();
+    }
   }
 
   Future<void> fetchCompanyInfo() async {
     await leadStore.getDashboard();
-    if (mounted) setState(() {});
+    if (mounted) setState(() {}); // Update UI after fetching
   }
 
   @override
@@ -43,25 +44,25 @@ class _CustomDrawerState extends State<CustomDrawer> {
         ),
         child: Column(
           children: [
-            // Compact Drawer Header
             Observer(
               builder: (_) {
                 final companyInfo = leadStore.companyInfo;
                 return Padding(
                   padding: EdgeInsets.only(right: 30),
                   child: Container(
-                    height: 120, // Reduced height
+                    height: 120,
                     alignment: Alignment.center,
                     child: companyInfo?.logo?.isNotEmpty ?? false
                         ? Image.network(
                             companyInfo!.logo!,
-                            width: 230, // Smaller width
-                            height: 100, // Smaller height
+                            width: 230,
+                            height: 100,
                             fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) =>
-                                const SizedBox(),
+                                const Icon(Icons.business, size: 50),
                           )
-                        : const SizedBox(),
+                        : const Icon(Icons.business,
+                            size: 50), // Default icon if no logo
                   ),
                 );
               },
