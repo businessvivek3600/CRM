@@ -105,10 +105,10 @@ class _MyWidgetState extends State<AddLeads> {
   String? getStaffId(String name) {
     try {
       return leadStore.staff
-          .firstWhere((staff) => staff.firstName + staff.lastName == name)
+          .firstWhere((staff) => "${staff.firstName} ${staff.lastName}" == name)
           .staffId;
     } catch (e) {
-      return null; // Return null if the name is not found
+      return null;
     }
   }
 
@@ -128,7 +128,7 @@ class _MyWidgetState extends State<AddLeads> {
       appBar: AppBar(
         backgroundColor: secondaryPrimaryColor,
         title: const Text(
-          'Add New Leads',
+          'Add New Lead',
           style: TextStyle(color: Colors.white),
         ),
         leading: IconButton(
@@ -155,16 +155,27 @@ class _MyWidgetState extends State<AddLeads> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    CustomDropdown(
-                      hint: 'Select Source',
-                      items: leadStore.leadSource.map((e) => e.name).toList(),
-                      selectedValue: selectedSource,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedSource = getLeadSourceId(value ?? "");
-                          warningLog("Selected Source: $selectedSource");
-                        });
+                    GestureDetector(
+                      onTap: () {
+                        FocusScope.of(context).unfocus(); // Close the keyboard and dropdown
                       },
+                      child: CustomDropdown(
+                        hint: 'Select Source',
+                        items: leadStore.leadSource.map((e) => e.name).toList(),
+                        selectedValue: selectedSource,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedSource = getLeadSourceId(value ?? "");
+                            warningLog("Selected Source: $selectedSource");
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please pick a source for the lead';
+                          }
+                          return null;
+                        },
+                      ),
                     ),
                     const SizedBox(height: 15),
                     CustomDropdown(
@@ -177,12 +188,18 @@ class _MyWidgetState extends State<AddLeads> {
                           warningLog("Selected Status: $_selectedStatusId");
                         });
                       },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please pick a status for the lead';
+                          }
+                          return null;
+                        }
                     ),
                     const SizedBox(height: 15),
                     CustomDropdown(
                       hint: 'Assigned Lead',
                       items: leadStore.staff
-                          .map((e) => e.firstName + e.lastName)
+                          .map((e) => "${e.firstName} ${e.lastName}")
                           .toList(),
                       selectedValue: _selectedEmployeeId,
                       onChanged: (value) {
@@ -223,8 +240,6 @@ class _MyWidgetState extends State<AddLeads> {
                           .toList(),
                     ),
                     const SizedBox(height: 5),
-
-// Tag Dropdown and Add Button
                     Row(
                       children: [
                         Expanded(
@@ -321,6 +336,12 @@ class _MyWidgetState extends State<AddLeads> {
                       focusNode: phoneFocusNode,
                       onFieldSubmitted: (_) {
                         FocusScope.of(context).requestFocus(companyFocusNode);
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'A valid phone number is required';
+                        }
+                        return null;
                       },
                     ),
                     const SizedBox(height: 15),
