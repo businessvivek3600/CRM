@@ -70,7 +70,7 @@ class AuthService {
       await appStore.setUser(null);
       await appStore.setToken('');
       await appStore.setLoggedIn(false);
-      await Future.delayed(const Duration(seconds: 3)); // Simulate API call
+      await Future.delayed(const Duration(seconds: 2)); // Simulate API call
       return true; // Logout successful
     } catch (e) {
       print("Logout failed: $e");

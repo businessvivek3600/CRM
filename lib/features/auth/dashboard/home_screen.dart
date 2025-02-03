@@ -50,6 +50,14 @@ class _HomeScreenState extends State<HomeScreen> {
     getLocation();
     _requestLocationPermission();
     _scheduleLocationTask();
+    afterBuildCreated(() {
+      fetchCompanyInfo();
+    });
+  }
+
+  Future<void> fetchCompanyInfo() async {
+    await leadStore.getDashboard();
+    if (mounted) setState(() {});
   }
 
   Future<void> _requestLocationPermission() async {
