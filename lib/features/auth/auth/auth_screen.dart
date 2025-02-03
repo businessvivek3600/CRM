@@ -165,7 +165,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                     style: TextStyle(
                                         color: Color(0xFF007BFF),
                                         fontWeight: FontWeight.bold),
-                                  ),
+                                  ), 
                                 ],
                               ),
                             ],

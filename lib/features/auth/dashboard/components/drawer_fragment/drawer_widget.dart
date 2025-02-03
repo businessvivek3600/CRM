@@ -7,6 +7,7 @@ import 'package:crm/store/lead_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:nb_utils/nb_utils.dart';
+// import 'package:nb_utils/nb_utils.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -19,15 +20,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
   @override
   void initState() {
     super.initState();
-    // Fetch only if companyInfo is null (first-time fetch)
-    if (leadStore.companyInfo == null) {
-      fetchCompanyInfo();
-    }
-  }
-
-  Future<void> fetchCompanyInfo() async {
-    await leadStore.getDashboard();
-    if (mounted) setState(() {}); // Update UI after fetching
   }
 
   @override
@@ -44,13 +36,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
         ),
         child: Column(
           children: [
+            // Compact Drawer Header
             Observer(
               builder: (_) {
                 final companyInfo = leadStore.companyInfo;
                 return Padding(
-                  padding: EdgeInsets.only(right: 30),
+                  padding: const EdgeInsets.only(right: 30),
                   child: Container(
-                    height: 120,
+                    height: 120, // Reduced height
                     alignment: Alignment.center,
                     child: companyInfo?.logo?.isNotEmpty ?? false
                         ? Image.network(
@@ -59,15 +52,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
                             height: 100,
                             fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.business, size: 50),
+                                const SizedBox(),
                           )
-                        : const Icon(Icons.business,
-                            size: 50), // Default icon if no logo
+                        : const SizedBox(),
                   ),
                 );
               },
             ),
-            Divider(),
+            const Divider(),
 
             // Compact ListView Items
             Expanded(
@@ -146,13 +138,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
         children: [
           CircleAvatar(
             radius: 25, // Compact size
-            backgroundImage: appStore.profileImage?.isNotEmpty ?? false
-                ? NetworkImage(appStore.profileImage!)
+            backgroundImage: appStore.profileImage.isNotEmpty
+                ? NetworkImage(appStore.profileImage)
                 : null,
-            child: appStore.profileImage?.isEmpty ?? true
+            child: appStore.profileImage.isEmpty
                 ? Text(
-                    appStore.fullName?.isNotEmpty ?? false
-                        ? appStore.fullName![0].toUpperCase()
+                    appStore.fullName.isNotEmpty
+                        ? appStore.fullName[0].toUpperCase()
                         : '',
                     style: const TextStyle(
                       fontSize: 18,
@@ -193,16 +185,22 @@ class _CustomDrawerState extends State<CustomDrawer> {
             onPressed: () async {
               bool logoutConfirmed = await _showLogoutDialog(context);
               if (logoutConfirmed) {
-                bool success = await AuthService().logout(
-                  context: context,
-                  isSessionExpired: true,
-                );
-                if (success) {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AuthScreen()),
-                    (_) => false,
+                if (mounted) {
+                  bool success = await AuthService().logout(
+                    context: context,
+                    isSessionExpired: true,
                   );
+
+                  if (success) {
+                    Fluttertoast.showToast(msg: 'Logged out Successfully!');
+                    if (mounted) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) => const AuthScreen()),
+                        (_) => false,
+                      );
+                    }
+                  }
                 }
               }
             },
