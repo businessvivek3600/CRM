@@ -246,12 +246,6 @@ class _LeadDetailsState extends State<LeadDetails> {
                           ) = await ApiService.deleteLead(deleteLead);
                           if (status) {
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Lead deleted successfully!"),
-                                backgroundColor: completedColor,
-                              ),
-                            );
                             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LeadsScreen(),));
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(

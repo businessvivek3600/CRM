@@ -61,47 +61,15 @@ class ApiService {
     }
     return (false, <String, dynamic>{}, '');
   }
-  static Future<(bool, Map<String, dynamic>, String?)> updateLead(FormData info) async {
-    try {
-      var res = await ApiHandler.fetchData(ApiConstant.addLead, data: info);
-      log('Response Data: ${res.$2}');
-      log("Status: ${res.$1}");
-      log("Message: ${res.$3}");
-
-      // Extract the response
-      bool status = res.$1;
-      Map<String, dynamic> data = res.$2 ?? {}; // Handle if res.$2 is null
-      String message = res.$3 ?? '';
-
-      // Check if 'data' field is null or contains data
-      if (data.isNotEmpty && data['data'] != null) {
-        log("Lead Data: ${data['data']}");
-        // You can now access the 'data' field safely
-      } else {
-        log("No lead data available.");
-      }
-
-      // Return the result
-      return (status, data, message);
-    } catch (e) {
-      logger.e('Error updating lead: $e', tag: tag);
-      return (false, <String, dynamic>{}, 'Error occurred');
-    }
-  }
-
 
   static Future<(bool, Map<String, dynamic>, String?)> deleteLead(
       Map<String, dynamic> info) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-      await await ApiHandler.fetchData(ApiConstant.deleteLead, data: info);
-
-
+      await ApiHandler.fetchData(ApiConstant.deleteLead, data: info);
       if (data['status']) {
-
         toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
         TF.success;
-        log('data ________________________-: $data');
         return (status, data, message);
       } else {
 
@@ -302,13 +270,15 @@ class ApiService {
   }
 
   ///----------------------Customer----------
-  static Future<(bool, Map<String, dynamic>, String?)> editCustomer(
-      Map<String, dynamic> info) async {
+  static Future<(bool, Map<String, dynamic>, String?)>  editCustomer(
+      FormData info) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-      await await ApiHandler.fetchData(ApiConstant.editCustomer,
+       await ApiHandler.fetchData(ApiConstant.editCustomer,
           data: info);
-      log('data : $data');
+      log('data--- : $data');
+      log('status--- : $status');
+      log('message--- : $message');
       if (status) {
         toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
         log("message --$message");

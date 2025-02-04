@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:crm/features/auth/dashboard/leads/leads_details.dart';
 import 'package:crm/store/lead_store.dart';
 import 'package:crm/utils/colors.dart';
@@ -7,7 +6,6 @@ import 'package:crm/utils/default_logger.dart';
 import 'package:crm/utils/text_field.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
 import '../../../../Models/leads_model.dart';
@@ -53,6 +51,7 @@ class _EditLeadState extends State<EditLead> {
   @override
   void initState() {
     super.initState();
+    infoLog("inital status id ==========${widget.lead.status}");
 
     // Initialize controllers with lead data
     nameController = TextEditingController(text: widget.lead.name);
@@ -243,6 +242,7 @@ class _EditLeadState extends State<EditLead> {
                       onChanged: (value) {
                         setState(() {
                           _selectedItem = getLeadSourceId(value ?? "");
+                          errorLog("selected Source id -----$_selectedItem");
                         });
                       },
                       validator: (value) {
@@ -262,6 +262,7 @@ class _EditLeadState extends State<EditLead> {
                       onChanged: (value) {
                         setState(() {
                           _statusSelectedItem = getLeadStatusId(value ?? "");
+                          errorLog("selected status id -----$_statusSelectedItem");
                         });
                       },
                       validator: (value) {
@@ -279,6 +280,7 @@ class _EditLeadState extends State<EditLead> {
                       onChanged: (value) {
                         setState(() {
                           _selectedEmployeeId = getLeadStaffId(value ?? "");
+                          errorLog("selected employee id -----$_selectedEmployeeId");
                         });
                       },
                       validator: (value) {
@@ -390,33 +392,28 @@ class _EditLeadState extends State<EditLead> {
                     hint: 'Enter Company Name',
                   ),
                   const SizedBox(height: 15),
-                  SizedBox(
-                    width: double
-                        .infinity, // Allows dropdown to take full available width
-                    child: DropdownButtonFormField<String>(
-                      value: country,
-                      isExpanded: true, // Prevent overflow
-                      items: leadStore.country
-                          .map((item) => DropdownMenuItem<String>(
-                                value: item.countryId,
-                                child: Text(item.shortName),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          country = value;
-                          state =
-                              null; // Reset state when a new country is selected
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Select Country',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                    ),
+                  CustomDropdown(
+                    hint: 'Select Country',
+                    items: leadStore.country.map((item) => item.shortName).toList(),
+                    selectedValue: leadStore.country
+                        .firstWhere((item) => item.countryId == country, orElse: () => leadStore.country.first)
+                        .shortName,
+                    onChanged: (value) {
+                      setState(() {
+                        country = leadStore.country
+                            .firstWhere((item) => item.shortName == value)
+                            .countryId;
+                        state = null; // Reset state when a new country is selected
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please pick a country';
+                      }
+                      return null;
+                    },
                   ),
+
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: stateController,
@@ -522,7 +519,7 @@ class _EditLeadState extends State<EditLead> {
                       ? country
                       : widget.lead.country,
               'source': _selectedItem ?? widget.lead.source,
-              'status': _selectedStatusId ?? widget.lead.status,
+              'status': _statusSelectedItem ?? widget.lead.status,
               'assigned': _selectedEmployeeId ?? widget.lead.assigned,
               'tags': selectedTags.isNotEmpty
                   ? jsonEncode(
@@ -538,25 +535,22 @@ class _EditLeadState extends State<EditLead> {
                   : widget.lead.lastcontact ?? "",
             });
             try {
-           final (
-                bool status,
-                Map<String, dynamic> response,
-                String? message
-              ) = await ApiService.updateLead(formData);
-           infoLog("😀FORM DATA THAT PASS TO API -----${formData.fields}");
-              if (response['status']) {
-                Lead lead = Lead.fromJson(response['data']);
-                infoLog("💬 -----${response['status']}");  infoLog("💬 -----${response['data']}");  infoLog("💬 -----${response['message']}");
-                errorLog("response  data = ${response['data']}");
+              final (
+              bool status,
+              Map<String, dynamic> response,
+              String? message
+              ) = await ApiService.addLeads(formData);
+              infoLog("💬 -----${response['status']}");
+              if (response['status'] == true) {
+                Lead lead = Lead.fromJson(response['data'][0]);
                 toastLong(response['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
                 TF.success;
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LeadDetails(lead: lead),));
 
-              } else {
-                toast(response['message'], gravity: ToastGravity.TOP,bgColor: Colors.red,textColor: Colors.white,);
-                infoLog('Error: $status - $response');
-                // Handle API error
-              }
+              }  else {
+             toast(message, gravity: ToastGravity.TOP, bgColor: Colors.red, textColor: Colors.white);
+             infoLog('Error: $status - ');
+           }
             } catch (e) {
               infoLog('Exception: $e');
               // Handle network or other errors
