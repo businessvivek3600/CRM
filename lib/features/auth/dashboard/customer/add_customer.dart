@@ -1,6 +1,7 @@
 import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/size_utils.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -351,7 +352,7 @@ class _AddCustomerState extends State<AddCustomer> {
           child: ElevatedButton(
             onPressed: () {
     if (_profileFormKey.currentState!.validate()) {
-              final Map<String, dynamic> formData = {
+      FormData formData = FormData.fromMap({
                 "company": _companyController.text,
                 "vat": _vatController.text,
                 "phonenumber": _phoneController.text,
@@ -371,7 +372,7 @@ class _AddCustomerState extends State<AddCustomer> {
                 'shipping_state': stateShippingController.text,
                 'shipping_zip': _shippingZipController.text,
                 'shipping_country': countryShipping ??"",
-              };
+              });
               infoLog("Add Customer DATA ----$formData");
 
               // Call the _saveCustomerData method
@@ -384,7 +385,7 @@ class _AddCustomerState extends State<AddCustomer> {
     );
   }
 
-  void _saveCustomerData(Map<String, dynamic> formData) async {
+  void _saveCustomerData(FormData formData) async {
     warningLog("Editable customer Data: $formData");
 
     try {

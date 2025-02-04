@@ -48,15 +48,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
             .where((item) => item.toLowerCase().contains(query.toLowerCase()))
             .toList();
       }
-
-      // If no items match the query, show "No results found" in the dropdown list
-      if (filteredItems.isEmpty) {
-        filteredItems = ["No results found"];
-      } else if (filteredItems.contains("No results found")) {
-        filteredItems.remove("No results found");
-      }
-
-      // Ensure selectedValue stays in the list if it's not already included
+  // Ensure selectedValue stays in the list if it's not already included
       if (selectedValue != null && !filteredItems.contains(selectedValue)) {
         filteredItems.add(selectedValue!);
       }
