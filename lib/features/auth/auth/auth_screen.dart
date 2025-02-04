@@ -104,7 +104,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     BoxShadow(
                         color: Colors.black26,
                         blurRadius: 10,
-                        offset: Offset(0, 4))
+                        offset: Offset(0, 4),),
                   ],
                 ),
                 child: SingleChildScrollView(
