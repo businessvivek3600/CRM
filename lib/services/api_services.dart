@@ -243,31 +243,24 @@ class ApiService {
 
   ///------------------------Dashboard-----------------------
   /// Fetch Dashboard from the API
-  static Future<(bool, Map<String, dynamic>, String?)>
-      getDashboardData() async {
-    try {
-      // Fetch data using the ApiHandler
-      var (bool status, Map<String, dynamic> data, String? message) =
-          await ApiHandler.fetchData(ApiConstant.dashboard,
-              method: ApiMethod.POST);
+  static Future<(bool, Map<String, dynamic>, String?)> getDashboardData() async {
+  try {
+    var (bool status, Map<String, dynamic> data, String? message) =
+        await ApiHandler.fetchData(ApiConstant.dashboard, method: ApiMethod.POST);
 
-      if (status && data.isNotEmpty) {
-        return (true, data, message);
-      } else {
-        message = message?.split('.').first;
-        // Optionally log or handle the error
-        toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
-        logger.e('Dashboard API error: $message', tag: 'DashboardAPI');
-        return (false, <String, dynamic>{}, message);
-      }
-    } catch (e) {
-      // Handle exceptions gracefully
-      logger.e('getDashboardData error: $e', tag: 'DashboardAPI');
+    if (status && data.isNotEmpty) {
+      return (true, data, message);
+    } else {
+      message = message?.split('.').first;
+      toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
+      logger.e('Dashboard API error: $message', tag: 'DashboardAPI');
+      return (false, <String, dynamic>{}, message);
     }
-
-    // Return default failure response in case of error
-    return (false, <String, dynamic>{}, null);
+  } catch (e, stackTrace) {
+    logger.e('getDashboardData error: $e', error: e, stackTrace: stackTrace, tag: 'DashboardAPI');
+    return (false, <String, dynamic>{}, 'Error fetching dashboard data');
   }
+}
 
   ///----------------------Customer----------
   static Future<(bool, Map<String, dynamic>, String?)>  editCustomer(

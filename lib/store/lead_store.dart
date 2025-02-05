@@ -161,10 +161,12 @@ abstract class _LeadStore with Store {
       // Map data to FourthBox
       fourthBox = FourthBox.fromJson(data['fourth_box'] ?? {});
       //Company Info
-      if (data['company_info'] != null) {
-        companyInfo = CompanyInfo.fromJson(data['company_info']);
+      if (status) {
+        companyInfo = data['company_info'] != null
+            ? CompanyInfo.fromJson(data['company_info'])
+            : null;
+        loadingLeads.value = false;
       }
-       
 
       if (data['country'] != null) {
         country =
