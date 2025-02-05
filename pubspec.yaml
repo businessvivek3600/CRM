@@ -65,6 +65,8 @@ dependencies:
   flutter_fast_forms: ^18.0.0
   workmanager: ^0.5.2
   permission_handler: ^11.3.1
+  dropdown_search: ^6.0.2
+  dropdown_button2: ^2.3.9
 
 
 dev_dependencies:
