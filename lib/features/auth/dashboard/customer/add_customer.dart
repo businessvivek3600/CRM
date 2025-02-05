@@ -315,6 +315,7 @@ class _AddCustomerState extends State<AddCustomer> {
                                 label: 'Shipping State',
                                 hint: 'Enter State',
                               ),
+
                               const SizedBox(height: 15),
                             ],
                           )),
