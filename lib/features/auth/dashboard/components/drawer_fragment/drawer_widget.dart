@@ -1,4 +1,5 @@
 import 'package:crm/features/auth/auth/auth_screen.dart';
+import 'package:crm/features/auth/dashboard/components/notification_screen.dart';
 import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
 import 'package:crm/services/auth_services.dart';
@@ -86,6 +87,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => const LeadsScreen()),
+                    ),
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.notifications,
+                    text: "Notification",
+                    textStyle: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const NotificationScreen()),
                     ),
                   ),
                   _buildDrawerItem(
