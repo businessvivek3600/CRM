@@ -25,6 +25,9 @@ class _CustomerScreenState extends State<CustomerScreen> {
   @override
   void initState() {
     super.initState();
+    customerStore.customers.clear();
+    currentPage = 0;
+    hasMore = true;
     customerStore.fetchCustomerData(page: currentPage).then((_) {
       setState(() {
         isShow = true;
@@ -120,87 +123,87 @@ class _CustomerScreenState extends State<CustomerScreen> {
                     ),
                     height10(),
                     customerStore.isShow
-                        ? Observer(
-                            builder: (context) {
-            final counts = customerStore.customersCounts;
-            if (counts == null) return const SizedBox();
-                              return GridView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: 3 , // Three items: Total, Active, Inactive Customers
-                                gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3, // Display 3 items in a row
-                                  childAspectRatio:
-                                  9 / 7, // Adjust card height/width ratio
-                                ),
-                                itemBuilder: (context, index) {
-                                  // Define labels and values dynamically based on index
-                                  String title;
-                                  String value;
-                                  Color color;
-
-                                  if (index == 0) {
-                                    title = 'Total\nCustomers';
-                                    value = counts.totalCustomer!;
-                                    color = Colors.blue;
-                                  } else if (index == 1) {
-                                    title = 'Active\nCustomers';
-                                    value = counts.activeCustomer!;
-                                    color = Colors.green;
-                                  } else {
-                                    title = 'Inactive\nCustomers';
-                                    value = counts.inactiveCustomer!;
-                                    color = Colors.red;
-                                  }
-
-                                  return Card(
-                                    elevation: 4,
-                                    color: Colors.white,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(2.0),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            title,
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 10),
-                                          Text(
-                                            value,
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: color,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );}
-                              )
-                                  : const SizedBox(),
-                              ],
+                        ? Observer(builder: (context) {
+                            final counts = customerStore.customersCounts;
+                            if (counts == null) return const SizedBox();
+                            return GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount:
+                                  3, // Three items: Total, Active, Inactive Customers
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3, // Display 3 items in a row
+                                childAspectRatio:
+                                    9 / 7, // Adjust card height/width ratio
                               ),
-                              height20(),
+                              itemBuilder: (context, index) {
+                                // Define labels and values dynamically based on index
+                                String title;
+                                String value;
+                                Color color;
 
-                              Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                              Row(
-                              children: [
-                              Container(
-                              width: 4,
+                                if (index == 0) {
+                                  title = 'Total\nCustomers';
+                                  value = counts.totalCustomer!;
+                                  color = Colors.blue;
+                                } else if (index == 1) {
+                                  title = 'Active\nCustomers';
+                                  value = counts.activeCustomer!;
+                                  color = Colors.green;
+                                } else {
+                                  title = 'Inactive\nCustomers';
+                                  value = counts.inactiveCustomer!;
+                                  color = Colors.red;
+                                }
+
+                                return Card(
+                                  elevation: 4,
+                                  color: Colors.white,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(2.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          title,
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          value,
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: color,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          })
+                        : const SizedBox(),
+                  ],
+                ),
+                height20(),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 4,
                           height: 24,
                           color: Colors.blue,
                         ),
