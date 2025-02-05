@@ -66,14 +66,10 @@ class ApiService {
       Map<String, dynamic> info) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-      await await ApiHandler.fetchData(ApiConstant.deleteLead, data: info);
-
-
+      await ApiHandler.fetchData(ApiConstant.deleteLead, data: info);
       if (data['status']) {
-
         toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
         TF.success;
-        log('data ________________________-: $data');
         return (status, data, message);
       } else {
 
@@ -274,13 +270,15 @@ class ApiService {
   }
 
   ///----------------------Customer----------
-  static Future<(bool, Map<String, dynamic>, String?)> editCustomer(
-      Map<String, dynamic> info) async {
+  static Future<(bool, Map<String, dynamic>, String?)>  editCustomer(
+      FormData info) async {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
-      await await ApiHandler.fetchData(ApiConstant.editCustomer,
+       await ApiHandler.fetchData(ApiConstant.editCustomer,
           data: info);
-      log('data : $data');
+      log('data--- : $data');
+      log('status--- : $status');
+      log('message--- : $message');
       if (status) {
         toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
         log("message --$message");

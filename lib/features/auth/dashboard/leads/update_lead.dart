@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:crm/features/auth/dashboard/leads/leads_details.dart';
 import 'package:crm/store/lead_store.dart';
 import 'package:crm/utils/colors.dart';
@@ -7,13 +6,12 @@ import 'package:crm/utils/default_logger.dart';
 import 'package:crm/utils/text_field.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
 import '../../../../Models/leads_model.dart';
 import '../../../../services/api_services.dart';
-import '../../../../store/app_store.dart';
-import '../../../../utils/size_utils.dart';
+
+import '../../../../widgets/custom_dropdown.dart';
 import '../../../../widgets/toastification/toastification.dart';
 
 class EditLead extends StatefulWidget {
@@ -53,9 +51,10 @@ class _EditLeadState extends State<EditLead> {
   @override
   void initState() {
     super.initState();
+    infoLog("inital status id ==========${widget.lead.status}");
 
     // Initialize controllers with lead data
-    nameController = TextEditingController(text: widget.lead.name ?? '');
+    nameController = TextEditingController(text: widget.lead.name);
     leadValueController = TextEditingController(
       text: widget.lead.leadValue != null
           ? widget.lead.leadValue.toString()
@@ -120,15 +119,64 @@ class _EditLeadState extends State<EditLead> {
     });
   }
 
-  List<Map<String, dynamic>> formData = [
-    {},
-    {},
-    {},
-    {},
-    {},
-    {},
-  ];
-  int activeStep = 0;
+
+  String? getLeadSourceId(String name) {
+    try {
+      return leadStore.leadSource
+          .firstWhere((source) => source.name == name)
+          .id;
+    } catch (e) {
+      return null;
+    }
+  }
+  String? getLeadSourceName(String? id) {
+
+    try {
+      return leadStore.leadSource
+          .firstWhere((source) => source.id == id)
+          .name;
+    } catch (e) {
+      return null;
+    }
+  }
+  String? getLeadStatusId(String name) {
+    try {
+      return leadStore.leadStatus
+          .firstWhere((status) => status.name == name)
+          .id;
+    } catch (e) {
+      return null; // Return null if the name is not found
+    }
+  }
+  String? getLeadStatusName(String? id) {
+
+    try {
+      return leadStore.leadStatus
+          .firstWhere((status) => status.id == id)
+          .name;
+    } catch (e) {
+      return null;
+    }
+  }
+  String? getLeadStaffId(String name) {
+    try {
+      return leadStore.staff
+          .firstWhere((status) => "${status.firstName} ${status.lastName}" == name)
+          .staffId;
+    } catch (e) {
+      return null; // Return null if the name is not found
+    }
+  }
+  String? getLeadStaffName(String? id) {
+
+    try {
+      final staff =  leadStore.staff
+          .firstWhere((status) => status.staffId == id);
+      return '${staff.firstName} ${staff.lastName}';
+    } catch (e) {
+      return null;
+    }
+  }
   Future<void> _selectLastContactDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -161,7 +209,6 @@ class _EditLeadState extends State<EditLead> {
       }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -188,75 +235,60 @@ class _EditLeadState extends State<EditLead> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  DropdownButtonFormField<String>(
-                    value: _selectedItem,
-                    items: leadStore.leadSource
-                        .toSet()
-                        .map((item) => DropdownMenuItem<String>(
-                              value: item.id,
-                              child: Text(item.name),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedItem = value;
-                        String sourceId = leadStore.leadSource
-                                .firstWhere((source) => source.id == value,
-                                    orElse: null)
-                                .id ??
-                            '';
-                      });
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Select Source',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
+                  CustomDropdown(
+                      hint: 'Select Source',
+                      items: leadStore.leadSource.map((e) => e.name).toList(),
+                      selectedValue: getLeadSourceName(_selectedItem), // Convert ID to name for display
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedItem = getLeadSourceId(value ?? "");
+                          errorLog("selected Source id -----$_selectedItem");
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please pick a source for the lead';
+                        }
+                        return null;
+                      }
+                  ),
+
+
+                  const SizedBox(height: 15),
+                  CustomDropdown(
+                      hint: 'Select Status',
+                      items: leadStore.leadStatus.map((e) => e.name).toList(),
+                      selectedValue: getLeadStatusName(_statusSelectedItem), // Convert ID to name for display
+                      onChanged: (value) {
+                        setState(() {
+                          _statusSelectedItem = getLeadStatusId(value ?? "");
+                          errorLog("selected status id -----$_statusSelectedItem");
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please pick a status for the lead';
+                        }
+                        return null;
+                      }
                   ),
                   const SizedBox(height: 15),
-                  DropdownButtonFormField<String>(
-                    value: _statusSelectedItem,
-                    items: leadStore.leadStatus
-                        .map((item) => DropdownMenuItem<String>(
-                              value: item.id,
-                              child: Text(item.name),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedStatusId = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Select Status',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  DropdownButtonFormField<String>(
-                    value: _selectedEmployeeId?.isEmpty ?? true
-                        ? null
-                        : _selectedEmployeeId,
-                    items: leadStore.staff
-                        .map((item) => DropdownMenuItem<String>(
-                              value: item.staffId,
-                              child: Text("${item.firstName} ${item.lastName}"),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedEmployeeId = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Assigned Lead',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
+                  CustomDropdown(
+                      hint: 'Assigned Lead',
+                      items: leadStore.staff.map((e) => "${e.firstName} ${e.lastName}").toList(),
+                      selectedValue: getLeadStaffName( _selectedEmployeeId), // Convert ID to name for display
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedEmployeeId = getLeadStaffId(value ?? "");
+                          errorLog("selected employee id -----$_selectedEmployeeId");
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please pick a status for the lead';
+                        }
+                        return null;
+                      }
                   ),
                   const SizedBox(height: 15),
                   const Row(
@@ -290,33 +322,31 @@ class _EditLeadState extends State<EditLead> {
                         .toList(),
                   ),
                   const SizedBox(height: 5),
-                  DropdownButton<String>(
-                    hint: const Text("Select a tag"),
-                    isExpanded: true,
-                    value: null,
-                    items: leadStore.tags.map((tag) {
-                      return DropdownMenuItem<String>(
-                        value: tag.id,
-                        child: Text(tag.name),
-                      );
-                    }).toList(),
-                    onChanged: (String? tagId) {
-                      if (tagId != null) {
-                        // Find the tag corresponding to the selected ID
-                        Tag? selectedTag = leadStore.tags.firstWhere(
-                          (tag) => tag.id == tagId,
-                          orElse: null,
-                        );
-
-                        if (!_dropDownTagId.contains(selectedTag.id)) {
-                          setState(() {
-                            // Add the selected tag's ID and name
-                            _dropDownTagId.add(selectedTag.id);
-                            selectedTags.add(selectedTag.name);
-                          });
-                        }
-                      }
-                    },
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomDropdown(
+                          hint: 'Select or Add a Tag',
+                          items: leadStore.tags.map((e) => e.name).toList(),
+                          onChanged: (value) {
+                            if (value != null && value.isNotEmpty) {
+                              setState(() {
+                                errorLog("tag value---$value");
+                                if (!selectedTags.contains(value)) {
+                                  selectedTags.add(value); // Add tag name directly
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add, color: Colors.blue),
+                        onPressed: () {
+                          _showAddTagDialog();
+                        },
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 15),
                   CommonTextField(
@@ -362,34 +392,29 @@ class _EditLeadState extends State<EditLead> {
                     hint: 'Enter Company Name',
                   ),
                   const SizedBox(height: 15),
-                  Container(
-                    width: double
-                        .infinity, // Allows dropdown to take full available width
-                    child: DropdownButtonFormField<String>(
-                      value: country,
-                      isExpanded: true, // Prevent overflow
-                      items: leadStore.country
-                          .map((item) => DropdownMenuItem<String>(
-                                value: item.countryId,
-                                child: Text(item.shortName),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          country = value;
-                          state =
-                              null; // Reset state when a new country is selected
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Select Country',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                    ),
+                  CustomDropdown(
+                    hint: 'Select Country',
+                    items: leadStore.country.map((item) => item.shortName).toList(),
+                    selectedValue: leadStore.country
+                        .firstWhere((item) => item.countryId == country, orElse: () => leadStore.country.first)
+                        .shortName,
+                    onChanged: (value) {
+                      setState(() {
+                        country = leadStore.country
+                            .firstWhere((item) => item.shortName == value)
+                            .countryId;
+                        state = null; // Reset state when a new country is selected
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please pick a country';
+                      }
+                      return null;
+                    },
                   ),
-                  SizedBox(height: 15),
+
+                  const SizedBox(height: 15),
                   CommonTextField(
                     controller: stateController,
                     label: 'State',
@@ -450,9 +475,9 @@ class _EditLeadState extends State<EditLead> {
             FormData formData = FormData.fromMap({
               "id": widget.lead.id,
               'name':
-                  isFieldUpdated(nameController.text, widget.lead.name ?? '')
+                  isFieldUpdated(nameController.text, widget.lead.name)
                       ? nameController.text
-                      : widget.lead.name ?? "",
+                      : widget.lead.name,
               'lead_value': isFieldUpdated(leadValueController.text,
                       (widget.lead.leadValue ?? "0.00") as String?)
                   ? leadValueController.text
@@ -490,15 +515,16 @@ class _EditLeadState extends State<EditLead> {
                   ? stateController.text
                   : widget.lead.state ?? "",
               'country':
-                  isFieldUpdated(country ?? " ", widget.lead.country ?? " ")
+                  isFieldUpdated(country ?? " ", widget.lead.country)
                       ? country
-                      : widget.lead.country ?? "",
-              'source': _selectedItem ?? widget.lead.source ?? "",
-              'status': _selectedStatusId ?? widget.lead.status ?? "",
-              'assigned': _selectedEmployeeId ?? widget.lead.assigned ?? "",
+                      : widget.lead.country,
+              'source': _selectedItem ?? widget.lead.source,
+              'status': _statusSelectedItem ?? widget.lead.status,
+              'assigned': _selectedEmployeeId ?? widget.lead.assigned,
               'tags': selectedTags.isNotEmpty
-                  ? jsonEncode(_dropDownTagId)
-                  : widget.lead.tags!.map((tag) => tag.id).toList() ?? [],
+                  ? jsonEncode(
+                  selectedTags)
+                  : widget.lead.tags!.map((tag) => tag.id).toList(),
               'description': isFieldUpdated(
                       descriptionController.text, widget.lead.description)
                   ? descriptionController.text
@@ -508,38 +534,25 @@ class _EditLeadState extends State<EditLead> {
                   ? lastContactController.text
                   : widget.lead.lastcontact ?? "",
             });
-            warningLog("Entered Form data ---$formData");
             try {
-              // Print data to console for debugging
-              errorLog("--------${formData.fields}");
-
-              // Make API call (replace `apiClient.post` with your actual API call method)
               final (
-                bool status,
-                Map<String, dynamic> response,
-                String? message
+              bool status,
+              Map<String, dynamic> response,
+              String? message
               ) = await ApiService.addLeads(formData);
-              errorLog("--------${formData.fields}");
-              errorLog("status:  $status");
-              errorLog("response  = ${response['data']}");
-              errorLog("message = $message");
-
-              if (status) {
-                Lead _lead = Lead.fromJson(response['data'][0]);
-
-
-                print("updated lead");
-                print('Success: $message');
-                toastLong(message, gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
+              infoLog("💬 -----${response['status']}");
+              if (response['status'] == true) {
+                Lead lead = Lead.fromJson(response['data'][0]);
+                toastLong(response['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
                 TF.success;
-                Navigator.pop(context, _lead);
-                // Handle success (e.g., show a success message or navigate)
-              } else {
-                print('Error: $status - $response');
-                // Handle API error
-              }
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LeadDetails(lead: lead),));
+
+              }  else {
+             toast(message, gravity: ToastGravity.TOP, bgColor: Colors.red, textColor: Colors.white);
+             infoLog('Error: $status - ');
+           }
             } catch (e) {
-              print('Exception: $e');
+              infoLog('Exception: $e');
               // Handle network or other errors
             }
           },
@@ -554,6 +567,46 @@ class _EditLeadState extends State<EditLead> {
           ),
         ),
       ),
+    );
+  }
+  void _showAddTagDialog() {
+    TextEditingController tagController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Add New Tag"),
+          content: TextField(
+            controller: tagController,
+            decoration: const InputDecoration(hintText: "Enter tag name"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context), // Close dialog
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                String newTag = tagController.text.trim();
+                if (newTag.isNotEmpty) {
+                  setState(() {
+                    if (!selectedTags.contains(newTag)) {
+                      selectedTags.add(newTag);
+                    }
+
+                    if (!leadStore.tags.any((tag) => tag.name == newTag)) {
+                      leadStore.tags.add(Tag(name: newTag, id: '')); // Add to tag list
+                    }
+                  });
+                }
+                Navigator.pop(context); // Close dialog after adding
+              },
+              child: const Text("Add"),
+            ),
+          ],
+        );
+      },
     );
   }
 }
