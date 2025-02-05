@@ -11,6 +11,7 @@ import '../../../../services/api_services.dart';
 import '../../../../store/lead_store.dart';
 import '../../../../utils/default_logger.dart';
 import '../../../../utils/text_field.dart';
+import '../../../../widgets/custom_dropdown.dart';
 
 class AddCustomer extends StatefulWidget {
   const AddCustomer({super.key});
@@ -53,15 +54,34 @@ class _AddCustomerState extends State<AddCustomer> {
       _shippingStreetController.text = _billingStreetController.text;
       _shippingZipController.text = _billingZipController.text;
       _shippingCityController.text = _billingCityController.text;
-      countryShipping = countryBilling;
+      countryBilling = countryShipping;
       stateShippingController.text = stateBillingController.text;
     } else {
-      // Clear shipping address fields when "same as billing" is unchecked
       _shippingStreetController.clear();
       _shippingZipController.clear();
       _shippingCityController.clear();
       countryShipping = null;
       stateShippingController.clear();
+    }
+  }
+
+  String? getCountryId(String name) {
+    try {
+      return leadStore.country
+          .firstWhere((country) => country.shortName == name)
+          .countryId;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  String? getCountryName(String id) {
+    try {
+      return leadStore.country
+          .firstWhere((country) => country.countryId == id)
+          .shortName;
+    } catch (e) {
+      return null; // Return null if the ID is not found
     }
   }
 
@@ -80,11 +100,11 @@ class _AddCustomerState extends State<AddCustomer> {
               child: TabBar(
                 unselectedLabelColor: AppConst.defaultPrimaryColor,
                 indicatorColor: acceptColor,
-
                 labelColor: black,
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicatorWeight: 2.0,
-                labelStyle: const TextStyle(fontSize: 18,fontWeight: FontWeight.w700),
+                labelStyle:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                 unselectedLabelStyle: const TextStyle(fontSize: 16),
                 tabs: const [
                   Tab(text: "Profile"),
@@ -149,32 +169,17 @@ class _AddCustomerState extends State<AddCustomer> {
                               hint: 'Enter Address',
                             ),
                             const SizedBox(height: 15),
-                            DropdownButtonFormField<String>(
-                              value: country,
+                            CustomDropdown(
+                              hint: 'Select Country',
                               items: leadStore.country
-                                  .map((item) => DropdownMenuItem<String>(
-                                        value: item.countryId,
-                                        child: SizedBox(
-                                            width: 250,
-                                            child: Text(item.shortName)),
-                                      ))
+                                  .map((e) => e.shortName)
                                   .toList(),
+                              selectedValue: country,
                               onChanged: (value) {
                                 setState(() {
-                                  country = value;
+                                  country = getCountryId(value ?? "");
+                                  warningLog("Selected Country: $country");
                                 });
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Select  Country',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Country is required';
-                                }
-                                return null;
                               },
                             ),
                             const SizedBox(height: 15),
@@ -182,36 +187,21 @@ class _AddCustomerState extends State<AddCustomer> {
                               controller: stateController,
                               label: 'Enter State',
                               hint: 'Enter State',
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return 'State is required';
-                                }
-                                return null;
-                              },
+
                             ),
                             const SizedBox(height: 15),
                             CommonTextField(
                               controller: _cityController,
                               label: 'City',
                               hint: 'Enter City',
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return 'City is required';
-                                }
-                                return null;
-                              },
+
                             ),
                             const SizedBox(height: 15),
                             CommonTextField(
                               controller: _zipController,
                               label: 'Zip Code',
                               hint: 'Enter Zip Code',
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return 'Zip Code is required';
-                                }
-                                return null;
-                              },
+
                             ),
                           ],
                         ),
@@ -244,27 +234,18 @@ class _AddCustomerState extends State<AddCustomer> {
                                 hint: 'Billing Zip',
                               ),
                               const SizedBox(height: 15),
-                              DropdownButtonFormField<String>(
-                                value: countryBilling,
+                              CustomDropdown(
+                                hint: 'Select Country',
                                 items: leadStore.country
-                                    .map((item) => DropdownMenuItem<String>(
-                                          value: item.countryId,
-                                          child: SizedBox(
-                                              width: 250,
-                                              child: Text(item.shortName)),
-                                ))
+                                    .map((e) => e.shortName)
                                     .toList(),
+                                selectedValue: countryBilling,
                                 onChanged: (value) {
                                   setState(() {
-                                    countryBilling = value;
+                                    countryBilling = getCountryId(value ?? "");
+                                    warningLog("Selected Country: $country");
                                   });
                                 },
-                                decoration: InputDecoration(
-                                  labelText: 'Select Billing Country',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                ),
                               ),
                               const SizedBox(height: 15),
                               CommonTextField(
@@ -282,6 +263,7 @@ class _AddCustomerState extends State<AddCustomer> {
                                     onChanged: (value) {
                                       setState(() {
                                         _sameAsBilling = value!;
+
                                         _copyBillingToShipping();
                                       });
                                     },
@@ -308,27 +290,24 @@ class _AddCustomerState extends State<AddCustomer> {
                                 hint: 'Shipping Zip',
                               ),
                               const SizedBox(height: 15),
-                              DropdownButtonFormField<String>(
-                                value: countryShipping,
+                              CustomDropdown(
+                                hint: 'Select Country',
                                 items: leadStore.country
-                                    .map((item) => DropdownMenuItem<String>(
-                                          value: item.countryId,
-                                          child: SizedBox(
-                                              width: 250,
-                                              child: Text(item.shortName)),
-                                ))
+                                    .map((item) => item.shortName)
                                     .toList(),
+                                selectedValue: leadStore.country
+                                    .firstWhere(
+                                        (item) => item.countryId == country,
+                                        orElse: () => leadStore.country.first)
+                                    .shortName,
                                 onChanged: (value) {
                                   setState(() {
-                                    countryShipping = value;
+                                    countryBilling = leadStore.country
+                                        .firstWhere(
+                                            (item) => item.shortName == value)
+                                        .countryId;
                                   });
                                 },
-                                decoration: InputDecoration(
-                                  labelText: 'Select Shipping Country',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                ),
                               ),
                               const SizedBox(height: 15),
                               CommonTextField(
@@ -348,36 +327,37 @@ class _AddCustomerState extends State<AddCustomer> {
         ),
         // Bottom Navigation Button
         bottomNavigationBar: Padding(
-          padding: const EdgeInsets.only(left: 15,right: 1,bottom: 20),
+          padding: const EdgeInsets.only(left: 15, right: 1, bottom: 20),
           child: ElevatedButton(
             onPressed: () {
-    if (_profileFormKey.currentState!.validate()) {
-      FormData formData = FormData.fromMap({
-                "company": _companyController.text,
-                "vat": _vatController.text,
-                "phonenumber": _phoneController.text,
-                "website": _websiteController.text,
-                "address": _addressController.text,
-                "country": country??"",
-                "state": stateController.text,
-                "zip": _zipController.text,
-                "city": _cityController.text,
-                'billing_street': _billingStreetController.text,
-                'billing_city': _billingCityController.text,
-                'billing_state': stateBillingController.text,
-                'billing_zip': _billingZipController.text,
-                'billing_country': countryBilling??"",
-                'shipping_street': _shippingStreetController.text,
-                'shipping_city': _shippingCityController.text,
-                'shipping_state': stateShippingController.text,
-                'shipping_zip': _shippingZipController.text,
-                'shipping_country': countryShipping ??"",
-              });
-              infoLog("Add Customer DATA ----$formData");
+              if (_profileFormKey.currentState!.validate()) {
+                FormData formData = FormData.fromMap({
+                  "company": _companyController.text,
+                  "vat": _vatController.text,
+                  "phonenumber": _phoneController.text,
+                  "website": _websiteController.text,
+                  "address": _addressController.text,
+                  "country": country ?? "",
+                  "state": stateController.text,
+                  "zip": _zipController.text,
+                  "city": _cityController.text,
+                  'billing_street': _billingStreetController.text,
+                  'billing_city': _billingCityController.text,
+                  'billing_state': stateBillingController.text,
+                  'billing_zip': _billingZipController.text,
+                  'billing_country': countryBilling ?? "",
+                  'shipping_street': _shippingStreetController.text,
+                  'shipping_city': _shippingCityController.text,
+                  'shipping_state': stateShippingController.text,
+                  'shipping_zip': _shippingZipController.text,
+                  'shipping_country': countryShipping ?? "",
+                });
+                infoLog("Add Customer DATA ----$formData");
 
-              // Call the _saveCustomerData method
-              _saveCustomerData(formData);
-            }},
+                // Call the _saveCustomerData method
+                _saveCustomerData(formData);
+              }
+            },
             child: const Text('Submit'),
           ),
         ),
@@ -393,12 +373,17 @@ class _AddCustomerState extends State<AddCustomer> {
           await ApiService.editCustomer(formData);
 
       // Print the response data to the console
-      print("Response status: $status");
-      print("Response data: ${response['message']}");
-      print("Response message: $message");
+     log("Response status: $status");
+      log("Response data: ${response['message']}");
+    log("Response message: $message");
 
       if (status) {
-        toastLong(response['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
+        toastLong(
+          response['message'],
+          gravity: ToastGravity.TOP,
+          bgColor: completedColor,
+          textColor: Colors.white,
+        );
         _companyController.clear();
         _vatController.clear();
         _phoneController.clear();
@@ -427,10 +412,13 @@ class _AddCustomerState extends State<AddCustomer> {
         });
 
         // Navigate back to the previous screen
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => CustomerScreen(),));
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CustomerScreen(),
+            ));
         print("Customer data successfully edited.");
       } else {
-
         print("Failed to edit customer data: $message");
       }
     } catch (error) {
