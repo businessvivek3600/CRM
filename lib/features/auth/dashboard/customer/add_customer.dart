@@ -255,23 +255,23 @@ class _AddCustomerState extends State<AddCustomer> {
                               ),
                               const SizedBox(height: 15),
                               // Checkbox for "Same as Billing Address"
-                              Row(
-                                children: [
-                                  Checkbox(
-                                    value: _sameAsBilling,
-                                    activeColor: acceptColor,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _sameAsBilling = value!;
-
-                                        _copyBillingToShipping();
-                                      });
-                                    },
-                                  ),
-                                  const Text("Same as billing address"),
-                                ],
-                              ),
-                              const SizedBox(height: 15),
+                              // Row(
+                              //   children: [
+                              //     Checkbox(
+                              //       value: _sameAsBilling,
+                              //       activeColor: acceptColor,
+                              //       onChanged: (value) {
+                              //         setState(() {
+                              //           _sameAsBilling = value!;
+                              //
+                              //           _copyBillingToShipping();
+                              //         });
+                              //       },
+                              //     ),
+                              //     const Text("Same as billing address"),
+                              //   ],
+                              // ),
+                              // const SizedBox(height: 15),
                               CommonTextField(
                                 controller: _shippingStreetController,
                                 label: 'Shipping Street',
@@ -315,7 +315,6 @@ class _AddCustomerState extends State<AddCustomer> {
                                 label: 'Shipping State',
                                 hint: 'Enter State',
                               ),
-
                               const SizedBox(height: 15),
                             ],
                           )),
