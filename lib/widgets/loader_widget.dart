@@ -53,79 +53,75 @@ class _LoaderWidgetState extends State<LoaderWidget>
 class LoadingWidget extends StatelessWidget {
   const LoadingWidget(
       {required this.child,
-        super.key,
-        required this.context,
-        required this.goRouter});
+      super.key,
+      required this.context,
+      required this.goRouter});
   final BuildContext context;
   final Widget child;
   final GoRouter goRouter;
 
-
   @override
   Widget build(BuildContext context) => Material(
-    child: Stack(
-      children: [
-        ResponsiveBreakpoints.builder(
-          breakpoints: [
-            const Breakpoint(start: 0, end: 450, name: MOBILE),
-            const Breakpoint(start: 451, end: 800, name: TABLET),
-            const Breakpoint(start: 801, end: 1920, name: DESKTOP),
-            const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+        child: Stack(
+          children: [
+            ResponsiveBreakpoints.builder(
+              breakpoints: [
+                const Breakpoint(start: 0, end: 450, name: MOBILE),
+                const Breakpoint(start: 451, end: 800, name: TABLET),
+                const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+                const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+              ],
+              // child: ToastificationConfigProvider(
+              //     config: const ToastificationConfig(
+              //       margin: EdgeInsets.fromLTRB(0, 16, 0, 110),
+              //       alignment: Alignment.center,
+              //       itemWidth: 440,
+              //       animationDuration: Duration(milliseconds: 500),
+              //     ),
+              child: child,
+              // ),
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Observer(builder: (context) {
+                if (appStore.isSessionExpired) {
+                  return _SessionExpiredWidget(goRouter: goRouter);
+                } else {
+                  return Container();
+                }
+              }),
+            ),
+            Observer(
+              builder: (_) => Visibility(
+                  visible: appStore.isLoading,
+                  child: AnimatedContainer(
+                      duration: 500.milliseconds,
+                      color: Colors.black.withOpacity(0.1),
+                      child: Center(
+                          child: SpinKitChasingDots(color: Colors.white)))),
+            ),
           ],
-          // child: ToastificationConfigProvider(
-          //     config: const ToastificationConfig(
-          //       margin: EdgeInsets.fromLTRB(0, 16, 0, 110),
-          //       alignment: Alignment.center,
-          //       itemWidth: 440,
-          //       animationDuration: Duration(milliseconds: 500),
-          //     ),
-          child: child,
-          // ),
+        ).onTap(
+          isMacOS || isWeb || isWindows || isLinux
+              ? null
+              : () {
+                  // if (defaultTargetPlatform == TargetPlatform.android) {
+                  //   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+                  //     // SystemUiOverlay.bottom,
+                  //     SystemUiOverlay.top,
+                  //   ]);
+                  //   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+                  //     statusBarColor: Colors.transparent, // Status bar color
+                  //     systemNavigationBarColor: Colors.transparent,
+                  //     systemNavigationBarContrastEnforced: true,
+                  //   ));
+                  // }
+                  hideKeyboard(context);
+                },
         ),
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Observer(builder: (context) {
-            if (appStore.isSessionExpired) {
-              return _SessionExpiredWidget(goRouter: goRouter);
-            } else {
-              return Container();
-            }
-          }),
-        ),
-        Observer(
-          builder: (_) => Visibility(
-              visible: appStore.isLoading,
-              child: AnimatedContainer(
-                  duration: 500.milliseconds,
-                  color: Colors.black.withOpacity(0.1),
-                  child: Center(
-                      child: SpinKitChasingDots(
-                        color:  Colors.white
-
-                      )))),
-        ),
-      ],
-    ).onTap(
-      isMacOS || isWeb || isWindows || isLinux
-          ? null
-          : () {
-        // if (defaultTargetPlatform == TargetPlatform.android) {
-        //   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
-        //     // SystemUiOverlay.bottom,
-        //     SystemUiOverlay.top,
-        //   ]);
-        //   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-        //     statusBarColor: Colors.transparent, // Status bar color
-        //     systemNavigationBarColor: Colors.transparent,
-        //     systemNavigationBarContrastEnforced: true,
-        //   ));
-        // }
-        hideKeyboard(context);
-      },
-    ),
-  );
+      );
 }
 
 class _SessionExpiredWidget extends StatefulWidget {
@@ -148,7 +144,7 @@ class _SessionExpiredWidgetState extends State<_SessionExpiredWidget> {
   Future<void> handleSessionExpiration() async {
     try {
       // Trigger logout for session expiration
-        await AuthService().logout(context: context, isSessionExpired: true);
+      await AuthService().logout(context: context, isSessionExpired: true);
 
       pl('Session expired. Navigating to login...');
       await Future.delayed(Duration(seconds: 1));
@@ -162,7 +158,6 @@ class _SessionExpiredWidgetState extends State<_SessionExpiredWidget> {
       pl('Error during session expiration: $e');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -184,43 +179,38 @@ class _SessionExpiredWidgetState extends State<_SessionExpiredWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              const SizedBox(
-                height: 15,
-                width: 15,
-                child: CircularProgressIndicator.adaptive(
-                  strokeWidth: 1,
-                  valueColor: AlwaysStoppedAnimation(Colors.white),
-                ),
-              ).paddingRight(DEFFAULT_PADDING / 2),
-              RichText(
-                text: TextSpan(
-                  text: 'Your session has expired. ',
-                  style: context.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w500, color: Colors.white),
-                  children: <TextSpan>[
-                    TextSpan(
-                        text: 'Login',
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            appStore.setSessionExpired(false);
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const AuthScreen()));
-                          },
-                        style: context.textTheme.bodyMedium?.copyWith(
-                            color: const Color.fromARGB(255, 214, 249, 250),
-                            fontWeight: FontWeight.bold)),
-                    const TextSpan(text: ' to continue.'),
-                  ],
-                ),
-              ).expand(),
-            ],
+         Builder(
+  builder: (context) {
+    return RichText(
+      text: TextSpan(
+        text: 'Your session has expired. ',
+        style: context.textTheme.bodySmall?.copyWith(
+          fontWeight: FontWeight.w500,
+          color: Colors.white,
+        ),
+        children: <TextSpan>[
+          TextSpan(
+            text: 'Login',
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                appStore.setSessionExpired(true);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AuthScreen()),
+                );
+              },
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: const Color.fromARGB(255, 214, 249, 250),
+              fontWeight: FontWeight.bold,
+            ),
           ),
+          const TextSpan(text: ' to continue.'),
         ],
       ),
     );
+  },
+),
+      ]));
+    
   }
 }

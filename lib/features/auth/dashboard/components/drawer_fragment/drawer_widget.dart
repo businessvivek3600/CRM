@@ -7,6 +7,7 @@ import 'package:crm/store/lead_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:nb_utils/nb_utils.dart';
+// import 'package:nb_utils/nb_utils.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -16,17 +17,9 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-  final LeadStore leadStore = LeadStore();
-
   @override
   void initState() {
     super.initState();
-    fetchCompanyInfo();
-  }
-
-  Future<void> fetchCompanyInfo() async {
-    await leadStore.getDashboard();
-    if (mounted) setState(() {});
   }
 
   @override
@@ -48,15 +41,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
               builder: (_) {
                 final companyInfo = leadStore.companyInfo;
                 return Padding(
-                  padding: EdgeInsets.only(right: 30),
+                  padding: const EdgeInsets.only(right: 30),
                   child: Container(
                     height: 120, // Reduced height
                     alignment: Alignment.center,
                     child: companyInfo?.logo?.isNotEmpty ?? false
                         ? Image.network(
                             companyInfo!.logo!,
-                            width: 230, // Smaller width
-                            height: 100, // Smaller height
+                            width: 230,
+                            height: 100,
                             fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) =>
                                 const SizedBox(),
@@ -66,7 +59,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 );
               },
             ),
-            Divider(),
+            const Divider(),
 
             // Compact ListView Items
             Expanded(
@@ -145,13 +138,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
         children: [
           CircleAvatar(
             radius: 25, // Compact size
-            backgroundImage: appStore.profileImage?.isNotEmpty ?? false
-                ? NetworkImage(appStore.profileImage!)
+            backgroundImage: appStore.profileImage.isNotEmpty
+                ? NetworkImage(appStore.profileImage)
                 : null,
-            child: appStore.profileImage?.isEmpty ?? true
+            child: appStore.profileImage.isEmpty
                 ? Text(
-                    appStore.fullName?.isNotEmpty ?? false
-                        ? appStore.fullName![0].toUpperCase()
+                    appStore.fullName.isNotEmpty
+                        ? appStore.fullName[0].toUpperCase()
                         : '',
                     style: const TextStyle(
                       fontSize: 18,
@@ -192,16 +185,22 @@ class _CustomDrawerState extends State<CustomDrawer> {
             onPressed: () async {
               bool logoutConfirmed = await _showLogoutDialog(context);
               if (logoutConfirmed) {
-                bool success = await AuthService().logout(
-                  context: context,
-                  isSessionExpired: true,
-                );
-                if (success) {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AuthScreen()),
-                    (_) => false,
+                if (mounted) {
+                  bool success = await AuthService().logout(
+                    context: context,
+                    isSessionExpired: true,
                   );
+
+                  if (success) {
+                    Fluttertoast.showToast(msg: 'Logged out Successfully!');
+                    if (mounted) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) => const AuthScreen()),
+                        (_) => false,
+                      );
+                    }
+                  }
                 }
               }
             },
