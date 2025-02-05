@@ -1,6 +1,7 @@
 import 'package:crm/Models/usercustomer_model.dart';
 import 'package:crm/utils/default_logger.dart';
 import 'package:crm/utils/size_utils.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
 import 'package:crm/features/auth/dashboard/customer/updatecustomer.dart';
@@ -135,8 +136,8 @@ class _CustomerDetailsState extends State<CustomerDetails> {
   }
 
   void _saveCustomerData() async {
-    if (_hasCustomerChanged()) {
-      final Map<String, dynamic> formData = {
+
+      final FormData formData = FormData.fromMap({
         "id": widget.customer.userId.toString(),
         'active': widget.customer.active.toString(),
         'company': _editableCustomer.company,
@@ -158,7 +159,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
         'shipping_state': _editableCustomer.shippingState,
         'shipping_zip': _editableCustomer.shippingZip,
         'shipping_country': _editableCustomer.shippingCountry,
-      };
+      });
       warningLog("Editable customer Data: $formData");
       var (bool status, Map<String, dynamic> data, String? message) =
           await ApiService.editCustomer(formData);
@@ -170,7 +171,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
       } else {
         print('Error: $status - $data');
       }
-    }
+
   }
 
   bool _hasCustomerChanged() {
@@ -401,6 +402,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
     );
     return country.shortName ?? 'N/A';
   }
+  bool _sameAsShipping = false;
 
   Widget _buildBillingShippingTab() {
     return SingleChildScrollView(
@@ -408,114 +410,84 @@ class _CustomerDetailsState extends State<CustomerDetails> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Row(
-              children: [
-                Container(
-                  width: 4,
-                  height: 24,
-                  color: Colors.blue,
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  'Billing Address',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
+            _buildSectionHeader('Billing Address'),
             height10(),
             _buildCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildEditableRow(
-                      'Street', "", _editableCustomer.billingStreet ?? "-",
-                      (value) {
-                    _editableCustomer =
-                        _editableCustomer.copyWith(billingStreet: value);
+                  _buildEditableRow('Street', "", _editableCustomer.billingStreet ?? "", (value) {
+                    _editableCustomer = _editableCustomer.copyWith(billingStreet: value);
+                    if (_sameAsShipping) _copyBillingToShipping();
                   }),
                   const Divider(),
-                  _buildEditableRow(
-                      'City', "", _editableCustomer.billingCity ?? "-",
-                      (value) {
-                    _editableCustomer =
-                        _editableCustomer.copyWith(billingCity: value);
+                  _buildEditableRow('City', "", _editableCustomer.billingCity ?? "", (value) {
+                    _editableCustomer = _editableCustomer.copyWith(billingCity: value);
+                    if (_sameAsShipping) _copyBillingToShipping();
                   }),
                   const Divider(),
-                  _buildEditableRow(
-                      'State', "", _editableCustomer.billingState ?? "-",
-                      (value) {
-                    _editableCustomer =
-                        _editableCustomer.copyWith(billingState: value);
+                  _buildEditableRow('State', "", _editableCustomer.billingState ?? "", (value) {
+                    _editableCustomer = _editableCustomer.copyWith(billingState: value);
+                    if (_sameAsShipping) _copyBillingToShipping();
                   }),
                   const Divider(),
-                  _buildEditableRow(
-                      'Zip Code', "", _editableCustomer.billingZip ?? "-",
-                      (value) {
-                    _editableCustomer =
-                        _editableCustomer.copyWith(billingZip: value);
+                  _buildEditableRow('Zip Code', "", _editableCustomer.billingZip ?? "", (value) {
+                    _editableCustomer = _editableCustomer.copyWith(billingZip: value);
+                    if (_sameAsShipping) _copyBillingToShipping();
                   }),
                   const Divider(),
-                  _buildEditableRow('Country', 'billingCountry',
-                      _editableCustomer.billingCountry!, (value) {}),
+                  _buildEditableRow('Country', 'billingCountry', _editableCustomer.billingCountry ?? "", (value) {
+                    _editableCustomer = _editableCustomer.copyWith(billingCountry: value);
+                    if (_sameAsShipping) _copyBillingToShipping();
+                  }),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            Row(
+           _buildSectionHeader('Shipping Address'),
+            if(_isEditMode)   Column(
               children: [
-                Container(
-                  width: 4,
-                  height: 24,
-                  color: Colors.blue,
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  'Shipping Address',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                height10(),
+                CheckboxListTile(
+                  title: const Text("Same as Billing Address"),
+                  value: _sameAsShipping,
+                  onChanged: (value) {
+                    setState(() {
+                      _sameAsShipping = value!;
+                      if (_sameAsShipping) {
+                        _copyBillingToShipping();
+                      }
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
                 ),
               ],
             ),
+
             height10(),
             _buildCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildEditableRow(
-                      'Street', "", _editableCustomer.shippingStreet ?? "-",
-                      (value) {
-                    _editableCustomer =
-                        _editableCustomer.copyWith(shippingStreet: value);
+                  _buildEditableRow('Street', "", _editableCustomer.shippingStreet ?? "", (value) {
+                    _editableCustomer = _editableCustomer.copyWith(shippingStreet: value);
                   }),
                   const Divider(),
-                  _buildEditableRow(
-                      'City', "", _editableCustomer.shippingCity ?? "-",
-                      (value) {
-                    _editableCustomer =
-                        _editableCustomer.copyWith(shippingCity: value);
+                  _buildEditableRow('City', "", _editableCustomer.shippingCity ?? "", (value) {
+                    _editableCustomer = _editableCustomer.copyWith(shippingCity: value);
                   }),
                   const Divider(),
-                  _buildEditableRow(
-                      'State', "", _editableCustomer.shippingState ?? "-",
-                      (value) {
-                    _editableCustomer =
-                        _editableCustomer.copyWith(shippingState: value);
+                  _buildEditableRow('State', "", _editableCustomer.shippingState ?? "", (value) {
+                    _editableCustomer = _editableCustomer.copyWith(shippingState: value);
                   }),
                   const Divider(),
-                  _buildEditableRow(
-                      'Zip Code', "", _editableCustomer.shippingZip ?? "-",
-                      (value) {
-                    _editableCustomer =
-                        _editableCustomer.copyWith(shippingZip: value);
+                  _buildEditableRow('Zip Code', "", _editableCustomer.shippingZip ?? "", (value) {
+                    _editableCustomer = _editableCustomer.copyWith(shippingZip: value);
                   }),
                   const Divider(),
-                  _buildEditableRow('Country', 'shippingCountry',
-                      _editableCustomer.shippingCountry!, (value) {}),
+                  _buildEditableRow('Country', 'shippingCountry', _editableCustomer.shippingCountry ?? "", (value) {
+                    _editableCustomer = _editableCustomer.copyWith(shippingCountry: value);
+                  }),
                 ],
               ),
             ),
@@ -524,6 +496,39 @@ class _CustomerDetailsState extends State<CustomerDetails> {
       ),
     );
   }
+
+  Widget _buildSectionHeader(String title) {
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 24,
+          color: Colors.blue,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _copyBillingToShipping() {
+    setState(() {
+      _editableCustomer = _editableCustomer.copyWith(
+        shippingStreet: _editableCustomer.billingStreet,
+        shippingCity: _editableCustomer.billingCity,
+        shippingState: _editableCustomer.billingState,
+        shippingZip: _editableCustomer.billingZip,
+        shippingCountry: _editableCustomer.billingCountry,
+      );
+    });
+  }
+
 
   Widget _buildCard({required Widget child}) {
     return Card(
