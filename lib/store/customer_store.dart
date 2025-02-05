@@ -15,6 +15,9 @@ abstract class _CustomerStore with Store {
   List<Customer> customers = [];
 
   @observable
+CustomerCounts? customersCounts ;
+
+  @observable
   bool isShow = true;
 
   @observable
@@ -45,7 +48,8 @@ abstract class _CustomerStore with Store {
           return Customer.fromJson(e);
         }).toList());
         customers.addAll(_customers);
-
+        errorLog("response data -- ${data['counts']}");
+        customersCounts = CustomerCounts.fromJson(data['counts']);
       } else {
         throw Exception(
             message ?? 'Unknown error occurred while fetching data');

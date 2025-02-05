@@ -214,24 +214,24 @@ class Customer {
 }
 
 class CustomerCounts {
-  final String totalCustomer;
-  final String activeCustomer;
-  final String inactiveCustomer;
+  final String? totalCustomer;
+  final String? activeCustomer;
+  final String? inactiveCustomer;
 
   CustomerCounts({
-    required this.totalCustomer,
-    required this.activeCustomer,
-    required this.inactiveCustomer,
+    this.totalCustomer,
+    this.activeCustomer,
+  this.inactiveCustomer,
   });
-
-  // Factory method to create a CustomerCounts from JSON
+// Factory method to create a CustomerCounts from JSON
   factory CustomerCounts.fromJson(Map<String, dynamic> json) {
     return CustomerCounts(
-      totalCustomer: json['total_customer'] as String,
-      activeCustomer: json['active_customer'] as String,
-      inactiveCustomer: json['inactive_customer'] as String,
+      totalCustomer: json['total_customers']?.toString() ?? '0',
+      activeCustomer: json['active_customers']?.toString() ?? '0',
+      inactiveCustomer: json['inactive_customers']?.toString() ?? '0',
     );
   }
+
 
   // Method to convert CustomerCounts to JSON
   Map<String, dynamic> toJson() {
