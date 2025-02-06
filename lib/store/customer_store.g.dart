@@ -40,6 +40,22 @@ mixin _$CustomerStore on _CustomerStore, Store {
     });
   }
 
+  late final _$customersCountsAtom =
+      Atom(name: '_CustomerStore.customersCounts', context: context);
+
+  @override
+  CustomerCounts? get customersCounts {
+    _$customersCountsAtom.reportRead();
+    return super.customersCounts;
+  }
+
+  @override
+  set customersCounts(CustomerCounts? value) {
+    _$customersCountsAtom.reportWrite(value, super.customersCounts, () {
+      super.customersCounts = value;
+    });
+  }
+
   late final _$isShowAtom =
       Atom(name: '_CustomerStore.isShow', context: context);
 
@@ -99,6 +115,7 @@ mixin _$CustomerStore on _CustomerStore, Store {
   String toString() {
     return '''
 customers: ${customers},
+customersCounts: ${customersCounts},
 isShow: ${isShow},
 canEdit: ${canEdit},
 totalCustomer: ${totalCustomer},

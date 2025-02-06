@@ -15,7 +15,7 @@ import '../../../../widgets/custom_dropdown.dart';
 class CustomerDetails extends StatefulWidget {
   final Customer customer;
 
-  const CustomerDetails({Key? key, required this.customer}) : super(key: key);
+  const CustomerDetails({super.key, required this.customer});
 
   @override
   State<CustomerDetails> createState() => _CustomerDetailsState();
