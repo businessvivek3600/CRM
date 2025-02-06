@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:crm/constants/api_constant.dart';
 import 'package:crm/database/function.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../Models/user_data.dart';
@@ -14,6 +16,19 @@ import '../widgets/toastification/toastification.dart';
 class AuthService {
   static String tag = 'AuthService';
 
+  Future<String?> getFbToken() async {
+    final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+    try {
+      String? token = defaultTargetPlatform == TargetPlatform.macOS
+          ? await firebaseMessaging.getAPNSToken() ?? 'unable to get token [macos]'
+          : await firebaseMessaging.getToken();
+      debugPrint('FirebaseMessaging token: $token');
+      return token;
+    } catch (e) {
+      debugPrint('Error getting FirebaseMessaging token: $e');
+      return null;
+    }
+  }
   /// login with email and password
   Future<void> login(
       BuildContext context, String email, String password) async {
@@ -22,6 +37,7 @@ class AuthService {
         "username": email,
         "password": password,
         'device_id': await getDeviceId(),
+        'fcm_token': await getFbToken(),
       };
       infoLog('Request Data: $requestData');
       var (bool status, Map<String, dynamic> data, String? message) =

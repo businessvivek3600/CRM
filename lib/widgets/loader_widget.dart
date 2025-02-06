@@ -137,7 +137,9 @@ class _SessionExpiredWidgetState extends State<_SessionExpiredWidget> {
   @override
   void initState() {
     super.initState();
-    handleSessionExpiration();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      handleSessionExpiration();
+    });
   }
 
   /// Handle session expiration
@@ -147,10 +149,10 @@ class _SessionExpiredWidgetState extends State<_SessionExpiredWidget> {
       await AuthService().logout(context: context, isSessionExpired: true);
 
       pl('Session expired. Navigating to login...');
-      await Future.delayed(Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 1));
 
-      // Use GoRouter to navigate to the login screen
-      GoRouter.of(context).go(Paths.login);
+      // Navigate to login screen using GoRouter
+      widget.goRouter.go(Paths.login);
 
       // Reset session expiration state
       appStore.setSessionExpired(false);
@@ -175,42 +177,35 @@ class _SessionExpiredWidgetState extends State<_SessionExpiredWidget> {
       ),
       padding: const EdgeInsets.all(8),
       margin: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-         Builder(
-  builder: (context) {
-    return RichText(
-      text: TextSpan(
-        text: 'Your session has expired. ',
-        style: context.textTheme.bodySmall?.copyWith(
-          fontWeight: FontWeight.w500,
-          color: Colors.white,
-        ),
-        children: <TextSpan>[
-          TextSpan(
-            text: 'Login',
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                appStore.setSessionExpired(true);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AuthScreen()),
-                );
-              },
-            style: context.textTheme.bodyMedium?.copyWith(
-              color: const Color.fromARGB(255, 214, 249, 250),
-              fontWeight: FontWeight.bold,
+      child: Builder(
+        builder: (context) {
+          return RichText(
+            text: TextSpan(
+              text: 'Your session has expired. ',
+              style: context.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+              children: <TextSpan>[
+                TextSpan(
+                  text: 'Login',
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      appStore.setSessionExpired(true);
+                      widget.goRouter.go(Paths.login);
+                    },
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: const Color.fromARGB(255, 214, 249, 250),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const TextSpan(text: ' to continue.'),
+              ],
             ),
-          ),
-          const TextSpan(text: ' to continue.'),
-        ],
+          );
+        },
       ),
     );
-  },
-),
-      ]));
-    
   }
 }
+

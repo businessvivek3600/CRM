@@ -1,7 +1,9 @@
 import 'package:crm/constants/app_constants.dart';
 import 'package:crm/features/auth/auth/auth_screen.dart';
+import 'package:crm/services/notification_service.dart';
 import 'package:crm/store/app_store.dart';
 import 'package:crm/utils/colors.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:geolocator/geolocator.dart';
@@ -9,7 +11,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:workmanager/workmanager.dart';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'constants/value_constants.dart';
 import 'database/dio/dio/dio_client.dart';
 import 'database/dio/dio/loging_interceotor.dart';
@@ -18,6 +21,12 @@ import 'features/auth/dashboard/home_screen.dart';
 import 'utils/default_logger.dart';
 import 'widgets/loader_widget.dart';
 
+
+@pragma('vm:entry-point')
+Future<void> _onBackgroundMessage(RemoteMessage message) async {
+  logger.d('onBackgroundMessage: ${message.notification?.title}');
+  NotificationService.showNotification(message);
+}
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -49,8 +58,19 @@ Future<void> main() async {
 }
 
 Future<void> initialize() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FirebaseMessaging.onBackgroundMessage(_onBackgroundMessage);
+  FirebaseMessaging.onMessage.listen(NotificationService.onMessage);
+  FirebaseMessaging.onMessageOpenedApp
+      .listen(NotificationService.onMessageOpenedApp);
+  NotificationService.instance.initialize();
   sharedPreferences = await SharedPreferences.getInstance();
   await appStore.setToken(getStringAsync(TOKEN), isInitializing: true);
+  // Print the device token for debugging
+  String? token = await FirebaseMessaging.instance.getToken();
+  logger.d('FCM Token: $token');
 }
 
 Future<void> initializeUserDataInMain() async {
