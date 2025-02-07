@@ -261,6 +261,22 @@ mixin _$LeadStore on _LeadStore, Store {
     });
   }
 
+  late final _$companyInfoAtom =
+      Atom(name: '_LeadStore.companyInfo', context: context);
+
+  @override
+  CompanyInfo? get companyInfo {
+    _$companyInfoAtom.reportRead();
+    return super.companyInfo;
+  }
+
+  @override
+  set companyInfo(CompanyInfo? value) {
+    _$companyInfoAtom.reportWrite(value, super.companyInfo, () {
+      super.companyInfo = value;
+    });
+  }
+
   late final _$getLeadsAsyncAction =
       AsyncAction('_LeadStore.getLeads', context: context);
 
@@ -331,7 +347,8 @@ metricData: ${metricData},
 firstBox: ${firstBox},
 secondBox: ${secondBox},
 thirdBox: ${thirdBox},
-fourthBox: ${fourthBox}
+fourthBox: ${fourthBox},
+companyInfo: ${companyInfo}
     ''';
   }
 }

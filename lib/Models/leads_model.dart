@@ -295,12 +295,14 @@ class Lead {
 class Permission {
   String canDelete;
   String alreadyCustomer;
+  String assignPerm;
 
-  Permission({required this.canDelete, required this.alreadyCustomer});
+  Permission({required this.canDelete, required this.alreadyCustomer,required this.assignPerm});
 
   factory Permission.fromJson(Map<String, dynamic> json) {
     return Permission(
       canDelete: (json['can_delete'] ?? '0').toString(),
+      assignPerm: (json['assign_perm'] ?? '0').toString(),
       alreadyCustomer: (json['already_customer'] ?? '0').toString(),
     );
   }
@@ -309,6 +311,7 @@ class Permission {
     return {
       'can_delete': canDelete,
       'already_customer': alreadyCustomer,
+      'assign_perm': assignPerm,
     };
   }
 }
