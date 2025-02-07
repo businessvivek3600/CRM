@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1014099622822",
+    "project_id": "crm-touchwood",
+    "storage_bucket": "crm-touchwood.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1014099622822:android:bc2a69e0265adfbd7eed67",
+        "android_client_info": {
+          "package_name": "com.app.crm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEU5mMq5dSONmQRxvoFLoazTwLC-rKKac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
