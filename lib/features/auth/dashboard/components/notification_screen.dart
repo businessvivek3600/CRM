@@ -55,7 +55,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      gradient:RadialGradient(colors: [
+                      gradient:const RadialGradient(colors: [
                        Colors.black12,
                         secondaryPrimaryColor,
                       ],
@@ -66,7 +66,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     CircleAvatar(
                     radius: 30,
                     backgroundImage: NetworkImage( item['image']),
-                                    ) : SizedBox(),
+                                    ) : const SizedBox(),
 
                       title: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,7 +79,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           ),
                         ],
                       ),
-                      subtitle: Text(item['body'] ?? 'No Message',style: TextStyle(color: Colors.white),),
+                      subtitle: Text(item['body'] ?? 'No Message',style: const TextStyle(color: Colors.white),),
                       trailing: Text(
                         item['timestamp']?.substring(0, 10) ?? '',
                         style: const TextStyle(fontSize: 12, color: Colors.black),
