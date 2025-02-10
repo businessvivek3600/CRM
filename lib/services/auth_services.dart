@@ -18,17 +18,23 @@ class AuthService {
 
   Future<String?> getFbToken() async {
     final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+    await firebaseMessaging.requestPermission();
     try {
-      String? token = defaultTargetPlatform == TargetPlatform.macOS
-          ? await firebaseMessaging.getAPNSToken() ?? 'unable to get token [macos]'
-          : await firebaseMessaging.getToken();
-      debugPrint('FirebaseMessaging token: $token');
-      return token;
+      if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+        String? apnsToken = await firebaseMessaging.getAPNSToken();
+        debugPrint('APNS token: $apnsToken');
+        return apnsToken ?? 'APNS token unavailable';
+      } else {
+        String? fcmToken = await firebaseMessaging.getToken();
+        debugPrint('FCM token: $fcmToken');
+        return fcmToken;
+      }
     } catch (e) {
-      debugPrint('Error getting FirebaseMessaging token: $e');
+      debugPrint('Error getting token: $e');
       return null;
     }
   }
+
   /// login with email and password
   Future<void> login(
       BuildContext context, String email, String password) async {
@@ -37,7 +43,7 @@ class AuthService {
         "username": email,
         "password": password,
         'device_id': await getDeviceId(),
-        'fcm_token': await getFbToken(),
+        'fcm_token': await getFbToken() ?? "",
       };
       infoLog('Request Data: $requestData');
       var (bool status, Map<String, dynamic> data, String? message) =
