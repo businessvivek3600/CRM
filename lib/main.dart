@@ -4,6 +4,7 @@ import 'package:crm/services/notification_service.dart';
 import 'package:crm/store/app_store.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:geolocator/geolocator.dart';
@@ -46,14 +47,17 @@ Future<void> openAppSettingsForLocationPermission() async {
     print('Failed to open app settings.');
   }
 }
+final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Workmanager().initialize(callbackDispatcher);
+  Workmanager().registerOneOffTask("taskId", "backgroundTask");
   await initialize();
   await setupAppStore();
   await initializeUserDataInMain();
   requestLocationPermission();
   await initNbUtils().then((value) async => await initialize());
+  await getFbToken();
   runApp(const MyApp());
 }
 
@@ -69,8 +73,18 @@ Future<void> initialize() async {
   sharedPreferences = await SharedPreferences.getInstance();
   await appStore.setToken(getStringAsync(TOKEN), isInitializing: true);
   // Print the device token for debugging
-  String? token = await FirebaseMessaging.instance.getToken();
-  logger.d('FCM Token: $token');
+}
+Future<String?> getFbToken() async {
+  try {
+    String? token = defaultTargetPlatform == TargetPlatform.iOS
+        ? await firebaseMessaging.getAPNSToken() ?? 'unable to get token [iOS]'
+        : await firebaseMessaging.getToken();
+    debugPrint('FirebaseMessaging token -----: $token');
+    return token;
+  } catch (e) {
+    debugPrint('Error getting FirebaseMessaging token: $e');
+    return null;
+  }
 }
 
 Future<void> initializeUserDataInMain() async {
