@@ -64,7 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1014099622822',
     projectId: 'crm-touchwood',
     storageBucket: 'crm-touchwood.firebasestorage.app',
-    iosBundleId: 'com.app.crm',
+    iosBundleId: 'com.app.teamcrm',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -73,7 +73,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1014099622822',
     projectId: 'crm-touchwood',
     storageBucket: 'crm-touchwood.firebasestorage.app',
-    iosBundleId: 'com.app.crm',
+    iosBundleId: 'com.app.teamcrm',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
