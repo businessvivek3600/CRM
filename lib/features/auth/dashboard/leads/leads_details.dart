@@ -17,7 +17,7 @@ import '../../../../store/lead_store.dart';
 import '../../../../widgets/date_formation.dart';
 
 class LeadDetails extends StatefulWidget {
- LeadDetails({Key? key, required this.lead}) : super(key: key);
+  LeadDetails({super.key, required this.lead});
   Lead lead;
   @override
   State<LeadDetails> createState() => _LeadDetailsState();
@@ -124,7 +124,7 @@ class _LeadDetailsState extends State<LeadDetails> {
             Expanded(
               child: TabBarView(
                 children: [
-                  ProfileTab(lead: widget.lead), // Includes cards
+                  ProfileTab(lead: widget.lead),
                   AddNotesTab(
                     noteData: widget.lead.notesData ?? [],
                     lead: widget.lead,
@@ -234,7 +234,7 @@ class _LeadDetailsState extends State<LeadDetails> {
                             ),
                           ); // Close dialog
                           // Add delete functionality here
-                           // Close dialog
+                          // Close dialog
                           final Map<String, dynamic> deleteLead = {
                             'id': widget.lead.id,
                           };
@@ -245,12 +245,16 @@ class _LeadDetailsState extends State<LeadDetails> {
                             String? message
                           ) = await ApiService.deleteLead(deleteLead);
                           if (status) {
-
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LeadsScreen(),));
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LeadsScreen(),
+                                ));
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text(message ?? "Failed to delete lead"),
+                              SnackBar(
+                                content:
+                                    Text(message ?? "Failed to delete lead"),
                                 backgroundColor: Colors.red,
                               ),
                             );
@@ -302,6 +306,7 @@ class _ProfileTabState extends State<ProfileTab> {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (widget.lead.permission!.alreadyCustomer != "1")
             Row(
@@ -547,6 +552,40 @@ class _ProfileTabState extends State<ProfileTab> {
                 ],
               ),
             ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Expanded(
+                child: Card(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  elevation: 4,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Details",
+                          style: TextStyle(
+                              color: acceptColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline),
+                        ),
+                        height20(),
+                        Text(
+                          widget.lead.description ?? 'N/A',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

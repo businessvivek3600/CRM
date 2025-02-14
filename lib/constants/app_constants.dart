@@ -17,4 +17,5 @@ class AppConst {
 
 
   static Color defaultPrimaryColor = const Color(0xFFa1adc7);
+
 }
