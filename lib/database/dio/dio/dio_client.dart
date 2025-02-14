@@ -30,6 +30,16 @@ class DioClient{
       }
       ..options.responseType = ResponseType.json;
     dio.interceptors.add(loggingInterceptor);
+    dio.interceptors.add(InterceptorsWrapper(
+      onResponse: (response, handler) {
+        if (response.data['status'] == false) {
+          if (response.data['message'] == "The Token field is required.") {
+            appStore.setSessionExpired(true);
+          }
+        }
+        handler.next(response);
+      },
+    ));
     logger.f('DioClient ${dio.options.baseUrl}',
         tag: 'DioClient', error: dio.options.headers);
   }
@@ -37,31 +47,25 @@ class DioClient{
     dio.options.headers = {
       Headers.acceptHeader: '*/*',
       Headers.wwwAuthenticateHeader : "touchwoodtechnologiescrm@741852963",
-      Headers.contentTypeHeader:
-          contentType ?? 'application/json; charset=UTF-8',
+      Headers.contentTypeHeader: contentType ?? 'application/json; charset=UTF-8',
       'x-api-key': "touchwoodtechnologiescrm@741852963",
     };
     log('updateUserToken : ${dio.options.headers}');
+
   }
 
   Future<Response> get(
       String uri, {
         Map<String, dynamic>? queryParameters,
         Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onReceiveProgress,
         bool token = true,
       }) async {
     try {
-      CancelToken cancelToken = CancelToken();
-      // pl('get : ${dio.options.headers} ${appStore.token}', 'DIO CLIENT');
 
       var response = await dio.get(
         uri,
         queryParameters: queryParameters,
         options: options,
-        cancelToken: cancelToken,
-        onReceiveProgress: onReceiveProgress,
       );
       return response;
     } on SocketException catch (err) {
@@ -77,13 +81,11 @@ class DioClient{
         Object? data,
         Map<String, dynamic>? queryParameters,
         Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onSendProgress,
-        ProgressCallback? onReceiveProgress,
+
         bool token = true,
       }) async {
     try {
-      CancelToken cancelToken = CancelToken();
+
       FormData formData = FormData();
       if (data is Map<String, dynamic>) {
         formData.fields
@@ -105,9 +107,7 @@ class DioClient{
         data: formData,
         queryParameters: queryParameters,
         options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress,
+
       );
       return response;
     } catch (e) {
@@ -120,9 +120,7 @@ class DioClient{
         data,
         Map<String, dynamic>? queryParameters,
         Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onReceiveProgress,
-        ProgressCallback? onSendProgress,
+
       }) async {
     try {
       var response = await dio.put(
@@ -130,9 +128,7 @@ class DioClient{
         data: data,
         queryParameters: queryParameters,
         options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress,
+
       );
 
       return response;
@@ -148,7 +144,7 @@ class DioClient{
         data,
         Map<String, dynamic>? queryParameters,
         Options? options,
-        CancelToken? cancelToken,
+
       }) async {
     try {
       var response = await dio.delete(
@@ -156,7 +152,7 @@ class DioClient{
         data: data,
         queryParameters: queryParameters,
         options: options,
-        cancelToken: cancelToken,
+
       );
       return response;
     } on FormatException catch (_) {

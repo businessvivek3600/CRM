@@ -11,6 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../database/notification_database.dart';
 
+
 class NotificationService {
   // Tag for logging purposes
   static const String tag = 'NotificationService';
@@ -55,7 +56,7 @@ class NotificationService {
   static void onMessageOpenedApp(RemoteMessage message) {
     print('onMessageOpenedApp: $message');
   }
-
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
   /// Initialize the local notification plugin and request notification permissions
   Future<void> initialize() async {
     const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -81,7 +82,17 @@ class NotificationService {
     );
 
     // Request permission for Firebase Messaging notifications
-    await FirebaseMessaging.instance.requestPermission(alert: true, badge: true, sound: true);
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      infoLog("User granted permission for push notifications");
+    } else {
+      errorLog("User denied push notification permission");
+    }
 
     // Ensure that notifications are displayed while the app is in the foreground
     await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
@@ -92,14 +103,14 @@ class NotificationService {
   }
 
   /// Request notification permission from the user
-  Future<void> requestPermission() async {
-    var status = await Permission.notification.request();  // Request notification access
-    if (status.isGranted) {
-      print('🔔 Notification access granted');
-    } else {
-      await openAppSettings();  // Open app settings if permission is denied
-    }
-  }
+  // Future<void> requestPermission() async {
+  //   var status = await Permission.notification.request();  // Request notification access
+  //   if (status.isGranted) {
+  //     print('🔔 Notification access granted');
+  //   } else {
+  //     await openAppSettings();  // Open app settings if permission is denied
+  //   }
+  // }
 
   /// Handle and display the incoming notification based on its type (text or image)
   static Future<void> handleMessages(RemoteMessage message) async {
@@ -114,8 +125,9 @@ class NotificationService {
     String timestamp = DateFormat('MM/dd/yyyy hh:mm a').format(DateTime.now());
 
     String payload = jsonEncode(data);
-
+    int notificationId = int.parse(message.messageId?.hashCode.toString().substring(0, 8) ?? DateTime.now().microsecondsSinceEpoch.toString());
     Map<String, dynamic> notificationData = {
+      "id":  notificationId,
       'title': title,
       'body': body,
       'image': image,

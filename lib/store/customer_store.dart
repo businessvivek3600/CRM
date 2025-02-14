@@ -32,7 +32,7 @@ CustomerCounts? customersCounts ;
     return customers.where((customer) => customer.active == '1').length;
   }
 
-
+/// Get all customjer list
   @action
   Future<void> fetchCustomerData({int page = 0}) async {
     try {
@@ -50,6 +50,29 @@ CustomerCounts? customersCounts ;
         customers.addAll(_customers);
         errorLog("response data -- ${data['counts']}");
         customersCounts = CustomerCounts.fromJson(data['counts']);
+      } else {
+        throw Exception(
+            message ?? 'Unknown error occurred while fetching data');
+      }
+    } catch (error) {
+      // Log or handle the error as needed
+      print('Error fetching customer data: ${error.toString()}');
+      throw Exception('Failed to fetch customer data: ${error.toString()}');
+    }
+  }
+
+  /// Customer details using customer id
+
+  Future<void> getCustomerDetails(String userId)async{
+    try {
+
+      // Start fetching data
+      var (status, data, message) = await ApiService.getCustomerDetails({'clientId':userId});
+
+      if (status) {
+        (data['customers'] as List).map((e) {
+          return Customer.fromJson(e);
+        });
       } else {
         throw Exception(
             message ?? 'Unknown error occurred while fetching data');
