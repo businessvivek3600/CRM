@@ -241,6 +241,28 @@ class ApiService {
     return (false, <String, dynamic>{}, null);
   }
 
+  /// Fetch single customer from the API using id
+  static Future<(bool, Map<String, dynamic>, String?)> getCustomerDetails(  Map<String, dynamic> info) async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+      await ApiHandler.fetchData(ApiConstant.customerDetails,
+          data: info,
+          method: ApiMethod.POST);
+
+      if (status && data.isNotEmpty) {
+        return (true, data, message);
+      } else {
+        message = message?.split('.').first;
+        // Uncomment below line to show toast notification
+        toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
+        return (false, <String, dynamic>{}, message);
+      }
+    } catch (e) {
+      logger.e('getCustomers error : $e', tag: tag);
+    }
+    return (false, <String, dynamic>{}, null);
+  }
+
   ///------------------------Dashboard-----------------------
   /// Fetch Dashboard from the API
   static Future<(bool, Map<String, dynamic>, String?)> getDashboardData() async {
