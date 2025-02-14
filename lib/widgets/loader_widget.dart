@@ -1,15 +1,11 @@
 import 'package:crm/widgets/spin_kit_chasing_dots.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:nb_utils/nb_utils.dart';
-
-import '../constants/value_constants.dart';
 import '../database/routes/route_path.dart';
-import '../features/auth/auth/auth_screen.dart';
 import '../services/auth_services.dart';
 import '../store/app_store.dart';
 import '../utils/default_logger.dart';
@@ -46,7 +42,7 @@ class _LoaderWidgetState extends State<LoaderWidget>
 
   @override
   Widget build(BuildContext context) {
-    return SpinKitChasingDots(color: Colors.white);
+    return const SpinKitChasingDots(color: Colors.white);
   }
 }
 
@@ -99,7 +95,7 @@ class LoadingWidget extends StatelessWidget {
                   child: AnimatedContainer(
                       duration: 500.milliseconds,
                       color: Colors.black.withOpacity(0.1),
-                      child: Center(
+                      child: const Center(
                           child: SpinKitChasingDots(color: Colors.white)))),
             ),
           ],

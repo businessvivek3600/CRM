@@ -8,6 +8,9 @@ import 'package:crm/store/lead_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../../../utils/colors.dart';
 // import 'package:nb_utils/nb_utils.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -89,24 +92,27 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           builder: (context) => const LeadsScreen()),
                     ),
                   ),
-                  _buildDrawerItem(
-                    icon: Icons.notifications,
-                    text: "Notification",
-                    textStyle: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const NotificationScreen()),
-                    ),
-                  ),
+                  // _buildDrawerItem(
+                  //   icon: Icons.notifications,
+                  //   text: "Notification",
+                  //   textStyle: const TextStyle(
+                  //       fontSize: 16, fontWeight: FontWeight.bold),
+                  //   onTap: () => Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //         builder: (context) => const NotificationScreen()),
+                  //   ),
+                  // ),
+                  if(appStore.userEmail == "touchcode@gmail.com")
                   _buildDrawerItem(
                     icon: Icons.delete,
                     text: "Delete",
                     iconColor: Colors.black,
                     textStyle: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.bold),
-                    onTap: () {},
+                    onTap: () {
+                      _showDeleteDialog(context);
+                    },
                   ),
                 ],
               ),
@@ -119,7 +125,109 @@ class _CustomDrawerState extends State<CustomDrawer> {
       ),
     );
   }
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Exclamation Mark Icon with Gradient Background
+                Container(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [Colors.redAccent, Colors.red],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(height: 16),
 
+                // Title
+                const Text(
+                  "Delete Account",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Description
+                const Text(
+                  "Are you sure that you want to delete your account?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: secondaryPrimaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close dialog
+                        },
+                        child: const Text(
+                          "No",
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: secondaryPrimaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        onPressed: () async {
+                          final Uri url = Uri.parse('https://crm.touchwoodtechnologies.com/delete_account');
+                          await launchUrl(url);
+                        },
+                        child: const Text(
+                          "Yes",
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
   // Compact Drawer Item
   Widget _buildDrawerItem({
     required IconData icon,

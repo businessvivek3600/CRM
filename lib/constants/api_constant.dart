@@ -5,6 +5,7 @@ class ApiConstant {
   static const login = 'staff-login';
   static const getLeads = 'get-leads';
   static const getCustomer = 'get-customers';
+  static const customerDetails = 'client-detail';
   static const addLead = 'add-leads';
   static const deleteNote = 'delete-note';
   static const deleteLead = 'delete-lead';
