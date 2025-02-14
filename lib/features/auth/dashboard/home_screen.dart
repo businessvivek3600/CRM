@@ -318,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCard(
+ Widget _buildCard(
       IconData icon, String count, String label, Color iconColor) {
     return Card(
       color: Colors.white, // Set card color to white
@@ -381,7 +381,8 @@ class InvoiceProgressItem extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                style:
+                const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
               Text(
                 "$count",
@@ -401,3 +402,4 @@ class InvoiceProgressItem extends StatelessWidget {
     );
   }
 }
+
