@@ -7,6 +7,8 @@ import 'package:crm/store/app_store.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:geolocator/geolocator.dart';
@@ -14,6 +16,8 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:workmanager/workmanager.dart';
 import '../../../../store/lead_store.dart';
 import '../../../services/api_services.dart';
+
+import 'components/notification_screen.dart';
 
 Future<void> hitApiWithLocation(
     String userId, double latitude, double longitude) async {
@@ -24,7 +28,7 @@ Future<void> hitApiWithLocation(
   });
   infoLog("LOACTION DATA ______ $formData");
   final (bool status, Map<String, dynamic> response, String? message) =
-      await ApiService.uploadLocation(formData);
+  await ApiService.uploadLocation(formData);
 
   if (status) {
     infoLog('Success: ${message}');
@@ -43,6 +47,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Timer? _locationTimer;
+  int unreadNotifications = 1;
   @override
   void initState() {
     super.initState();
@@ -54,85 +59,71 @@ class _HomeScreenState extends State<HomeScreen> {
       fetchCompanyInfo();
     });
   }
-
-  Future<void> fetchCompanyInfo() async {
-    await leadStore.getDashboard();
-    if (mounted) setState(() {});
-  }
-
-  Future<void> _requestLocationPermission() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        debugPrint('Location permission denied');
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      debugPrint('Location permission permanently denied');
-      return;
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+  Future<String?> getFbToken() async {
+    try {
+      String? token = defaultTargetPlatform == TargetPlatform.iOS
+          ? await firebaseMessaging.getAPNSToken()
+          : await firebaseMessaging.getToken();
+      debugPrint('FirebaseMessaging token -----: $token');
+      return token;
+    } catch (e) {
+      debugPrint('Error getting FirebaseMessaging token: $e');
+      return null;
     }
   }
-
-  void _scheduleLocationTask() {
-    _locationTimer = Timer.periodic(const Duration(minutes: 10), (timer) {
-      getLocation();
-    });
-    Workmanager().registerPeriodicTask(
-      'fetchLocationTask',
-      'fetchLocation',
-      frequency: const Duration(minutes: 15),
-      inputData: {'id': appStore.staffId},
-    );
-  }
-
-  Future<void> _initializeData() async {
-    // Display a loading state while fetching data
-    appStore.setLoading(true);
-
-    // Fetch dashboard data and user data
-    await leadStore.getDashboard();
-    await appStore.loadUserData();
-
-    // Hide loading state
-    appStore.setLoading(false);
-  }
-
-  void getLocation() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.always) {
-        warningLog('Location permissions are denied.');
-        return;
-      }
-    }
-
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    warningLog(
-        'Latitude: ${position.latitude}, Longitude: ${position.longitude}');
-
-    await hitApiWithLocation(
-        appStore.staffId, position.latitude, position.longitude);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       drawer: const CustomDrawer(),
       appBar: AppBar(
         backgroundColor: secondaryPrimaryColor,
         elevation: 0,
         title: const Text(
-          'Home Screen',
+          'Dashboard',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 23, color: white),
         ),
+        actions: [
+          Stack(
+            clipBehavior: Clip.none, // Ensure badge doesn't get clipped
+            children: [
+              IconButton(
+                onPressed: () {
+                  // Navigate to the notification screen
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => const NotificationScreen()),);
+                },
+                icon: const Icon(Icons.notifications_outlined, color: white),
+              ),
+              if (unreadNotifications > 0)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(2.0),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 18,
+                      minHeight: 18,
+                    ),
+                    child: Text(
+                      unreadNotifications.toString(),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
       body: Observer(
         builder: (context) {
@@ -163,15 +154,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                   : null,
                               child: appStore.profileImage.isEmpty
                                   ? Text(
-                                      appStore.fullName.isNotEmpty
-                                          ? appStore.fullName[0].toUpperCase()
-                                          : '',
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                    )
+                                appStore.fullName.isNotEmpty
+                                    ? appStore.fullName[0].toUpperCase()
+                                    : '',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              )
                                   : null,
                             ),
                             const SizedBox(width: 10),
@@ -202,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                             childAspectRatio: 3 / 2,
                             crossAxisCount: 2,
                             crossAxisSpacing: 10,
@@ -288,14 +279,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                 itemCount: leadStore.leadStatusDashboard.length,
                                 itemBuilder: (context, index) {
                                   final leadStatus =
-                                      leadStore.leadStatusDashboard[index];
+                                  leadStore.leadStatusDashboard[index];
                                   final colorCode =
-                                      leadStatus.color.replaceFirst('#', '');
+                                  leadStatus.color.replaceFirst('#', '');
                                   double progressValue =
-                                      leadStore.firstBox.totalLeads > 0
-                                          ? leadStatus.total /
-                                              leadStore.firstBox.totalLeads
-                                          : 0.0;
+                                  leadStore.firstBox.totalLeads > 0
+                                      ? leadStatus.total /
+                                      leadStore.firstBox.totalLeads
+                                      : 0.0;
                                   return InvoiceProgressItem(
                                     label: leadStatus.name,
                                     value: progressValue,
@@ -318,6 +309,71 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> fetchCompanyInfo() async {
+    await leadStore.getDashboard();
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _requestLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        debugPrint('Location permission denied');
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      debugPrint('Location permission permanently denied');
+      return;
+    }
+  }
+
+  void _scheduleLocationTask() {
+    _locationTimer = Timer.periodic(const Duration(minutes: 10), (timer) {
+      getLocation();
+    });
+    Workmanager().registerPeriodicTask(
+      'fetchLocationTask',
+      'fetchLocation',
+      frequency: const Duration(minutes: 15),
+      inputData: {'id': appStore.staffId},
+    );
+  }
+
+  Future<void> _initializeData() async {
+    // Display a loading state while fetching data
+    appStore.setLoading(true);
+
+    // Fetch dashboard data and user data
+    await leadStore.getDashboard();
+    await appStore.loadUserData();
+
+    // Hide loading state
+    appStore.setLoading(false);
+  }
+
+  void getLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+      if (permission != LocationPermission.always) {
+        warningLog('Location permissions are denied.');
+        return;
+      }
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    warningLog(
+        'Latitude: ${position.latitude}, Longitude: ${position.longitude}');
+
+    await hitApiWithLocation(
+        appStore.staffId, position.latitude, position.longitude);
+  }
   Widget _buildCard(
       IconData icon, String count, String label, Color iconColor) {
     return Card(
@@ -382,7 +438,7 @@ class InvoiceProgressItem extends StatelessWidget {
               Text(
                 label,
                 style:
-                    const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
               Text(
                 "$count",
