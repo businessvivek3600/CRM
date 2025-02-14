@@ -381,8 +381,7 @@ class InvoiceProgressItem extends StatelessWidget {
             children: [
               Text(
                 label,
-                style:
-                    const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
               Text(
                 "$count",
