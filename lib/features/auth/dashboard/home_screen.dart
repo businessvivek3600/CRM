@@ -28,7 +28,7 @@ Future<void> hitApiWithLocation(
   });
   infoLog("LOACTION DATA ______ $formData");
   final (bool status, Map<String, dynamic> response, String? message) =
-  await ApiService.uploadLocation(formData);
+      await ApiService.uploadLocation(formData);
 
   if (status) {
     infoLog('Success: ${message}');
@@ -59,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
       fetchCompanyInfo();
     });
   }
+
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
   Future<String?> getFbToken() async {
     try {
@@ -72,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return null;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,8 +94,11 @@ class _HomeScreenState extends State<HomeScreen> {
               IconButton(
                 onPressed: () {
                   // Navigate to the notification screen
-                  Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => const NotificationScreen()),);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const NotificationScreen()),
+                  );
                 },
                 icon: const Icon(Icons.notifications_outlined, color: white),
               ),
@@ -138,6 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
           return LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
+                physics: NeverScrollableScrollPhysics(),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -154,15 +160,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                   : null,
                               child: appStore.profileImage.isEmpty
                                   ? Text(
-                                appStore.fullName.isNotEmpty
-                                    ? appStore.fullName[0].toUpperCase()
-                                    : '',
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              )
+                                      appStore.fullName.isNotEmpty
+                                          ? appStore.fullName[0].toUpperCase()
+                                          : '',
+                                      style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    )
                                   : null,
                             ),
                             const SizedBox(width: 10),
@@ -193,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             childAspectRatio: 3 / 2,
                             crossAxisCount: 2,
                             crossAxisSpacing: 10,
@@ -279,14 +285,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                 itemCount: leadStore.leadStatusDashboard.length,
                                 itemBuilder: (context, index) {
                                   final leadStatus =
-                                  leadStore.leadStatusDashboard[index];
+                                      leadStore.leadStatusDashboard[index];
                                   final colorCode =
-                                  leadStatus.color.replaceFirst('#', '');
+                                      leadStatus.color.replaceFirst('#', '');
                                   double progressValue =
-                                  leadStore.firstBox.totalLeads > 0
-                                      ? leadStatus.total /
-                                      leadStore.firstBox.totalLeads
-                                      : 0.0;
+                                      leadStore.firstBox.totalLeads > 0
+                                          ? leadStatus.total /
+                                              leadStore.firstBox.totalLeads
+                                          : 0.0;
                                   return InvoiceProgressItem(
                                     label: leadStatus.name,
                                     value: progressValue,
@@ -374,6 +380,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await hitApiWithLocation(
         appStore.staffId, position.latitude, position.longitude);
   }
+
   Widget _buildCard(
       IconData icon, String count, String label, Color iconColor) {
     return Card(
@@ -438,7 +445,7 @@ class InvoiceProgressItem extends StatelessWidget {
               Text(
                 label,
                 style:
-                const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
               Text(
                 "$count",
