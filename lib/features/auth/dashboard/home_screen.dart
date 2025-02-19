@@ -1,7 +1,6 @@
 // import 'package:crm/features/auth/dashboard/components/drawer_fragment/drawer_widget.dart';
 import 'dart:async';
 
-import 'package:crm/constants/app_constants.dart';
 import 'package:crm/features/auth/dashboard/components/drawer_fragment/drawer_widget.dart';
 import 'package:crm/store/app_store.dart';
 import 'package:crm/utils/colors.dart';
