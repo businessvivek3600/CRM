@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import '../../../../Models/leads_model.dart';
 import '../../../../services/api_services.dart';
 import '../../../../store/lead_store.dart';
+import '../../../../widgets/custom_dropdown.dart';
 
 class ConvertToCustomer extends StatefulWidget {
   ConvertToCustomer({super.key, required this.lead});
@@ -65,8 +66,9 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
     addressController = TextEditingController(text: widget.lead.address ?? "");
     cityController = TextEditingController(text: widget.lead.city ?? "");
     stateController = TextEditingController(text: widget.lead.state ?? "");
-    country = leadStore.country
-            .any((country) => country.countryId == widget.lead.country)
+    errorLog("COUNTRY__________${widget.lead.country}");
+    country = widget.lead.country != 0 &&
+        leadStore.country.any((c) => c.countryId == widget.lead.country)
         ? widget.lead.country
         : null;
     websiteController = TextEditingController(text: widget.lead.website ?? "");
@@ -175,37 +177,26 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                     hint: 'Enter Address',
                   ),
                   const SizedBox(height: 15),
-                  Container(
-                    width: double.infinity,
-                    child: DropdownButtonFormField<String>(
-                      value: leadStore.country
-                          .firstWhereOrNull((v) => v.countryId == country)
-                          ?.countryId,
-                      isExpanded: true, // Prevent overflow
-                      items: leadStore.country
-                          .map((item) => DropdownMenuItem<String>(
-                                value: item.countryId,
-                                child: Text(item.shortName),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          country = value;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Select Country',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Country is required';
-                        }
-                        return null;
-                      },
-                    ),
+                  CustomDropdown(
+                    hint: 'Select Country',
+                    items: leadStore.country.map((item) => item.shortName).toList(),
+                    selectedValue: (country != null && country != 0)
+                        ? leadStore.country.firstWhere((item) => item.countryId == country).shortName
+                        : null,
+                    onChanged: (value) {
+                      setState(() {
+                        country = leadStore.country
+                            .firstWhere((item) => item.shortName == value)
+                            .countryId;
+
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please pick a country';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 15),
                   CommonTextField(
@@ -389,6 +380,10 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                                     cityController.text, widget.lead.city ?? "")
                                 ? cityController.text.trim()
                                 : widget.lead.city;
+                            updatedData['state'] = isFieldUpdated(
+                                stateController.text, widget.lead.state ?? "")
+                                ? stateController.text.trim()
+                                : widget.lead.state;
                             updatedData['zip'] = isFieldUpdated(
                                     zipController.text, widget.lead.zip ?? "")
                                 ? zipController.text.trim()

@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
 import 'package:crm/features/auth/dashboard/customer/updatecustomer.dart';
 import 'package:crm/utils/colors.dart';
+import 'package:nb_utils/nb_utils.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../../Models/leads_model.dart';
 import '../../../../services/api_services.dart';
@@ -13,7 +15,7 @@ import '../../../../store/lead_store.dart';
 import '../../../../widgets/custom_dropdown.dart';
 
 class CustomerDetails extends StatefulWidget {
-  final Customer customer;
+  final String customer;
 
   const CustomerDetails({super.key, required this.customer});
 
@@ -23,23 +25,44 @@ class CustomerDetails extends StatefulWidget {
 
 class _CustomerDetailsState extends State<CustomerDetails> {
   bool _isEditMode = false;
-  late Customer _editableCustomer;
-  late Customer _initialCustomer;
+  bool isLoading = false;
+   Customer? _editableCustomer;
+   Customer? _initialCustomer;
 
   @override
   void initState() {
     super.initState();
-    _editableCustomer = widget.customer;
-    _initialCustomer = widget.customer;
-  }
 
+    _fetchCustomerDetails();
+  }
+  Future<void> _fetchCustomerDetails() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    var (bool status, Map<String, dynamic> data, String? message) =
+    await ApiService.getCustomerDetails({'clientId': widget.customer});
+
+    if (status && data.containsKey('customers') && (data['customers'] as List).isNotEmpty) {
+      setState(() {
+        _editableCustomer = Customer.fromJson(data['customers'][0]);
+        _initialCustomer = Customer.fromJson(data['customers'][0]);
+      });
+    } else {
+      toast(message ?? 'Failed to load customer details', gravity: ToastGravity.TOP, bgColor: Colors.red);
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.customer.company),
+          title: Text(_initialCustomer?.company ?? ""),
           backgroundColor: secondaryPrimaryColor,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -68,7 +91,9 @@ class _CustomerDetailsState extends State<CustomerDetails> {
           ],
         ),
         body: SafeArea(
-          child: Column(
+          child: isLoading
+              ? _buildShimmerEffect()
+              :  Column(
             children: [
               Material(
                 color: const Color(0xfffef7ff),
@@ -146,27 +171,27 @@ class _CustomerDetailsState extends State<CustomerDetails> {
   void _saveCustomerData() async {
 
     final FormData formData = FormData.fromMap({
-      "id": widget.customer.userId.toString(),
-      'active': widget.customer.active.toString(),
-      'company': _editableCustomer.company,
-      'vat': _editableCustomer.vat,
-      'phonenumber': _editableCustomer.phoneNumber,
-      'country': _editableCustomer.country,
-      'city': _editableCustomer.city,
-      'zip': _editableCustomer.zip,
-      'state': _editableCustomer.state,
-      'address': _editableCustomer.address,
-      'website': _editableCustomer.website,
-      'billing_street': _editableCustomer.billingStreet,
-      'billing_city': _editableCustomer.billingCity,
-      'billing_state': _editableCustomer.billingState,
-      'billing_zip': _editableCustomer.billingZip,
-      'billing_country': _editableCustomer.billingCountry,
-      'shipping_street': _editableCustomer.shippingStreet,
-      'shipping_city': _editableCustomer.shippingCity,
-      'shipping_state': _editableCustomer.shippingState,
-      'shipping_zip': _editableCustomer.shippingZip,
-      'shipping_country': _editableCustomer.shippingCountry,
+      "id": _initialCustomer!.userId.toString(),
+      'active': _initialCustomer!.active.toString(),
+      'company': _editableCustomer!.company,
+      'vat': _editableCustomer!.vat,
+      'phonenumber': _editableCustomer!.phoneNumber,
+      'country': _editableCustomer!.country,
+      'city': _editableCustomer!.city,
+      'zip': _editableCustomer!.zip,
+      'state': _editableCustomer!.state,
+      'address': _editableCustomer!.address,
+      'website': _editableCustomer!.website,
+      'billing_street': _editableCustomer!.billingStreet,
+      'billing_city': _editableCustomer!.billingCity,
+      'billing_state': _editableCustomer!.billingState,
+      'billing_zip': _editableCustomer!.billingZip,
+      'billing_country': _editableCustomer!.billingCountry,
+      'shipping_street': _editableCustomer!.shippingStreet,
+      'shipping_city': _editableCustomer!.shippingCity,
+      'shipping_state': _editableCustomer!.shippingState,
+      'shipping_zip': _editableCustomer!.shippingZip,
+      'shipping_country': _editableCustomer!.shippingCountry,
     });
     warningLog("Editable customer Data: $formData");
     var (bool status, Map<String, dynamic> data, String? message) =
@@ -180,6 +205,40 @@ class _CustomerDetailsState extends State<CustomerDetails> {
       print('Error: $status - $data');
     }
 
+  }
+  Widget _buildShimmerEffect() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              width: 150,
+              height: 20,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildShimmerCard(),
+          const SizedBox(height: 16),
+          _buildShimmerCard(),
+        ],
+      ),
+    );
+  }
+  Widget _buildShimmerCard() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        width: double.infinity,
+        height: 100,
+        color: Colors.white,
+      ),
+    );
   }
 
   Widget _buildProfileTab() {
@@ -211,54 +270,54 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildEditableRow(
-                      'Company', "", _editableCustomer.company ?? "", (value) {
+                      'Company', "", _editableCustomer?.company ?? "", (value) {
                     _editableCustomer =
-                        _editableCustomer.copyWith(company: value);
+                        _editableCustomer?.copyWith(company: value);
                   }),
                   const Divider(),
                   _buildEditableRow(
-                      'VAT Number', "", _editableCustomer.vat ?? "", (value) {
-                    _editableCustomer = _editableCustomer.copyWith(vat: value);
+                      'VAT Number', "", _editableCustomer?.vat ?? "", (value) {
+                    _editableCustomer = _editableCustomer?.copyWith(vat: value);
                   }),
                   const Divider(),
-                  _buildEditableRow('Phone', "", _editableCustomer.phoneNumber,
+                  _buildEditableRow('Phone', "", _editableCustomer?.phoneNumber ?? "",
                           (value) {
                         _editableCustomer =
-                            _editableCustomer.copyWith(phoneNumber: value);
+                            _editableCustomer?.copyWith(phoneNumber: value);
                       }),
                   const Divider(),
-                  _buildEditableRow('Website', "", _editableCustomer.website,
+                  _buildEditableRow('Website', "", _editableCustomer?.website ?? '',
                           (value) {
                         _editableCustomer =
-                            _editableCustomer.copyWith(website: value);
+                            _editableCustomer?.copyWith(website: value);
                       }),
                   const Divider(),
-                  _buildEditableRow('Address', "", _editableCustomer.address,
+                  _buildEditableRow('Address', "", _editableCustomer?.address ?? "",
                           (value) {
                         _editableCustomer =
-                            _editableCustomer.copyWith(address: value);
+                            _editableCustomer?.copyWith(address: value);
                       }),
                   const Divider(),
-                  _buildEditableRow('City', "", _editableCustomer.city,
+                  _buildEditableRow('City', "", _editableCustomer?.city ?? "",
                           (value) {
-                        _editableCustomer = _editableCustomer.copyWith(city: value);
+                        _editableCustomer = _editableCustomer?.copyWith(city: value);
                       }),
                   const Divider(),
-                  _buildEditableRow('State', "", _editableCustomer.state,
+                  _buildEditableRow('State', "", _editableCustomer?.state ?? '',
                           (value) {
                         _editableCustomer =
-                            _editableCustomer.copyWith(state: value);
+                            _editableCustomer?.copyWith(state: value);
                       }),
                   const Divider(),
-                  _buildEditableRow('Zip Code', "", _editableCustomer.zip,
+                  _buildEditableRow('Zip Code', "", _editableCustomer?.zip ?? "",
                           (value) {
-                        _editableCustomer = _editableCustomer.copyWith(zip: value);
+                        _editableCustomer = _editableCustomer?.copyWith(zip: value);
                       }),
                   const Divider(),
                   _buildEditableRow('Country', 'country',
-                      getCountryName(_editableCustomer.country), (value) {
+                      getCountryName(_editableCustomer?.country ??""), (value) {
                         _editableCustomer =
-                            _editableCustomer.copyWith(country: value);
+                            _editableCustomer!.copyWith(country: value);
                       }),
                 ],
               ),
@@ -301,8 +360,13 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                   hint: 'Select $type',
                   items: leadStore.country.map((item) => item.shortName).toList(),
                   selectedValue: leadStore.country
-                      .firstWhere((item) => item.countryId ==_getSelectedCountry(type), orElse: () => leadStore.country.first)
-                      .shortName,
+                      .where((item) => item.countryId == _getSelectedCountry(type))
+                      .isNotEmpty
+                      ? leadStore.country
+                      .firstWhere((item) => item.countryId == _getSelectedCountry(type))
+                      .shortName
+                      : null,
+
                   onChanged: (selectedValue) {
 
                       setState(() {
@@ -356,27 +420,28 @@ class _CustomerDetailsState extends State<CustomerDetails> {
   String _getSelectedCountry(String type) {
     switch (type) {
       case 'country':
-        return _editableCustomer.country;
+        return _editableCustomer?.country?.isNotEmpty == true ? _editableCustomer!.country! : '';
       case 'shippingCountry':
-        return _editableCustomer.shippingCountry!;
+        return _editableCustomer?.shippingCountry?.isNotEmpty == true ? _editableCustomer!.shippingCountry! : '';
       case 'billingCountry':
-        return _editableCustomer.billingCountry!;
+        return _editableCustomer?.billingCountry?.isNotEmpty == true ? _editableCustomer!.billingCountry! : '';
       default:
         return '';
     }
   }
 
+
   void _updateCountry(String type, String selectedValue) {
     String? countryId = getCountryId(selectedValue);  // Convert name to ID
     switch (type) {
       case 'country':
-        _editableCustomer = _editableCustomer.copyWith(country: countryId);
+        _editableCustomer = _editableCustomer?.copyWith(country: countryId);
         break;
       case 'billingCountry':
-        _editableCustomer = _editableCustomer.copyWith(billingCountry: countryId);
+        _editableCustomer = _editableCustomer?.copyWith(billingCountry: countryId);
         break;
       case 'shippingCountry':
-        _editableCustomer = _editableCustomer.copyWith(shippingCountry: countryId);
+        _editableCustomer = _editableCustomer?.copyWith(shippingCountry: countryId);
         break;
     }
   }
@@ -407,26 +472,26 @@ class _CustomerDetailsState extends State<CustomerDetails> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildEditableRow('Street', "", _editableCustomer.billingStreet ?? "", (value) {
-                    _editableCustomer = _editableCustomer.copyWith(billingStreet: value);
+                  _buildEditableRow('Street', "", _editableCustomer?.billingStreet ?? "", (value) {
+                    _editableCustomer = _editableCustomer?.copyWith(billingStreet: value);
                   }),
                   const Divider(),
-                  _buildEditableRow('City', "", _editableCustomer.billingCity ?? "", (value) {
-                    _editableCustomer = _editableCustomer.copyWith(billingCity: value);
+                  _buildEditableRow('City', "", _editableCustomer?.billingCity ?? "", (value) {
+                    _editableCustomer = _editableCustomer?.copyWith(billingCity: value);
 
                   }),
                   const Divider(),
-                  _buildEditableRow('State', "", _editableCustomer.billingState ?? "", (value) {
-                    _editableCustomer = _editableCustomer.copyWith(billingState: value);
+                  _buildEditableRow('State', "", _editableCustomer?.billingState ?? "", (value) {
+                    _editableCustomer = _editableCustomer?.copyWith(billingState: value);
                   ();
                   }),
                   const Divider(),
-                  _buildEditableRow('Zip Code', "", _editableCustomer.billingZip ?? "", (value) {
-                    _editableCustomer = _editableCustomer.copyWith(billingZip: value);
+                  _buildEditableRow('Zip Code', "", _editableCustomer?.billingZip ?? "", (value) {
+                    _editableCustomer = _editableCustomer?.copyWith(billingZip: value);
                   }),
                   const Divider(),
-                  _buildEditableRow('Country', 'billingCountry', _editableCustomer.billingCountry ?? "", (value) {
-                    _editableCustomer = _editableCustomer.copyWith(billingCountry: value);
+                  _buildEditableRow('Country', 'billingCountry', _editableCustomer?.billingCountry ?? "", (value) {
+                    _editableCustomer = _editableCustomer?.copyWith(billingCountry: value);
                   }),
                 ],
               ),
@@ -437,24 +502,24 @@ class _CustomerDetailsState extends State<CustomerDetails> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildEditableRow('Street', "", _editableCustomer.shippingStreet ?? "", (value) {
-                    _editableCustomer = _editableCustomer.copyWith(shippingStreet: value);
+                  _buildEditableRow('Street', "", _editableCustomer?.shippingStreet ?? "", (value) {
+                    _editableCustomer = _editableCustomer?.copyWith(shippingStreet: value);
                   }),
                   const Divider(),
-                  _buildEditableRow('City', "", _editableCustomer.shippingCity ?? "", (value) {
-                    _editableCustomer = _editableCustomer.copyWith(shippingCity: value);
+                  _buildEditableRow('City', "", _editableCustomer?.shippingCity ?? "", (value) {
+                    _editableCustomer = _editableCustomer?.copyWith(shippingCity: value);
                   }),
                   const Divider(),
-                  _buildEditableRow('State', "", _editableCustomer.shippingState ?? "", (value) {
-                    _editableCustomer = _editableCustomer.copyWith(shippingState: value);
+                  _buildEditableRow('State', "", _editableCustomer?.shippingState ?? "", (value) {
+                    _editableCustomer = _editableCustomer?.copyWith(shippingState: value);
                   }),
                   const Divider(),
-                  _buildEditableRow('Zip Code', "", _editableCustomer.shippingZip ?? "", (value) {
-                    _editableCustomer = _editableCustomer.copyWith(shippingZip: value);
+                  _buildEditableRow('Zip Code', "", _editableCustomer?.shippingZip ?? "", (value) {
+                    _editableCustomer = _editableCustomer?.copyWith(shippingZip: value);
                   }),
                   const Divider(),
-                  _buildEditableRow('Country', 'shippingCountry', _editableCustomer.shippingCountry ?? "", (value) {
-                    _editableCustomer = _editableCustomer.copyWith(shippingCountry: value);
+                  _buildEditableRow('Country', 'shippingCountry', _editableCustomer?.shippingCountry ?? "", (value) {
+                    _editableCustomer = _editableCustomer?.copyWith(shippingCountry: value);
                   }),
                 ],
               ),

@@ -5,6 +5,7 @@ import 'package:crm/store/customer_store.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
 import 'package:crm/utils/size_utils.dart';
+import 'package:crm/widgets/shimmer_effect.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
@@ -125,7 +126,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
                     customerStore.isShow
                         ? Observer(builder: (context) {
                             final counts = customerStore.customersCounts;
-                            if (counts == null) return const SizedBox();
+                            if (counts == null) return buildShimmerEffect();
                             return GridView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
@@ -230,7 +231,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
                       itemBuilder: (context, index) {
                         if (index == customerStore.customers.length) {
                           return hasMore
-                              ? const Center(child: CircularProgressIndicator())
+                              ? buildShimmerEffect()
                               : const Center(
                                   child: Text("No more data",
                                       style: TextStyle(
@@ -247,7 +248,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    CustomerDetails(customer: customer),
+                                    CustomerDetails(customer: customer.userId),
                               ),
                             );
                           },

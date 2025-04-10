@@ -10,6 +10,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../../services/api_services.dart';
 import '../../../../../utils/colors.dart';
 // import 'package:nb_utils/nb_utils.dart';
 
@@ -305,26 +306,30 @@ class _CustomDrawerState extends State<CustomDrawer> {
             onPressed: () async {
               bool logoutConfirmed = await _showLogoutDialog(context);
               if (logoutConfirmed) {
-                if (mounted) {
-                  bool success = await AuthService().logout(
-                    context: context,
-                    isSessionExpired: true,
-                  );
+                String userId = appStore.staffId; // Ensure you have the correct user ID
 
-                  if (success) {
-                    Fluttertoast.showToast(msg: 'Logged out Successfully!');
-                    if (mounted) {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (_) => const AuthScreen()),
-                        (_) => false,
-                      );
-                    }
+                var (bool success, Map<String, dynamic> response, String? message) =
+                await ApiService.getLogout({"staffid": userId});
+
+                if (success) {
+                  Fluttertoast.showToast(msg: 'Logged out Successfully!');
+                  if (mounted) {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AuthScreen()),
+                          (_) => false,
+                    );
                   }
+                } else {
+                  Fluttertoast.showToast(
+                      msg: message ?? "Logout failed",
+                      gravity: ToastGravity.TOP,
+                      backgroundColor: Colors.red);
                 }
               }
             },
           ),
+
         ],
       ),
     );

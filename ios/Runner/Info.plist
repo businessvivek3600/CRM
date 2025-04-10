@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.app.teamcrm.backgroundTask</string>
+	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -19,19 +23,21 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
+	<string>1.0.1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<string>1</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>We need your location to provide better services.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>We need your location to provide better services.</string>
+	<string>We need your location for continuous tracking.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>We need your location for this app</string>
+	<string>We need your location to provide better services.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
@@ -39,13 +45,11 @@
 		<string>location</string>
 		<string>fetch</string>
 		<string>processing</string>
-		<string>external-accessory</string>
 		<string>nearby-interaction</string>
 		<string>remote-notification</string>
 		<string>push-to-talk</string>
+		<string>external-accessory</string>
 	</array>
-	 <key>FirebaseAppDelegateProxyEnabled</key>
-     <false/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

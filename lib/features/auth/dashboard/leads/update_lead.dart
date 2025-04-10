@@ -395,9 +395,9 @@ class _EditLeadState extends State<EditLead> {
                   CustomDropdown(
                     hint: 'Select Country',
                     items: leadStore.country.map((item) => item.shortName).toList(),
-                    selectedValue: leadStore.country
-                        .firstWhere((item) => item.countryId == country, orElse: () => leadStore.country.first)
-                        .shortName,
+                    selectedValue: (country != null && country != 0)
+                        ? leadStore.country.firstWhere((item) => item.countryId == country).shortName
+                        : null,
                     onChanged: (value) {
                       setState(() {
                         country = leadStore.country
@@ -545,7 +545,7 @@ class _EditLeadState extends State<EditLead> {
                 Lead lead = Lead.fromJson(response['data'][0]);
                 toastLong(response['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
                 TF.success;
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LeadDetails(lead: lead),));
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LeadDetails(lead: widget.lead.id),));
 
               }  else {
              toast(message, gravity: ToastGravity.TOP, bgColor: Colors.red, textColor: Colors.white);
