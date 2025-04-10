@@ -10,24 +10,28 @@ import 'package:crm/features/auth/dashboard/leads/update_lead.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
 import 'package:crm/utils/size_utils.dart';
+import 'package:crm/widgets/shimmer_effect.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nb_utils/nb_utils.dart';
 import '../../../../services/api_services.dart';
 import '../../../../store/lead_store.dart';
 import '../../../../widgets/date_formation.dart';
 
 class LeadDetails extends StatefulWidget {
-  LeadDetails({super.key, required this.lead});
-  Lead lead;
+  const LeadDetails({super.key, required this.lead});
+final String lead;
   @override
   State<LeadDetails> createState() => _LeadDetailsState();
 }
 
 class _LeadDetailsState extends State<LeadDetails> {
+  Lead? lead;
+  bool isLoading = false;
   @override
   void initState() {
     // TODO: implement initState
-    _selectedCountryName = getCountryNames(widget.lead.country);
+    _fetchLeadDetails();
     super.initState();
   }
 
@@ -46,6 +50,28 @@ class _LeadDetailsState extends State<LeadDetails> {
     return _selectedCountryName;
   }
 
+  Future<void> _fetchLeadDetails() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    var (bool status, Map<String, dynamic> data, String? message) =
+    await ApiService.getLeadDetails({'leadId': widget.lead});
+
+    if (status && data.containsKey('leads') && (data['leads'] as List).isNotEmpty) {
+      setState(() {
+      lead = Lead.fromJson(data['leads'][0]);
+      _selectedCountryName = getCountryNames(lead!.country);
+
+      });
+    } else {
+      toast(message ?? 'Failed to load customer details', gravity: ToastGravity.TOP, bgColor: Colors.red);
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -54,7 +80,7 @@ class _LeadDetailsState extends State<LeadDetails> {
         appBar: AppBar(
           backgroundColor: secondaryPrimaryColor,
           title: Text(
-            '#${widget.lead.id} - ${widget.lead.name.toUpperCase()}',
+            lead != null ? '#${lead!.id} - ${lead!.name.toUpperCase()}' : 'Loading...',
             style: const TextStyle(color: Colors.white),
           ),
           leading: IconButton(
@@ -81,13 +107,13 @@ class _LeadDetailsState extends State<LeadDetails> {
                 final updatedLead = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EditLead(lead: widget.lead),
+                    builder: (context) => EditLead(lead: lead!),
                   ),
                 );
 
                 if (updatedLead != null) {
                   setState(() {
-                    widget.lead = updatedLead; // Update UI with new lead data
+                    lead = updatedLead;
                   });
                 }
               },
@@ -103,7 +129,11 @@ class _LeadDetailsState extends State<LeadDetails> {
             ),
           ],
         ),
-        body: Column(
+        body:  isLoading
+            ?  buildShimmerEffect() // Show a loading indicator
+            : lead == null
+            ? const Center(child: Text("Failed to load lead details"))
+            :Column(
           children: [
             Material(
               color: const Color(0xfffef7ff),
@@ -124,14 +154,14 @@ class _LeadDetailsState extends State<LeadDetails> {
             Expanded(
               child: TabBarView(
                 children: [
-                  ProfileTab(lead: widget.lead),
+                  ProfileTab(lead: lead!),
                   AddNotesTab(
-                    noteData: widget.lead.notesData ?? [],
-                    lead: widget.lead,
+                    noteData: lead!.notesData ?? [],
+                    lead: lead!,
                   ),
                   RemindersTab(
-                    remainder: widget.lead.reminders ?? [],
-                    lead: widget.lead,
+                    remainder: lead!.reminders ?? [],
+                    lead: lead!,
                   )
                 ],
               ),
@@ -236,7 +266,7 @@ class _LeadDetailsState extends State<LeadDetails> {
                           // Add delete functionality here
                           // Close dialog
                           final Map<String, dynamic> deleteLead = {
-                            'id': widget.lead.id,
+                            'id': widget.lead,
                           };
                           // Call API to delete the note
                           final (
