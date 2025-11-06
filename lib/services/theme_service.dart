@@ -22,7 +22,6 @@ class AppTheme {
             const BottomNavigationBarThemeData(backgroundColor: Colors.white),
         iconTheme: const IconThemeData(color: appTextSecondaryColor),
         textTheme: GoogleFonts.workSansTextTheme(),
-        dialogBackgroundColor: Colors.white,
         unselectedWidgetColor: Colors.black,
         dividerColor: borderColor,
         bottomSheetTheme: BottomSheetThemeData(
@@ -38,7 +37,7 @@ class AppTheme {
             backgroundColor: primaryColor,
             systemOverlayStyle: const SystemUiOverlayStyle(
                 statusBarIconBrightness: Brightness.light)),
-        dialogTheme: DialogTheme(shape: dialogShape()),
+    dialogTheme: DialogThemeData(shape: dialogShape(20)),
         navigationBarTheme: NavigationBarThemeData(
             labelTextStyle:
                 WidgetStateProperty.all(primaryTextStyle(size: 10))),
@@ -69,7 +68,6 @@ class AppTheme {
             backgroundColor: scaffoldSecondaryDark),
         iconTheme: const IconThemeData(color: Colors.white),
         textTheme: GoogleFonts.workSansTextTheme(),
-        dialogBackgroundColor: scaffoldSecondaryDark,
         unselectedWidgetColor: Colors.white60,
         bottomSheetTheme: BottomSheetThemeData(
           shape: RoundedRectangleBorder(
@@ -81,7 +79,7 @@ class AppTheme {
         floatingActionButtonTheme: FloatingActionButtonThemeData(
             backgroundColor: color ?? primaryColor),
         cardColor: scaffoldSecondaryDark,
-        dialogTheme: DialogTheme(shape: dialogShape()),
+    dialogTheme: DialogThemeData(shape: dialogShape()),
         navigationBarTheme: NavigationBarThemeData(
             labelTextStyle: WidgetStateProperty.all(
                 primaryTextStyle(size: 10, color: Colors.white))),
@@ -129,7 +127,6 @@ class AppTheme {
               size: 10, color: set.bottomNavigationBarSelectedTextColor)),
       iconTheme: IconThemeData(color: set.iconColor, opacity: 1, size: 24.0),
       textTheme: set.textTheme,
-      dialogBackgroundColor: set.dialogBackgroundColor,
       unselectedWidgetColor: set.unselectedWidgetColor,
       dividerColor: set.dividerColor,
       bottomSheetTheme: BottomSheetThemeData(
@@ -140,7 +137,7 @@ class AppTheme {
       cardColor: set.cardColor,
       floatingActionButtonTheme:
           FloatingActionButtonThemeData(backgroundColor: set.primaryColor),
-      dialogTheme: DialogTheme(shape: dialogShape(20)),
+      dialogTheme: DialogThemeData(shape: dialogShape(20)),
 
       navigationBarTheme: NavigationBarThemeData(
           labelTextStyle: WidgetStateProperty.all(
@@ -150,7 +147,7 @@ class AppTheme {
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.disabled)) {
-              return set.unselectedWidgetColor.withOpacity(0.2);
+              return set.unselectedWidgetColor.withValues(alpha: 0.2);
             }
             if (states.contains(WidgetState.selected)) {
               return set.primaryColor;
@@ -159,7 +156,7 @@ class AppTheme {
           }),
           foregroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.disabled)) {
-              return set.unselectedWidgetColor.withOpacity(0.5);
+              return set.unselectedWidgetColor.withValues(alpha: 0.5);
             }
             if (states.contains(WidgetState.selected)) {
               return Colors.white;
@@ -177,7 +174,7 @@ class AppTheme {
         style: ButtonStyle(
           foregroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.disabled)) {
-              return set.unselectedWidgetColor.withOpacity(0.5);
+              return set.unselectedWidgetColor.withValues(alpha: 0.5);
             }
             if (states.contains(WidgetState.selected)) {
               return Colors.white;
@@ -205,7 +202,7 @@ class AppTheme {
           borderRadius: radius(DEFFAULT_RADIUS),
           boxShadow: [
             BoxShadow(
-                color: set.shadowColor.withOpacity(0.5),
+                color: set.shadowColor..withValues(alpha: 0.5),
                 spreadRadius: 5,
                 blurRadius: 15,
                 offset: const Offset(0, 1)),
@@ -220,7 +217,7 @@ class AppTheme {
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
-            return Colors.grey.withOpacity(0.2);
+            return Colors.grey.withValues(alpha: 0.2);
           }
           if (states.contains(WidgetState.selected)) {
             return set.primaryColor;
@@ -228,7 +225,7 @@ class AppTheme {
           return set.scaffoldColor;
         }),
         checkColor: WidgetStateProperty.all(Colors.white),
-        overlayColor: WidgetStateProperty.all(Colors.grey.withOpacity(0.1)),
+        overlayColor: WidgetStateProperty.all(Colors.grey.withValues(alpha: 0.1)),
         splashRadius: 20,
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         shape: RoundedRectangleBorder(borderRadius: radius(5)),
@@ -325,7 +322,7 @@ class ThemeSetColor {
   }
 }
 
-/// dark themeset color extends ThemeSetColor
+/// dark theme set color extends ThemeSetColor
 ThemeSetColor get darkThemeSetColor {
   const primaryColor = Color(0xFF2F3D46);
   const appBarColor = Color(0xFF2F3D46);
@@ -335,7 +332,7 @@ ThemeSetColor get darkThemeSetColor {
   return ThemeSetColor(
     brightness: Brightness.dark,
     primaryColor: primaryColor,
-    secondaryColor: primaryColor.withOpacity(0.1),
+    secondaryColor: primaryColor.withValues(alpha: 0.1),
     appBarColor: appBarColor,
     appBarTextColor: Colors.white,
     appBarIconColor: Colors.white,
@@ -400,7 +397,7 @@ ThemeSetColor get lightThemeSetColor {
   return ThemeSetColor(
       brightness: Brightness.light,
       primaryColor: primaryColor,
-      secondaryColor: primaryColor.withOpacity(0.1),
+      secondaryColor: primaryColor.withValues(alpha: 0.1),
       appBarColor: primaryColor,
       appBarTextColor: Colors.white,
       appBarIconColor: Colors.white,

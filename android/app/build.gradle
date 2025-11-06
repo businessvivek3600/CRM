@@ -33,8 +33,14 @@ if (keystorePropertiesFile.exists()) {
 }
 android {
     namespace = "com.app.teamcrm"
-    compileSdk = 34
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 35
+    ndkVersion =  "27.0.12077973"
+    // ✅ Add this new option for 16 KB alignment
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -50,10 +56,10 @@ android {
         applicationId = "com.app.teamcrm"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 21
+        minSdkVersion = flutter.minSdkVersion
         targetSdk = 34
-        versionCode = 4
-        versionName = "1.0.4"
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
     }
     signingConfigs {
         release {
@@ -72,6 +78,18 @@ android {
             ndk {
                 debugSymbolLevel 'FULL'
             }
+            // ✅ Add this new option for 16 KB alignment
+            packaging {
+                jniLibs {
+                    useLegacyPackaging = false
+                }
+                resources {
+                    excludes += [
+                            '/META-INF/{AL2.0,LGPL2.1}',
+                    ]
+                }
+            }
+
         }
     }
 }
