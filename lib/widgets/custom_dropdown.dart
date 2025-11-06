@@ -95,10 +95,18 @@ class _CustomDropdownState extends State<CustomDropdown> {
                     .toList()
                     : [],
                 value: selectedValue,
+                onMenuStateChange: (isOpen) {
+                  if (!isOpen) {
+                    setState(() {
+                      searchController.clear();
+                      filterItems(''); // Reset filtered items
+                    });
+                  }
+                },
                 onChanged: (String? value) {
                   setState(() {
                     selectedValue = value;
-                    searchController.text = value ?? '';
+                    searchController.text = '';
                     filterItems('');
                   });
                   field.didChange(value);

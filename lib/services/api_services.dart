@@ -42,6 +42,28 @@ class ApiService {
     return (false, <String, dynamic>{}, null);
   }
 
+  /// Fetch single customer from the API using id
+  static Future<(bool, Map<String, dynamic>, String?)> getLeadDetails(  Map<String, dynamic> info) async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+      await ApiHandler.fetchData(ApiConstant.leadDetails,
+          data: info,
+          method: ApiMethod.POST);
+
+      if (status && data.isNotEmpty) {
+        return (true, data, message);
+      } else {
+        message = message?.split('.').first;
+        // Uncomment below line to show toast notification
+        toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
+        return (false, <String, dynamic>{}, message);
+      }
+    } catch (e) {
+      logger.e('getCustomers error : $e', tag: tag);
+    }
+    return (false, <String, dynamic>{}, null);
+  }
+
   static Future<(bool, Map<String, dynamic>, String?)> addLeads(
       FormData info) async {
     try {
@@ -327,4 +349,26 @@ class ApiService {
     return (false, <String, dynamic>{}, '');
   }
 
+
+  ///----------Logout--------------------------------
+  static Future<(bool, Map<String, dynamic>, String?)> getLogout(  Map<String, dynamic> info) async {
+    try {
+      var (bool status, Map<String, dynamic> data, String? message) =
+      await ApiHandler.fetchData(ApiConstant.logout,
+          data: info,
+          method: ApiMethod.POST);
+
+      if (status && data.isNotEmpty) {
+        return (true, data, message);
+      } else {
+        message = message?.split('.').first;
+        // Uncomment below line to show toast notification
+        toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
+        return (false, <String, dynamic>{}, message);
+      }
+    } catch (e) {
+      logger.e('getCustomers error : $e', tag: tag);
+    }
+    return (false, <String, dynamic>{}, null);
+  }
 }

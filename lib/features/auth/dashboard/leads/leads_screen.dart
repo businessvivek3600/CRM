@@ -4,6 +4,7 @@ import 'package:crm/features/auth/dashboard/leads/leads_details.dart';
 import 'package:crm/features/auth/dashboard/home_screen.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
+import 'package:crm/widgets/shimmer_effect.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -156,7 +157,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
                   ? Observer(builder: (_) {
                       List<LeadSummary> leadsSummary = leadStore.leadSummary;
                       if (leadsSummary.isEmpty) {
-                        return const Center(child: CircularProgressIndicator());
+                        return buildShimmerEffect(length: 2);
                       }
                       return SizedBox(
                         height: 100,
@@ -206,13 +207,11 @@ class _LeadsScreenState extends State<LeadsScreen> {
                         leads.isEmpty ? 1 : leads.length + (hasMore ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (leads.isEmpty) {
-                        return const Center(
-                            child:
-                                CircularProgressIndicator()); // Prevent accessing empty list
+                        return buildShimmerEffect(length: 2); // Prevent accessing empty list
                       }
 
                       if (index == leads.length) {
-                        return const Center(child: CircularProgressIndicator());
+                        return buildShimmerEffect(length: 3);
                       }
 
                       // Ensure index is within bounds
@@ -276,7 +275,7 @@ class _LeadsScreenState extends State<LeadsScreen> {
           context,
           MaterialPageRoute(
               builder: (context) => LeadDetails(
-                    lead: lead,
+                    lead: lead.id,
                   )),
         );
       },

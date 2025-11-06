@@ -11,6 +11,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:upgrader/upgrader.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -189,7 +190,26 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         title: AppConst.appName,
-        home: appStore.isLoggedIn ? const HomeScreen() : const AuthScreen(),
+        home: UpgradeAlert(
+          upgrader: Upgrader(
+            // Automatically detect the Play Store version
+            countryCode: 'in', // optional; helps if your app is only in India
+            durationUntilAlertAgain: const Duration(days: 1),
+
+            // Enable logging to debug upgrade behavior
+            debugLogging: kDebugMode,
+
+            // Optional customization
+            messages: UpgraderMessages(
+              code:
+                  'A new version of the app is available. Please update to continue enjoying the latest features and improvements.',
+            ),
+
+          ),
+          child: appStore.isLoggedIn
+              ? const HomeScreen()
+              : const AuthScreen(),
+        ),
         builder: (context, child) {
           return LoadingWidget(
             context: context,

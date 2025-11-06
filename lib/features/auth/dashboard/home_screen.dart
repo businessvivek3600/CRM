@@ -97,30 +97,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 icon: const Icon(Icons.notifications_outlined, color: white),
               ),
-              if (unreadNotifications > 0)
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(2.0),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 18,
-                      minHeight: 18,
-                    ),
-                    child: Text(
-                      unreadNotifications.toString(),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
+              // if (unreadNotifications > 0)
+              //   Positioned(
+              //     right: 0,
+              //     top: 0,
+              //     child: Container(
+              //       padding: const EdgeInsets.all(2.0),
+              //       decoration: BoxDecoration(
+              //         color: Colors.red,
+              //         borderRadius: BorderRadius.circular(10),
+              //       ),
+              //       constraints: const BoxConstraints(
+              //         minWidth: 18,
+              //         minHeight: 18,
+              //       ),
+              //       child: Text(
+              //         unreadNotifications.toString(),
+              //         style: const TextStyle(
+              //           fontSize: 12,
+              //           color: Colors.white,
+              //         ),
+              //         textAlign: TextAlign.center,
+              //       ),
+              //     ),
+              //   ),
             ],
           ),
         ],
