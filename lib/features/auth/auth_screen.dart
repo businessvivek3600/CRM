@@ -1,10 +1,13 @@
-import 'package:crm/features/auth/dashboard/home_screen.dart';
+
+import 'package:crm/features/dashboard/main_dashboard.dart';
 import 'package:crm/utils/colors.dart';
-import 'package:crm/utils/text_field.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import '../../../services/auth_services.dart';
-import '../../../store/app_store.dart';
+import '../../services/auth_services.dart';
+import '../../store/app_store.dart';
+import '../../widgets/common_text_field.dart';
+import '../dashboard/home/home_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -31,23 +34,28 @@ class _AuthScreenState extends State<AuthScreen> {
 
   void _login() async {
     if (!_loginFormKey.currentState!.validate()) return;
-    _loginFormKey.currentState!.save();
+
     setState(() => _isLoading = true);
 
-    AuthService()
-        .login(context, _emailController.text, _passwordController.text)
-        .then((value) async {
-      setState(() => _isLoading = false);
-      if (appStore.isLoggedIn) {
-        appStore.setIsLoggedIn(true);
-        await appStore.saveCredentials(
-            _emailController.text, _passwordController.text);
-        Navigator.push(
+    bool success = await AuthService()
+        .login(context, _emailController.text, _passwordController.text);
+
+    setState(() => _isLoading = false);
+
+    if (success) {
+      await appStore.saveCredentials(
+          _emailController.text, _passwordController.text);
+
+     if(mounted) {
+        Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(
+            builder: (context) => const MainDashboard(),
+            //const HomeScreen()
+          ),
         );
       }
-    });
+    }
   }
 
   Future<void> _loadSavedCredentials() async {

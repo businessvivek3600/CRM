@@ -1,11 +1,13 @@
 import 'dart:convert';
-import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
+import 'dart:io';
+
+import 'package:crm/features/dashboard/leads/leads_screen.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
-import 'package:crm/utils/extensions.dart';
-import 'package:crm/utils/text_field.dart';
+
+import 'package:crm/widgets/common_text_field.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -23,11 +25,8 @@ class AddLeads extends StatefulWidget {
 }
 
 class _MyWidgetState extends State<AddLeads> {
-  String? _selectedSourceId;
   String? _selectedEmployeeId;
   String? _selectedStatusId;
-
-  final List<String> _dropDownTagId = [];
   TextEditingController nameController = TextEditingController();
   TextEditingController leadValueController = TextEditingController();
   TextEditingController positionController = TextEditingController();
@@ -126,22 +125,18 @@ class _MyWidgetState extends State<AddLeads> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: secondaryPrimaryColor,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         title: const Text(
-          'Add New Lead',
-          style: TextStyle(color: Colors.white),
+          'Add New Lead', style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const LeadsScreen(),
-              ),
-            );
-          },
         ),
+        centerTitle: false,
+        leading: const BackButton(color: Colors.black,),
       ),
       resizeToAvoidBottomInset: true, // Adjusts UI when keyboard appears
       body: Column(
@@ -149,7 +144,7 @@ class _MyWidgetState extends State<AddLeads> {
           // Scrollable form content
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Form(
                 key: _profileFormKey,
                 child: Column(
@@ -211,59 +206,135 @@ class _MyWidgetState extends State<AddLeads> {
                     ),
 
                     const SizedBox(height: 15),
-                    const Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Icon(
-                          Icons.local_offer,
-                          size: 18,
-                        ),
-                        Text(
-                          " Tags",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Wrap(
-                      spacing: 8,
-                      children: selectedTags
-                          .map((tag) => Chip(
-                        label: Text(tag),
-                        deleteIcon: const Icon(Icons.close),
-                        onDeleted: () {
-                          setState(() {
-                            selectedTags.remove(tag);
-                          });
-                        },
-                      ))
-                          .toList(),
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CustomDropdown(
-                            hint: 'Select or Add a Tag',
-                            items: leadStore.tags.map((e) => e.name).toList(),
-                            onChanged: (value) {
-                              if (value != null && value.isNotEmpty) {
-                                setState(() {
-                                  if (!selectedTags.contains(value)) {
-                                    selectedTags.add(value); // Add tag name directly
-                                  }
-                                });
-                              }
-                            },
+                    /// TAGS SECTION
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: CRMColors.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: CRMColors.border),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          /// Header
+                          const Row(
+                            children: [
+                              Icon(
+                                Icons.local_offer_outlined,
+                                size: 18,
+                                color: CRMColors.textSecondary,
+                              ),
+                              SizedBox(width: 6),
+                              Text(
+                                "Tags",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: CRMColors.textPrimary,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.add, color: Colors.blue),
-                          onPressed: () {
-                            _showAddTagDialog(); // Show input dialog for a new tag
-                          },
-                        ),
-                      ],
+
+                          const SizedBox(height: 12),
+
+                          /// Selected Tags
+                          if (selectedTags.isNotEmpty)
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: selectedTags.map((tag) {
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: CRMColors.primary.withOpacity(0.08),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: CRMColors.primary.withOpacity(0.2),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+
+                                      /// Tag Name
+                                      Text(
+                                        tag,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: CRMColors.textPrimary,
+                                        ),
+                                      ),
+
+                                      const SizedBox(width: 6),
+
+                                      /// Remove Button
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            selectedTags.remove(tag);
+                                          });
+                                        },
+                                        child: const Icon(
+                                          Icons.close,
+                                          size: 16,
+                                          color: CRMColors.textMuted,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+
+                          if (selectedTags.isNotEmpty) const SizedBox(height: 10),
+
+                          /// Dropdown + Add button
+                          Row(
+                            children: [
+
+                              /// Dropdown
+                              Expanded(
+                                child: CustomDropdown(
+                                  hint: 'Select or Add Tag',
+                                  items: leadStore.tags.map((e) => e.name).toList(),
+                                  onChanged: (value) {
+                                    if (value != null && value.isNotEmpty) {
+                                      setState(() {
+                                        if (!selectedTags.contains(value)) {
+                                          selectedTags.add(value);
+                                        }
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
+
+                              const SizedBox(width: 8),
+
+                              /// Add Button
+                              Container(
+                                height: 50,
+                                width: 50,
+                                decoration: BoxDecoration(
+                                  color: CRMColors.primary,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: IconButton(
+                                  icon: const Icon(Icons.add, color: Colors.white),
+                                  onPressed: _showAddTagDialog,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
 
 
@@ -473,7 +544,7 @@ class _MyWidgetState extends State<AddLeads> {
                             'status': _selectedStatusId,
                             'assigned': _selectedEmployeeId,
                             'tags': jsonEncode(
-                                selectedTags), // Assuming IDs for tags
+                                selectedTags),
                             'description': descriptionController.text.trim(),
                           });
 
@@ -504,7 +575,7 @@ class _MyWidgetState extends State<AddLeads> {
                                   backgroundColor: Colors.red,
                                 ),
                               );
-                              print('Error: ${status} - ${response}');
+                              print('Error: $status - $response');
                               // Handle API error
                             }
                           } catch (e) {
@@ -537,45 +608,161 @@ class _MyWidgetState extends State<AddLeads> {
       ),
     );
   }
+
   void _showAddTagDialog() {
     TextEditingController tagController = TextEditingController();
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Add New Tag"),
-          content: TextField(
-            controller: tagController,
-            decoration: InputDecoration(hintText: "Enter tag name"),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context), // Close dialog
-              child: Text("Cancel"),
+    if (Platform.isIOS) {
+      /// IOS STYLE DIALOG
+      showCupertinoDialog(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text(
+              "Add New Tag",
+              style: TextStyle(fontWeight: FontWeight.w600),
             ),
-            TextButton(
-              onPressed: () {
-                String newTag = tagController.text.trim();
-                if (newTag.isNotEmpty) {
-                  setState(() {
-                    if (!selectedTags.contains(newTag)) {
-                      selectedTags.add(newTag);
-                    }
 
-                    if (!leadStore.tags.any((tag) => tag.name == newTag)) {
-                      leadStore.tags.add(Tag(name: newTag, id: '')); // Add to tag list
-                    }
-                  });
-                }
-                Navigator.pop(context); // Close dialog after adding
-              },
-              child: Text("Add"),
+            content: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: CupertinoTextField(
+                controller: tagController,
+                placeholder: "Enter tag name",
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: CRMColors.border),
+                ),
+              ),
             ),
-          ],
-        );
-      },
-    );
+
+            actions: [
+              CupertinoDialogAction(
+                child: const Text("Cancel"),
+                onPressed: () => Navigator.pop(context),
+              ),
+
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                child: const Text("Add"),
+                onPressed: () {
+                  String newTag = tagController.text.trim();
+
+                  if (newTag.isNotEmpty) {
+                    setState(() {
+                      if (!selectedTags.contains(newTag)) {
+                        selectedTags.add(newTag);
+                      }
+
+                      if (!leadStore.tags.any((t) => t.name == newTag)) {
+                        leadStore.tags.add(Tag(name: newTag, id: ''));
+                      }
+                    });
+                  }
+
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      /// ANDROID MATERIAL DIALOG
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+
+            title: const Text(
+              "Add New Tag",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+
+            content: TextField(
+              controller: tagController,
+              autofocus: true,
+              decoration: InputDecoration(
+                hintText: "Enter tag name",
+                filled: true,
+                fillColor: CRMColors.surface,
+
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
+
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: CRMColors.border),
+                ),
+
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: CRMColors.border),
+                ),
+
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: CRMColors.primary,
+                    width: 1.4,
+                  ),
+                ),
+              ),
+            ),
+
+            actionsPadding: const EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 6,
+            ),
+
+            actions: [
+              TextButton(
+                child: const Text("Cancel"),
+                onPressed: () => Navigator.pop(context),
+              ),
+
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CRMColors.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text("Add"),
+                onPressed: () {
+                  String newTag = tagController.text.trim();
+
+                  if (newTag.isNotEmpty) {
+                    setState(() {
+                      if (!selectedTags.contains(newTag)) {
+                        selectedTags.add(newTag);
+                      }
+
+                      if (!leadStore.tags.any((t) => t.name == newTag)) {
+                        leadStore.tags.add(Tag(name: newTag, id: ''));
+                      }
+                    });
+                  }
+
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
 }

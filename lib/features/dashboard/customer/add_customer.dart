@@ -1,4 +1,4 @@
-import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
+import 'package:crm/features/dashboard/customer/customer_screen.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/size_utils.dart';
 import 'package:dio/dio.dart';
@@ -10,7 +10,7 @@ import '../../../../constants/app_constants.dart';
 import '../../../../services/api_services.dart';
 import '../../../../store/lead_store.dart';
 import '../../../../utils/default_logger.dart';
-import '../../../../utils/text_field.dart';
+import '../../../widgets/common_text_field.dart';
 import '../../../../widgets/custom_dropdown.dart';
 
 class AddCustomer extends StatefulWidget {
@@ -54,7 +54,7 @@ class _AddCustomerState extends State<AddCustomer> {
       _shippingStreetController.text = _billingStreetController.text;
       _shippingZipController.text = _billingZipController.text;
       _shippingCityController.text = _billingCityController.text;
-      countryBilling = countryShipping;
+      countryShipping = countryBilling;
       stateShippingController.text = stateBillingController.text;
     } else {
       _shippingStreetController.clear();
@@ -91,24 +91,55 @@ class _AddCustomerState extends State<AddCustomer> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Add Customer'),
+          elevation: 0,
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          title: const Text(
+            'Add Customer', style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+          ),
+          centerTitle: false,
+          leading: const BackButton(color: Colors.black,),
         ),
+        resizeToAvoidBottomInset: true,
         body: Column(
           children: [
             Container(
-              color: Colors.white,
+              margin: const EdgeInsets.fromLTRB(16, 6, 16, 12),
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: CRMColors.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: CRMColors.border),
+              ),
               child: TabBar(
-                unselectedLabelColor: AppConst.defaultPrimaryColor,
-                indicatorColor: acceptColor,
-                labelColor: black,
+                indicator: BoxDecoration(
+                  color: CRMColors.primary,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+
+                labelColor: Colors.white,
+                unselectedLabelColor: CRMColors.textSecondary,
+
+                labelStyle: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+
+                unselectedLabelStyle: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+
                 indicatorSize: TabBarIndicatorSize.tab,
-                indicatorWeight: 2.0,
-                labelStyle:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                unselectedLabelStyle: const TextStyle(fontSize: 16),
+                dividerColor: Colors.transparent,
+
                 tabs: const [
                   Tab(text: "Profile"),
-                  Tab(text: "Billing Details"),
+                  Tab(text: "Addresses"),
                 ],
               ),
             ),
@@ -121,7 +152,7 @@ class _AddCustomerState extends State<AddCustomer> {
                     SingleChildScrollView(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
+                            horizontal: 20, vertical: 10),
                         child: Column(
                           children: [
                             height10(),
@@ -174,7 +205,7 @@ class _AddCustomerState extends State<AddCustomer> {
                               items: leadStore.country
                                   .map((e) => e.shortName)
                                   .toList(),
-                              selectedValue: country,
+                              selectedValue: getCountryName(country ?? ""),
                               onChanged: (value) {
                                 setState(() {
                                   country = getCountryId(value ?? "");
@@ -211,11 +242,12 @@ class _AddCustomerState extends State<AddCustomer> {
                     SingleChildScrollView(
                       child: Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10),
+                              horizontal: 20, vertical: 10),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              // const SizedBox(height: 15),
+                              _sectionHeader("Billing Address"),
+                              const SizedBox(height: 10),
                               CommonTextField(
                                 controller: _billingStreetController,
                                 label: 'Billing Street',
@@ -239,13 +271,16 @@ class _AddCustomerState extends State<AddCustomer> {
                                 items: leadStore.country
                                     .map((e) => e.shortName)
                                     .toList(),
-                                selectedValue: countryBilling,
-                                onChanged: (value) {
-                                  setState(() {
-                                    countryBilling = getCountryId(value ?? "");
-                                    warningLog("Selected Country: $country");
-                                  });
-                                },
+                                selectedValue: getCountryName(countryBilling ?? ""),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      countryBilling = getCountryId(value ?? "");
+
+                                      if (_sameAsBilling) {
+                                        countryShipping = countryBilling;
+                                      }
+                                    });
+                                  },
                               ),
                               const SizedBox(height: 15),
                               CommonTextField(
@@ -253,25 +288,37 @@ class _AddCustomerState extends State<AddCustomer> {
                                 label: 'Billing State',
                                 hint: 'Enter State',
                               ),
-                              const SizedBox(height: 15),
-                              // Checkbox for "Same as Billing Address"
-                              // Row(
-                              //   children: [
-                              //     Checkbox(
-                              //       value: _sameAsBilling,
-                              //       activeColor: acceptColor,
-                              //       onChanged: (value) {
-                              //         setState(() {
-                              //           _sameAsBilling = value!;
-                              //
-                              //           _copyBillingToShipping();
-                              //         });
-                              //       },
-                              //     ),
-                              //     const Text("Same as billing address"),
-                              //   ],
-                              // ),
                               // const SizedBox(height: 15),
+                              // Container(
+                              //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              //   decoration: BoxDecoration(
+                              //     color: CRMColors.surface,
+                              //     borderRadius: BorderRadius.circular(10),
+                              //     border: Border.all(color: CRMColors.border),
+                              //   ),
+                              //   child: Row(
+                              //     children: [
+                              //       Checkbox(
+                              //         value: _sameAsBilling,
+                              //         activeColor: CRMColors.primary,
+                              //         onChanged: (value) {
+                              //           setState(() {
+                              //             _sameAsBilling = value!;
+                              //             _copyBillingToShipping();
+                              //           });
+                              //         },
+                              //       ),
+                              //       const Text(
+                              //         "Shipping address same as billing",
+                              //         style: TextStyle(fontSize: 14),
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
+
+                              const SizedBox(height: 20),
+                              _sectionHeader("Shipping Address"),
+                              const SizedBox(height: 10),
                               CommonTextField(
                                 controller: _shippingStreetController,
                                 label: 'Shipping Street',
@@ -295,19 +342,12 @@ class _AddCustomerState extends State<AddCustomer> {
                                 items: leadStore.country
                                     .map((item) => item.shortName)
                                     .toList(),
-                                selectedValue: leadStore.country
-                                    .firstWhere(
-                                        (item) => item.countryId == country,
-                                        orElse: () => leadStore.country.first)
-                                    .shortName,
-                                onChanged: (value) {
-                                  setState(() {
-                                    countryBilling = leadStore.country
-                                        .firstWhere(
-                                            (item) => item.shortName == value)
-                                        .countryId;
-                                  });
-                                },
+                                selectedValue: getCountryName(countryShipping ?? ""),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      countryShipping = getCountryId(value ?? "");
+                                    });
+                                  },
                               ),
                               const SizedBox(height: 15),
                               CommonTextField(
@@ -327,7 +367,7 @@ class _AddCustomerState extends State<AddCustomer> {
         ),
         // Bottom Navigation Button
         bottomNavigationBar: Padding(
-          padding: const EdgeInsets.only(left: 15, right: 1, bottom: 20),
+          padding: const EdgeInsets.all(16),
           child: ElevatedButton(
             onPressed: () {
               if (_profileFormKey.currentState!.validate()) {
@@ -358,13 +398,52 @@ class _AddCustomerState extends State<AddCustomer> {
                 _saveCustomerData(formData);
               }
             },
-            child: const Text('Submit'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: CRMColors.primary,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text(
+              'Add Customer',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: Colors.white,
+              ),
+            ),
+
           ),
         ),
       ),
     );
   }
-
+  Widget _sectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, bottom: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 18,
+            decoration: BoxDecoration(
+              color: CRMColors.primary,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: boldTextStyle(
+              size: 16,
+              color: CRMColors.textPrimary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
   void _saveCustomerData(FormData formData) async {
     warningLog("Editable customer Data: $formData");
 

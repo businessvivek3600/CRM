@@ -28,13 +28,13 @@ mixin _$CustomerStore on _CustomerStore, Store {
       Atom(name: '_CustomerStore.customers', context: context);
 
   @override
-  List<Customer> get customers {
+  ObservableList<Customer> get customers {
     _$customersAtom.reportRead();
     return super.customers;
   }
 
   @override
-  set customers(List<Customer> value) {
+  set customers(ObservableList<Customer> value) {
     _$customersAtom.reportWrite(value, super.customers, () {
       super.customers = value;
     });
@@ -88,6 +88,62 @@ mixin _$CustomerStore on _CustomerStore, Store {
     });
   }
 
+  late final _$currentPageAtom =
+      Atom(name: '_CustomerStore.currentPage', context: context);
+
+  @override
+  int get currentPage {
+    _$currentPageAtom.reportRead();
+    return super.currentPage;
+  }
+
+  @override
+  set currentPage(int value) {
+    _$currentPageAtom.reportWrite(value, super.currentPage, () {
+      super.currentPage = value;
+    });
+  }
+
+  late final _$hasMoreAtom =
+      Atom(name: '_CustomerStore.hasMore', context: context);
+
+  @override
+  bool get hasMore {
+    _$hasMoreAtom.reportRead();
+    return super.hasMore;
+  }
+
+  @override
+  set hasMore(bool value) {
+    _$hasMoreAtom.reportWrite(value, super.hasMore, () {
+      super.hasMore = value;
+    });
+  }
+
+  late final _$isLoadingMoreAtom =
+      Atom(name: '_CustomerStore.isLoadingMore', context: context);
+
+  @override
+  bool get isLoadingMore {
+    _$isLoadingMoreAtom.reportRead();
+    return super.isLoadingMore;
+  }
+
+  @override
+  set isLoadingMore(bool value) {
+    _$isLoadingMoreAtom.reportWrite(value, super.isLoadingMore, () {
+      super.isLoadingMore = value;
+    });
+  }
+
+  late final _$loadMoreCustomersAsyncAction =
+      AsyncAction('_CustomerStore.loadMoreCustomers', context: context);
+
+  @override
+  Future<void> loadMoreCustomers() {
+    return _$loadMoreCustomersAsyncAction.run(() => super.loadMoreCustomers());
+  }
+
   late final _$fetchCustomerDataAsyncAction =
       AsyncAction('_CustomerStore.fetchCustomerData', context: context);
 
@@ -118,6 +174,9 @@ customers: ${customers},
 customersCounts: ${customersCounts},
 isShow: ${isShow},
 canEdit: ${canEdit},
+currentPage: ${currentPage},
+hasMore: ${hasMore},
+isLoadingMore: ${isLoadingMore},
 totalCustomer: ${totalCustomer},
 activeCustomer: ${activeCustomer}
     ''';

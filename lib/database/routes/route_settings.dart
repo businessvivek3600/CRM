@@ -1,18 +1,20 @@
 import 'package:crm/Models/leads_model.dart';
 import 'package:crm/constants/value_constants.dart';
-import 'package:crm/features/auth/auth/auth_screen.dart';
-import 'package:crm/features/auth/dashboard/customer/add_customer.dart';
-import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
-import 'package:crm/features/auth/dashboard/leads/addleads.dart';
-import 'package:crm/features/auth/dashboard/leads/leads_details.dart';
-import 'package:crm/features/auth/dashboard/leads/leads_screen.dart';
+import 'package:crm/features/auth/auth_screen.dart';
+import 'package:crm/features/dashboard/customer/add_customer.dart';
+import 'package:crm/features/dashboard/customer/customer_screen.dart';
+import 'package:crm/features/dashboard/leads/add_leads.dart';
+import 'package:crm/features/dashboard/leads/leads_details.dart';
+import 'package:crm/features/dashboard/leads/leads_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../features/auth/dashboard/home_screen.dart';
+import '../../features/dashboard/home/home_screen.dart';
+import '../../features/dashboard/home/home_screen.dart';
+import '../../features/dashboard/leads/leads_screen.dart';
 import '../../services/auth_services.dart';
 import '../../store/app_store.dart';
 import '../../utils/default_logger.dart';

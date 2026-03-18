@@ -445,6 +445,37 @@ class Reminder {
       'can_delete': canDelete,
     };
   }
+  Reminder copyWith({
+    String? id,
+    String? description,
+    String? date,
+    String? isnotified,
+    String? staffid,
+    String? firstname,
+    String? lastname,
+    String? profileImage,
+    String? thumbImage,
+    String? smallImage,
+    String? creator,
+    int? canEdit,
+    int? canDelete,
+  }) {
+    return Reminder(
+      id: id ?? this.id,
+      description: description ?? this.description,
+      date: date ?? this.date,
+      isnotified: isnotified ?? this.isnotified,
+      staffid: staffid ?? this.staffid,
+      firstname: firstname ?? this.firstname,
+      lastname: lastname ?? this.lastname,
+      profileImage: profileImage ?? this.profileImage,
+      thumbImage: thumbImage ?? this.thumbImage,
+      smallImage: smallImage ?? this.smallImage,
+      creator: creator ?? this.creator,
+      canEdit: canEdit ?? this.canEdit,
+      canDelete: canDelete ?? this.canDelete,
+    );
+  }
 }
 
 ///----Staff-Member------

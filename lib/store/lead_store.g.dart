@@ -13,13 +13,13 @@ mixin _$LeadStore on _LeadStore, Store {
       Atom(name: '_LeadStore.loadingLeads', context: context);
 
   @override
-  ValueNotifier<bool> get loadingLeads {
+  bool get loadingLeads {
     _$loadingLeadsAtom.reportRead();
     return super.loadingLeads;
   }
 
   @override
-  set loadingLeads(ValueNotifier<bool> value) {
+  set loadingLeads(bool value) {
     _$loadingLeadsAtom.reportWrite(value, super.loadingLeads, () {
       super.loadingLeads = value;
     });
@@ -92,13 +92,13 @@ mixin _$LeadStore on _LeadStore, Store {
       Atom(name: '_LeadStore.reminders', context: context);
 
   @override
-  List<Reminder> get reminders {
+  ObservableList<Reminder> get reminders {
     _$remindersAtom.reportRead();
     return super.reminders;
   }
 
   @override
-  set reminders(List<Reminder> value) {
+  set reminders(ObservableList<Reminder> value) {
     _$remindersAtom.reportWrite(value, super.reminders, () {
       super.reminders = value;
     });
@@ -324,6 +324,50 @@ mixin _$LeadStore on _LeadStore, Store {
         name: '_LeadStore.getAssignedById');
     try {
       return super.getAssignedById(sourceId);
+    } finally {
+      _$_LeadStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void addReminderToStore(Reminder reminder) {
+    final _$actionInfo = _$_LeadStoreActionController.startAction(
+        name: '_LeadStore.addReminderToStore');
+    try {
+      return super.addReminderToStore(reminder);
+    } finally {
+      _$_LeadStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void updateReminderInStore(String id, Reminder updatedReminder) {
+    final _$actionInfo = _$_LeadStoreActionController.startAction(
+        name: '_LeadStore.updateReminderInStore');
+    try {
+      return super.updateReminderInStore(id, updatedReminder);
+    } finally {
+      _$_LeadStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void deleteReminderFromStore(String id) {
+    final _$actionInfo = _$_LeadStoreActionController.startAction(
+        name: '_LeadStore.deleteReminderFromStore');
+    try {
+      return super.deleteReminderFromStore(id);
+    } finally {
+      _$_LeadStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setReminders(List<Reminder> initialReminders) {
+    final _$actionInfo = _$_LeadStoreActionController.startAction(
+        name: '_LeadStore.setReminders');
+    try {
+      return super.setReminders(initialReminders);
     } finally {
       _$_LeadStoreActionController.endAction(_$actionInfo);
     }

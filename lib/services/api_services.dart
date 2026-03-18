@@ -69,11 +69,7 @@ class ApiService {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
          await ApiHandler.fetchData(ApiConstant.addLead, data: info);
-      log('data : $data');
-      log("status : $status");
-      log("message : $message");
       if (status) {
-        log("message --$message");
         return (status, data, message);
       } else {
         return (false, data, message);
@@ -110,9 +106,9 @@ class ApiService {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
       await await ApiHandler.fetchData(ApiConstant.convertToCustomer, data: info);
-      log('data : $data');
+
       if (status) {
-        log("message --$message");
+
         return (status, data, message);
       } else {
         return (false, data, message);
@@ -134,7 +130,6 @@ class ApiService {
 
         toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
         TF.success;
-        log('data ________________________-: $data');
         return (status, data, message);
       } else {
 
@@ -151,7 +146,7 @@ class ApiService {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
           await await ApiHandler.fetchData(ApiConstant.editNote, data: info);
-      log('data : $data');
+
       toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
       if (data['status']) {
         log("message --$message");
@@ -170,10 +165,10 @@ class ApiService {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
           await await ApiHandler.fetchData(ApiConstant.deleteNote, data: info);
-      log('data : $data');
+
       toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
       if (status) {
-        log("message --$message");
+
         return (status, data, message);
       } else {
         return (false, data, message);
@@ -190,9 +185,9 @@ class ApiService {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
           await await ApiHandler.fetchData(ApiConstant.addReminder, data: info);
-      log('data : $data');
+
       if (status) {
-        log("message --$message");
+
         return (status, data, message);
       } else {
         return (false, data, message);
@@ -209,9 +204,10 @@ class ApiService {
       var (bool status, Map<String, dynamic> data, String? message) =
           await await ApiHandler.fetchData(ApiConstant.editReminder,
               data: info);
-      log('data : $data');
+
       if (status) {
-        log("message --$message");
+
+        return (true, data, message);
       } else {
         return (false, data, message);
       }
@@ -227,10 +223,10 @@ class ApiService {
       var (bool status, Map<String, dynamic> data, String? message) =
           await await ApiHandler.fetchData(ApiConstant.deleteReminder,
               data: info);
-      log('data : $data');
+
       if (status) {
         return (true, data, message);
-        log("message --$message");
+
       } else {
         return (false, data, message);
       }
@@ -313,12 +309,10 @@ class ApiService {
       var (bool status, Map<String, dynamic> data, String? message) =
        await ApiHandler.fetchData(ApiConstant.editCustomer,
           data: info);
-      log('data--- : $data');
-      log('status--- : $status');
-      log('message--- : $message');
+
       if (status) {
         toastLong(data['message'], gravity: ToastGravity.TOP,bgColor: completedColor,textColor: Colors.white,);
-        log("message --$message");
+
         return (status, data, message);
       } else {
         toast(message ?? 'Something went wrong', gravity: ToastGravity.TOP, bgColor: Colors.red);
@@ -336,9 +330,9 @@ class ApiService {
     try {
       var (bool status, Map<String, dynamic> data, String? message) =
       await await ApiHandler.fetchData(ApiConstant.userLocation, data: info);
-      log('data : $data');
+
       if (status) {
-        log("message --$message");
+
         return (status, data, message);
       } else {
         return (false, data, message);

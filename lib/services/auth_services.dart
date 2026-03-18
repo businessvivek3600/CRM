@@ -36,8 +36,7 @@ class AuthService {
   }
 
   /// login with email and password
-  Future<void> login(
-      BuildContext context, String email, String password) async {
+  Future<bool> login(BuildContext context, String email, String password) async {
     try {
       var requestData = {
         "username": email,
@@ -45,29 +44,32 @@ class AuthService {
         'device_id': await getDeviceId(),
         'fcm_token': await getFbToken() ?? "",
       };
-      infoLog('Request Data: $requestData');
+      /// PRINT POST DATA
+      log("LOGIN REQUEST URL: ${ApiConstant.login}");
+      log("LOGIN REQUEST DATA: $requestData");
       var (bool status, Map<String, dynamic> data, String? message) =
-          await ApiHandler.fetchData(
-        ApiConstant.login,
-        data: requestData,
-      );
-      infoLog('API Response: $data');
+      await ApiHandler.fetchData(ApiConstant.login, data: requestData);
+      /// PRINT RESPONSE
+      log("LOGIN STATUS: $status");
+      log("LOGIN RESPONSE DATA: $data");
+      log("LOGIN MESSAGE: $message");
       if (status) {
         String? token = data['login_token'];
-        log('data : token=> $token');
+        log("LOGIN TOKEN: $token");
         if (token != null) {
           Map<String, dynamic>? user = data['userData'];
+          log("USER DATA: $user");
           if (user != null && user.isNotEmpty) {
-            ///set user data
             for (var key in user.keys) {
               await setUserDataByFieldName(key, user[key]);
             }
+
             await appStore.setUser(userFromJson(user));
             await appStore.setToken(token);
-
             dioClient.updateHeader(token);
-
             await appStore.setLoggedIn(true);
+
+            return true; // ✅ SUCCESS
           }
         }
       } else {
@@ -78,8 +80,11 @@ class AuthService {
           style: TF.flat,
         );
       }
+
+      return false;
     } catch (e) {
       logger.e('login error : $e', tag: tag);
+      return false;
     }
   }
 

@@ -10,64 +10,95 @@ final customerStore = CustomerStore();
 class CustomerStore = _CustomerStore with _$CustomerStore;
 
 abstract class _CustomerStore with Store {
+  @observable
+  ObservableList<Customer> customers = ObservableList<Customer>();
 
   @observable
-  List<Customer> customers = [];
-
-  @observable
-CustomerCounts? customersCounts ;
+  CustomerCounts? customersCounts;
 
   @observable
   bool isShow = true;
 
   @observable
   int canEdit = 0;
-  // Getter for total customers
+
+  @observable
+  int currentPage = 0;
+
+  @observable
+  bool hasMore = true;
+
+  @observable
+  bool isLoadingMore = false;
+
+
   @computed
   int get totalCustomer => customers.length;
 
-  // Getter for active customers
+
   @computed
   int get activeCustomer {
     return customers.where((customer) => customer.active == '1').length;
   }
 
-/// Get all customjer list
+  @action
+  Future<void> loadMoreCustomers() async {
+    if (isLoadingMore || !hasMore) return;
+
+    isLoadingMore = true;
+    currentPage++;
+
+    int previousLength = customers.length;
+
+    await fetchCustomerData(page: currentPage);
+
+    if (customers.length == previousLength) {
+      hasMore = false;
+    }
+
+    isLoadingMore = false;
+  }
+  /// Get all customer list
   @action
   Future<void> fetchCustomerData({int page = 0}) async {
     try {
-
-      // Start fetching data
       var (status, data, message) = await ApiService.getCustomers(page: page);
 
       if (status) {
         canEdit = data['can_create'] ?? 0;
-        infoLog("canEdit  - ${data['can_create']}");
-      List<Customer> _customers = [];
-        tryCatch(() =>  _customers = (data['customers'] as List).map((e) {
-          return Customer.fromJson(e);
-        }).toList());
+
+        List<Customer> _customers = [];
+
+        try {
+          _customers = (data['customers'] as List).map((e) {
+            return Customer.fromJson(e);
+          }).toList();
+        } catch (e) {
+          errorLog("❌ Customer parsing error: $e");
+        }
+
         customers.addAll(_customers);
-        errorLog("response data -- ${data['counts']}");
-        customersCounts = CustomerCounts.fromJson(data['counts']);
+
+        try {
+          customersCounts = CustomerCounts.fromJson(data['counts']);
+        } catch (e) {
+          errorLog("❌ Counts parsing error: $e");
+        }
       } else {
-        throw Exception(
-            message ?? 'Unknown error occurred while fetching data');
+        errorLog("Message: $message");
       }
     } catch (error) {
-      // Log or handle the error as needed
-      print('Error fetching customer data: ${error.toString()}');
-      throw Exception('Failed to fetch customer data: ${error.toString()}');
+      errorLog(error.toString());
     }
   }
 
   /// Customer details using customer id
 
-  Future<void> getCustomerDetails(String userId)async{
+  Future<void> getCustomerDetails(String userId) async {
     try {
-
       // Start fetching data
-      var (status, data, message) = await ApiService.getCustomerDetails({'clientId':userId});
+      var (status, data, message) =
+          await ApiService.getCustomerDetails({'clientId': userId});
 
       if (status) {
         (data['customers'] as List).map((e) {

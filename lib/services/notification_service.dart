@@ -103,14 +103,14 @@ class NotificationService {
   }
 
   /// Request notification permission from the user
-  // Future<void> requestPermission() async {
-  //   var status = await Permission.notification.request();  // Request notification access
-  //   if (status.isGranted) {
-  //     print('🔔 Notification access granted');
-  //   } else {
-  //     await openAppSettings();  // Open app settings if permission is denied
-  //   }
-  // }
+  Future<void> requestPermission() async {
+    var status = await Permission.notification.request();  // Request notification access
+    if (status.isGranted) {
+      print('🔔 Notification access granted');
+    } else {
+      await openAppSettings();  // Open app settings if permission is denied
+    }
+  }
 
   /// Handle and display the incoming notification based on its type (text or image)
   static Future<void> handleMessages(RemoteMessage message) async {

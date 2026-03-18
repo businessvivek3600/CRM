@@ -13,7 +13,7 @@ class AppConst {
   static const pusherAppChatTopic = 'offer-chat-notification.';
 
   ///api
-  static const String baseUrl = "https://crm.touchwoodtechnologies.com/api/";
+  static const String baseUrl = "https://swiftcrm.touchwoodtechnologies.com/api/";
 
 
   static Color defaultPrimaryColor = const Color(0xFFa1adc7);

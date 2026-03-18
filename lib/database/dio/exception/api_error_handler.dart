@@ -117,28 +117,20 @@ class ApiHandler {
       Response res = await (method == ApiMethod.POST
           ? dioClient.post(endPoint, data: data, options: options, token: token)
           : dioClient.get(endPoint, options: options, token: token));
-      ApiResponse? apiResponse;
-      try {
-        apiResponse = ApiResponse.withSuccess(res);
-        if (res.data?['status'] == false) {
-          pl('[$endPoint] res.data: ${res.data}');
-        }
-      } catch (e) {
-        apiResponse = ApiResponse.withError(findErrorMessageInData(res.data));
-      }
-      if (apiResponse.response != null) {
-        return (
-        (apiResponse.response?.data?['status'] as bool?) ?? false,
-        (apiResponse.response?.data as Map<String, dynamic>?) ?? {},
-        (apiResponse.response?.data?['message'] ??
-            findErrorMessageInData(apiResponse.response?.data?['error']) ??
-            '') as String,
-        );
-      } else {
-        return (false, <String, dynamic>{}, apiResponse.error.toString());
-      }
+
+      debugPrint("API RESPONSE => ${res.data}");
+
+      final responseData = Map<String, dynamic>.from(res.data ?? {});
+
+      return (
+      responseData['status'] == true,
+      responseData,
+      responseData['message']?.toString()
+      );
+
     } catch (e) {
-      return (false, <String, dynamic>{}, findErrorMessageInData(e));
+      debugPrint("API ERROR => $e");
+      return (false, <String, dynamic>{}, e.toString());
     }
   }
 

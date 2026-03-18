@@ -1,10 +1,12 @@
-import 'package:crm/features/auth/dashboard/customer/customer_Screen.dart';
+import 'package:crm/features/dashboard/customer/customer_screen.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:crm/utils/default_logger.dart';
 import 'package:crm/utils/extensions.dart';
-import 'package:crm/utils/text_field.dart';
-import 'package:dio/src/form_data.dart';
+import 'package:crm/widgets/common_text_field.dart';
+import 'package:dio/dio.dart';
+
 import 'package:flutter/material.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 import '../../../../Models/leads_model.dart';
 import '../../../../services/api_services.dart';
@@ -12,7 +14,7 @@ import '../../../../store/lead_store.dart';
 import '../../../../widgets/custom_dropdown.dart';
 
 class ConvertToCustomer extends StatefulWidget {
-  ConvertToCustomer({super.key, required this.lead});
+  const ConvertToCustomer({super.key, required this.lead});
   final Lead lead;
 
   @override
@@ -81,14 +83,17 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: secondaryPrimaryColor,
-        title: const Text(
+        appBar: AppBar(
+          leading:BackButton(color: Colors.black,),
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          iconTheme: const IconThemeData(color: Colors.white),
+
+          title:  Text(
           'Convert to Customer',
-          style: TextStyle(color: Colors.white),
-        ),
-        automaticallyImplyLeading: true,
-      ),
+            style: boldTextStyle( size: 18),
+            overflow: TextOverflow.ellipsis,
+      ),),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -98,9 +103,11 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  sectionHeader("Customer Information"),
+                  const SizedBox(height: 8,),
                   CommonTextField(
                     controller: nameController,
-                    label: 'First Name',
+                    label: 'First Name *',
                     hint: 'Enter First Name',
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -112,7 +119,7 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: lastNameController,
-                    label: 'Last Name',
+                    label: 'Last Name *',
                     hint: 'Enter Last Name',
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -124,13 +131,13 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: positionController,
-                    label: 'Position',
+                    label: 'Position *',
                     hint: 'Enter Position',
                   ),
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: emailController,
-                    label: 'Email',
+                    label: 'Email *',
                     hint: 'Enter Email',
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -149,7 +156,7 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: companyController,
-                    label: 'Company',
+                    label: 'Company *',
                     hint: 'Enter Company Name',
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -161,7 +168,7 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: phoneController,
-                    label: 'Phone',
+                    label: 'Phone *',
                     hint: 'Enter Phone Number',
                   ),
                   const SizedBox(height: 15),
@@ -171,6 +178,8 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                     hint: 'Enter your website address',
                   ),
                   const SizedBox(height: 15),
+                  sectionHeader("Address Information"),
+                  const SizedBox(height: 8),
                   CommonTextField(
                     controller: addressController,
                     label: 'Address',
@@ -178,7 +187,7 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                   ),
                   const SizedBox(height: 15),
                   CustomDropdown(
-                    hint: 'Select Country',
+                    hint: 'Select Country *',
                     items: leadStore.country.map((item) => item.shortName).toList(),
                     selectedValue: (country != null && country != 0)
                         ? leadStore.country.firstWhere((item) => item.countryId == country).shortName
@@ -201,7 +210,7 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: stateController,
-                    label: 'State',
+                    label: 'State *',
                     hint: 'Enter State',
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -213,7 +222,7 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: cityController,
-                    label: 'City',
+                    label: 'City *',
                     hint: 'Enter City',
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -225,7 +234,7 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                   const SizedBox(height: 15),
                   CommonTextField(
                     controller: zipController,
-                    label: 'Zip Code',
+                    label: 'Zip Code *',
                     hint: 'Enter Zip Code',
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -235,6 +244,8 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                     },
                   ),
                   const SizedBox(height: 15),
+                  sectionHeader("Account Settings"),
+                  const SizedBox(height: 8),
                   if (!sendSetPasswordEmail)
                     TextFormField(
                       controller: passwordController,
@@ -246,7 +257,7 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                         return null;
                       },
                       decoration: InputDecoration(
-                        labelText: "Password",
+                        labelText: "Password *",
                         border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -262,6 +273,7 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                         ),
                       ),
                     ),
+                  if (!sendSetPasswordEmail)
                   const SizedBox(height: 16.0),
                   Row(
                     children: [
@@ -336,11 +348,11 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                             final updatedData = <String, dynamic>{};
                             // Check for each field and use the initial value if it's null or empty
                             updatedData['firstname'] = isFieldUpdated(
-                                    nameController.text, firstName ?? "")
+                                    nameController.text, firstName)
                                 ? nameController.text.trim()
                                 : widget.lead.name.split(' ')[0];
                             updatedData['lastname'] = isFieldUpdated(
-                                    lastNameController.text, lastName ?? "")
+                                    lastNameController.text, lastName)
                                 ? lastNameController.text.trim()
                                 : widget.lead.name
                                     .split(' ')
@@ -401,12 +413,8 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                             updatedData['noWelcomeEmail'] =
                                 doNotSendWelcomeEmail ? 1 : 0;
                             updatedData['leadid'] = widget.lead.id;
-                            errorLog(
-                                "company name---${companyController.text.trim()}");
-                            errorLog(
-                                "CITY name---${cityController.text.trim()}");
                             final formData = FormData.fromMap(updatedData);
-                            errorLog("COVERT DATA ___ $updatedData");
+
                             if (updatedData.isNotEmpty) {
                               try {
                                 final (
@@ -416,12 +424,8 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
                                 ) = await ApiService.convertCustomer(formData);
 
                                 if (status) {
-                                  infoLog('Success: $message');
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const CustomerScreen(),
-                                      ));
+                                    infoLog('Success: $message');
+                                    Navigator.pop(context, true);
                                   // Show success message or navigate
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -461,6 +465,41 @@ class _ConvertedToCustomerState extends State<ConvertToCustomer> {
             ),
           ),
         ),
+      ),
+    );
+  }
+  Widget sectionHeader(String title) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: boldTextStyle(size: 16),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          height: 2,
+          width: 40,
+          decoration: BoxDecoration(
+            color: CRMColors.primary,
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+  Widget requiredLabel(String text) {
+    return RichText(
+      text: TextSpan(
+        text: text,
+        style: primaryTextStyle(size: 14),
+        children: const [
+          TextSpan(
+            text: " *",
+            style: TextStyle(color: Colors.red),
+          )
+        ],
       ),
     );
   }

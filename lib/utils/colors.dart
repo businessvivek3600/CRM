@@ -44,3 +44,25 @@ Color fromHex(String hexString) {
   buffer.write(hexString.replaceFirst('#', ''));
   return Color(int.parse(buffer.toString(), radix: 16));
 }
+
+
+class CRMColors {
+  // Brand Colors
+  static const Color primary = Color(0xFF373B44);
+  static const Color accent = Color(0xFF4285F4);
+
+  // Neutral Palette
+  static const Color background = Colors.white;
+  static const Color surface = Color(0xFFF8FAFC);
+  static const Color border = Color(0xFFE2E8F0);
+
+  // Text Colors
+  static const Color textPrimary = Color(0xFF1E293B);
+  static const Color textSecondary = Color(0xFF64748B);
+  static const Color textMuted = Color(0xFF94A3B8);
+
+  // Status Colors (Fallbacks)
+  static const Color success = Color(0xFF10B981);
+  static const Color warning = Color(0xFFF59E0B);
+  static const Color error = Color(0xFFEF4444);
+}

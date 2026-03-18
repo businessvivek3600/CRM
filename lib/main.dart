@@ -1,17 +1,16 @@
 import 'package:crm/constants/app_constants.dart';
-import 'package:crm/features/auth/auth/auth_screen.dart';
+import 'package:crm/features/auth/auth_screen.dart';
+import 'package:crm/features/dashboard/main_dashboard.dart';
 import 'package:crm/services/notification_service.dart';
 import 'package:crm/store/app_store.dart';
 import 'package:crm/utils/colors.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:upgrader/upgrader.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -19,35 +18,46 @@ import 'constants/value_constants.dart';
 import 'database/dio/dio/dio_client.dart';
 import 'database/dio/dio/loging_interceotor.dart';
 import 'database/routes/route_settings.dart';
-import 'features/auth/dashboard/home_screen.dart';
+import 'features/dashboard/home/home_screen.dart';
 import 'utils/default_logger.dart';
 import 'widgets/loader_widget.dart';
-
 
 @pragma('vm:entry-point')
 Future<void> _onBackgroundMessage(RemoteMessage message) async {
   logger.d('onBackgroundMessage: ${message.notification?.title}');
   NotificationService.showNotification(message);
 }
+
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     WidgetsFlutterBinding.ensureInitialized();
-    final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    final userId = inputData?['id'];
-    final latitude = position.latitude;
-    final longitude = position.longitude;
-    logger.d("Location fetched: $latitude, $longitude for user: $userId");
-    await hitApiWithLocation(userId, latitude, longitude);
+
+    if (task == "sendUserLocation") {
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      final userId = inputData?['id'];
+
+      final latitude = position.latitude;
+      final longitude = position.longitude;
+
+      logger.d("Location fetched: $latitude , $longitude");
+
+      await hitApiWithLocation(userId, latitude, longitude);
+    }
+
     return Future.value(true);
   });
 }
+
 Future<void> openAppSettingsForLocationPermission() async {
   bool opened = await Geolocator.openAppSettings();
   if (!opened) {
     print('Failed to open app settings.');
   }
 }
+
 final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,11 +84,10 @@ Future<void> initialize() async {
   await appStore.setToken(getStringAsync(TOKEN), isInitializing: true);
   // Print the device token for debugging
 }
+
 Future<String?> getFbToken() async {
   try {
-    String? token = defaultTargetPlatform == TargetPlatform.iOS
-        ? await firebaseMessaging.getAPNSToken()
-        : await firebaseMessaging.getToken();
+    String? token = await FirebaseMessaging.instance.getToken();
     debugPrint('FirebaseMessaging token -----: $token');
     return token;
   } catch (e) {
@@ -118,6 +127,7 @@ Future<void> initNbUtils() async {
   textPrimarySizeGlobal = 14;
   textSecondarySizeGlobal = 12;
 }
+
 Future<void> requestLocationPermission() async {
   LocationPermission permission = await Geolocator.checkPermission();
 
@@ -130,7 +140,8 @@ Future<void> requestLocationPermission() async {
   }
 
   if (permission == LocationPermission.deniedForever) {
-    warningLog('Location permissions are permanently denied. Please enable it in Settings.');
+    warningLog(
+        'Location permissions are permanently denied. Please enable it in Settings.');
     await openAppSettingsForLocationPermission();
     return;
   }
@@ -145,8 +156,6 @@ Future<void> requestLocationPermission() async {
     warningLog('Location permission granted: Always');
   }
 }
-
-
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -190,26 +199,8 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
         title: AppConst.appName,
-        home: UpgradeAlert(
-          upgrader: Upgrader(
-            // Automatically detect the Play Store version
-            countryCode: 'in', // optional; helps if your app is only in India
-            durationUntilAlertAgain: const Duration(days: 1),
-
-            // Enable logging to debug upgrade behavior
-            debugLogging: kDebugMode,
-
-            // Optional customization
-            messages: UpgraderMessages(
-              code:
-                  'A new version of the app is available. Please update to continue enjoying the latest features and improvements.',
-            ),
-
-          ),
-          child: appStore.isLoggedIn
-              ? const HomeScreen()
-              : const AuthScreen(),
-        ),
+        home: appStore.isLoggedIn ? const MainDashboard() :
+        const AuthScreen(),
         builder: (context, child) {
           return LoadingWidget(
             context: context,
